@@ -212,6 +212,21 @@ def rk4_step(R: np.ndarray, Omega: np.ndarray, J: np.ndarray, h: float,
 
     return R_next, Omega_next
 
+
+def project_to_so3(R: np.ndarray) -> np.ndarray:
+    """
+    Project a nearby 3x3 matrix onto SO(3) using the SVD / polar-factor projection.
+    """
+    U, _, Vt = np.linalg.svd(R)
+    R_proj = U @ Vt
+
+    # Enforce det = +1
+    if np.linalg.det(R_proj) < 0:
+        U[:, -1] *= -1.0
+        R_proj = U @ Vt
+
+    return R_proj
+
 # Main
 
 def run_simulation():
@@ -230,15 +245,18 @@ def run_simulation():
     Omega0 = np.array([4.14, 4.14, 4.14])
     t = np.linspace(0.0, tf, N + 1)
 
-
-    # LGVI 
+    # LGVI
     Pi = J @ Omega0
     a_0 = h * (Pi + 0.5 * h * moment(R, m, g, rho_c, e3))
     f_0 = solve(J, a_0)
 
-    # RK4 
+    # RK4
     R_rk = np.eye(3)
     Omega_rk = Omega0.copy()
+
+    # RK4 projected onto SO(3)
+    R_rk_proj = np.eye(3)
+    Omega_rk_proj = Omega0.copy()
 
     # Plot Saving Data LGVI
     Omega_hist = np.zeros((N, 3))
@@ -254,12 +272,21 @@ def run_simulation():
     mu_hist_rk = np.zeros(N)
     orth_hist_rk = np.zeros(N)
 
+    # Plot Saving Data RK4 projected
+    Omega_hist_rk_proj = np.zeros((N, 3))
+    E_hist_rk_proj = np.zeros(N)
+    mu_hist_rk_proj = np.zeros(N)
+    orth_hist_rk_proj = np.zeros(N)
+
     # Momentum map values
     mu0 = float(e3 @ R @ Pi)
     mu0_rk = float(e3 @ R_rk @ (J @ Omega_rk))
+    mu0_rk_proj = float(e3 @ R_rk_proj @ (J @ Omega_rk_proj))
 
     for k in range(N):
+        # -----------------
         # LGVI step
+        # -----------------
         R, Pi, F, Omega, M_k, M_k1, f_0, n_iter, residual = lgvi_step(
             R, Pi, f_0, J, h, m, g, rho_c, e3
         )
@@ -271,7 +298,9 @@ def run_simulation():
         res_hist[k] = residual
         iter_hist[k] = n_iter
 
-        # RK4 step
+        # -----------------
+        # Plain RK4 step
+        # -----------------
         R_rk, Omega_rk = rk4_step(R_rk, Omega_rk, J, h, m, g, rho_c, e3)
 
         Omega_hist_rk[k, :] = Omega_rk
@@ -279,43 +308,63 @@ def run_simulation():
         mu_hist_rk[k] = float(e3 @ R_rk @ (J @ Omega_rk))
         orth_hist_rk[k] = norm(np.eye(3) - R_rk.T @ R_rk, ord="fro")
 
+        # -----------------
+        # RK4 + projection onto SO(3)
+        # -----------------
+        R_rk_proj, Omega_rk_proj = rk4_step(R_rk_proj, Omega_rk_proj, J, h, m, g, rho_c, e3)
+        R_rk_proj = project_to_so3(R_rk_proj)
+
+        Omega_hist_rk_proj[k, :] = Omega_rk_proj
+        E_hist_rk_proj[k] = energy(R_rk_proj, Omega_rk_proj, J, m, g, rho_c, e3)
+        mu_hist_rk_proj[k] = float(e3 @ R_rk_proj @ (J @ Omega_rk_proj))
+        orth_hist_rk_proj[k] = norm(np.eye(3) - R_rk_proj.T @ R_rk_proj, ord="fro")
+
     DeltaE = E_hist - E_hist[0]
     DeltaMu = mu_hist - mu0
 
     DeltaE_rk = E_hist_rk - E_hist_rk[0]
     DeltaMu_rk = mu_hist_rk - mu0_rk
 
+    DeltaE_rk_proj = E_hist_rk_proj - E_hist_rk_proj[0]
+    DeltaMu_rk_proj = mu_hist_rk_proj - mu0_rk_proj
+
     return (
         t[1:],
         Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
-        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
+        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk,
+        Omega_hist_rk_proj, E_hist_rk_proj, DeltaE_rk_proj, mu_hist_rk_proj, DeltaMu_rk_proj, orth_hist_rk_proj
     )
 
 
 def make_plots(t,
                Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
-               Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk):
+               Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk,
+               Omega_hist_rk_proj, E_hist_rk_proj, DeltaE_rk_proj, mu_hist_rk_proj, DeltaMu_rk_proj, orth_hist_rk_proj):
 
-    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+    fig, axs = plt.subplots(2, 2, figsize=(13, 8))
 
     # Angular velocity comparison
-    line1, = axs[0, 0].plot(t, Omega_hist[:, 0], label=r"$\Omega_1$ LGVI")
+    line1, = axs[0, 0].plot(t, Omega_hist[:, 0], "-", label=r"$\Omega_1$ LGVI")
     axs[0, 0].plot(t, Omega_hist_rk[:, 0], "--", color=line1.get_color(), label=r"$\Omega_1$ RK4")
+    axs[0, 0].plot(t, Omega_hist_rk_proj[:, 0], ":", color=line1.get_color(), label=r"$\Omega_1$ RK4-proj")
 
-    line2, = axs[0, 0].plot(t, Omega_hist[:, 1], label=r"$\Omega_2$ LGVI")
+    line2, = axs[0, 0].plot(t, Omega_hist[:, 1], "-", label=r"$\Omega_2$ LGVI")
     axs[0, 0].plot(t, Omega_hist_rk[:, 1], "--", color=line2.get_color(), label=r"$\Omega_2$ RK4")
+    axs[0, 0].plot(t, Omega_hist_rk_proj[:, 1], ":", color=line2.get_color(), label=r"$\Omega_2$ RK4-proj")
 
-    line3, = axs[0, 0].plot(t, Omega_hist[:, 2], label=r"$\Omega_3$ LGVI")
+    line3, = axs[0, 0].plot(t, Omega_hist[:, 2], "-", label=r"$\Omega_3$ LGVI")
     axs[0, 0].plot(t, Omega_hist_rk[:, 2], "--", color=line3.get_color(), label=r"$\Omega_3$ RK4")
+    axs[0, 0].plot(t, Omega_hist_rk_proj[:, 2], ":", color=line3.get_color(), label=r"$\Omega_3$ RK4-proj")
 
-    axs[0, 0].set_title("Angular velocity: LGVI vs RK4")
+    axs[0, 0].set_title("Angular velocity: LGVI vs RK4 vs RK4-proj")
     axs[0, 0].set_xlabel("t")
     axs[0, 0].set_ylabel(r"$\Omega$")
-    axs[0, 0].legend(fontsize=8, ncol=2)
+    axs[0, 0].legend(fontsize=7, ncol=3)
 
     # Total energy comparison
     axs[0, 1].plot(t, E_hist, label="LGVI")
     axs[0, 1].plot(t, E_hist_rk, "--", label="RK4")
+    axs[0, 1].plot(t, E_hist_rk_proj, ":", label="RK4-proj")
     axs[0, 1].set_title("Total energy")
     axs[0, 1].set_xlabel("t")
     axs[0, 1].set_ylabel("E")
@@ -324,6 +373,7 @@ def make_plots(t,
     # Orthogonality error comparison
     axs[1, 0].plot(t, orth_hist, label="LGVI")
     axs[1, 0].plot(t, orth_hist_rk, "--", label="RK4")
+    axs[1, 0].plot(t, orth_hist_rk_proj, ":", label="RK4-proj")
     axs[1, 0].set_title(r"Orthogonality error $\|I - R^T R\|_F$")
     axs[1, 0].set_xlabel("t")
     axs[1, 0].set_ylabel("error")
@@ -332,6 +382,7 @@ def make_plots(t,
     # Momentum error comparison
     axs[1, 1].plot(t, DeltaMu, label="LGVI")
     axs[1, 1].plot(t, DeltaMu_rk, "--", label="RK4")
+    axs[1, 1].plot(t, DeltaMu_rk_proj, ":", label="RK4-proj")
     axs[1, 1].set_title(r"Momentum error")
     axs[1, 1].set_xlabel("t")
     axs[1, 1].set_ylabel(r"$\Delta \mu$")
@@ -340,10 +391,11 @@ def make_plots(t,
     fig.tight_layout()
     plt.show()
 
-    fig2, axs2 = plt.subplots(1, 3, figsize=(14, 4))
+    fig2, axs2 = plt.subplots(1, 3, figsize=(15, 4))
 
     axs2[0].plot(t, DeltaE, label="LGVI")
     axs2[0].plot(t, DeltaE_rk, "--", label="RK4")
+    axs2[0].plot(t, DeltaE_rk_proj, ":", label="RK4-proj")
     axs2[0].set_title(r"Energy deviation $\Delta E_k$")
     axs2[0].set_xlabel("t")
     axs2[0].set_ylabel(r"$\Delta E$")
@@ -367,13 +419,15 @@ if __name__ == "__main__":
     (
         t,
         Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
-        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
+        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk,
+        Omega_hist_rk_proj, E_hist_rk_proj, DeltaE_rk_proj, mu_hist_rk_proj, DeltaMu_rk_proj, orth_hist_rk_proj
     ) = run_simulation()
 
     make_plots(
         t,
         Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
-        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
+        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk,
+        Omega_hist_rk_proj, E_hist_rk_proj, DeltaE_rk_proj, mu_hist_rk_proj, DeltaMu_rk_proj, orth_hist_rk_proj
     )
 
     print("----- LGVI -----")
@@ -389,3 +443,9 @@ if __name__ == "__main__":
     print("Max orthogonality error:", np.max(orth_hist_rk))
     print("Max |DeltaMu|:", np.max(np.abs(DeltaMu_rk)))
     print("Max |DeltaE|:", np.max(np.abs(DeltaE_rk)))
+
+    print("\n----- RK4 projected onto SO(3) -----")
+    print("Final orthogonality error:", orth_hist_rk_proj[-1])
+    print("Max orthogonality error:", np.max(orth_hist_rk_proj))
+    print("Max |DeltaMu|:", np.max(np.abs(DeltaMu_rk_proj)))
+    print("Max |DeltaE|:", np.max(np.abs(DeltaE_rk_proj)))
