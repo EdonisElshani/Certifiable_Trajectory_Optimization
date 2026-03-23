@@ -3,10 +3,6 @@ import matplotlib.pyplot as plt
 from numpy.linalg import norm, solve
 
 
-# =========================
-# Basic Lie algebra helpers
-# =========================
-
 def hat(v: np.ndarray) -> np.ndarray:
     """Map R^3 -> so(3)."""
     return np.array([
@@ -21,15 +17,10 @@ def vee(X: np.ndarray) -> np.ndarray:
     return np.array([X[2, 1], X[0, 2], X[1, 0]])
 
 
-# =========================
-# Rodrigues formula
-# =========================
-
 def rodrigues(f: np.ndarray) -> np.ndarray:
     """
     Rodrigues formula:
-        F = I + sin(theta)/theta * f^
-              + (1-cos(theta))/theta^2 * (f^)^2
+        F = I + sin(theta)/theta * f^ + (1-cos(theta))/theta^2 * (f^)^2
     with theta = ||f||.
     """
     theta = norm(f)
@@ -46,11 +37,6 @@ def rodrigues(f: np.ndarray) -> np.ndarray:
         + ((1.0 - np.cos(theta)) / theta**2) * (f_hat @ f_hat)
     )
 
-
-# =========================
-# Problem-specific functions
-# =========================
-
 def moment(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> np.ndarray:
     """
     M_k = m g rho_c x (R^T e3)
@@ -60,8 +46,6 @@ def moment(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray)
 
 def potential(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> float:
     """
-    Keep sign consistent with your thesis.
-    Here:
         U(R) = -m g e3^T R rho_c
     """
     return float(-m * g * (e3 @ (R @ rho_c)))
@@ -70,7 +54,7 @@ def potential(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarr
 def energy(R: np.ndarray, Omega: np.ndarray, J: np.ndarray, m: float, g: float,
            rho_c: np.ndarray, e3: np.ndarray) -> float:
     """
-    Continuous total energy diagnostic:
+    Continuous total energy:
         E = 1/2 Omega^T J Omega + U(R)
     """
     T = 0.5 * Omega @ J @ Omega
@@ -102,14 +86,9 @@ def A_of_f(f: np.ndarray, a: np.ndarray, J: np.ndarray) -> np.ndarray:
 
 def jacobian_A(f: np.ndarray, J: np.ndarray) -> np.ndarray:
     """
-    Jacobian from Lee's formula:
-    ∇A(f)
-      = ((cos||f|| ||f|| - sin||f||)/||f||^3) Jf f^T
-        + (sin||f||/||f||) J
-        + ((sin||f|| ||f|| - 2(1-cos||f||))/||f||^4) (f x Jf) f^T
-        + ((1-cos||f||)/||f||^2) (-hat(Jf) + hat(f) J)
+    Jacobian from Lee's formula ∇A(f)
 
-    For very small ||f|| we use the linearization ∇A(0) ≈ J.
+    For very small ||f||: Linearization ∇A(0) approx J.
     """
     theta = norm(f)
 
@@ -132,14 +111,10 @@ def jacobian_A(f: np.ndarray, J: np.ndarray) -> np.ndarray:
     return term1 + term2 + term3 + term4
 
 
-# =========================
-# Newton solve for f_k
-# =========================
-
 def solve_f_newton(a: np.ndarray, J: np.ndarray, f_init: np.ndarray = None,
                    tol: float = 1e-12, max_iter: int = 50) -> tuple[np.ndarray, int, float]:
     """
-    Solve A(f) = 0 using Newton iteration:
+    Newton iteration solving A(f) = 0:
         f_{i+1} = f_i - [∇A(f_i)]^{-1} A(f_i)
 
     Initial guess:
@@ -170,16 +145,12 @@ def solve_f_newton(a: np.ndarray, J: np.ndarray, f_init: np.ndarray = None,
     )
 
 
-# =========================
-# One LGVI step
-# =========================
-
 def lgvi_step(R_k: np.ndarray, Pi_k: np.ndarray, f_0: np.ndarray,
               J: np.ndarray, h: float, m: float, g: float,
               rho_c: np.ndarray, e3: np.ndarray,
               tol: float = 1e-12, max_iter: int = 50) -> tuple:
     """
-    One step using Lee's Newton solve in R^3:
+    One step:
         a_k = h (Pi_k + h/2 M_k)
         solve A(f_k) = 0
         F_k = Rodrigues(f_k)
@@ -209,20 +180,12 @@ def lgvi_step(R_k: np.ndarray, Pi_k: np.ndarray, f_0: np.ndarray,
     return R_k1, Pi_k1, F_k, Omega_k, M_k, M_k1, f_k, n_iter, residual
 
 
-# =========================
-# Continuous 3D pendulum RHS for RK4
-# =========================
-
 def rk4_rhs(R: np.ndarray, Omega: np.ndarray, J: np.ndarray,
             m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
-    Continuous 3D pendulum equations written as
-
+    Continuous 3D pendulum equations:
         R_dot = R * hat(Omega)
         J * Omega_dot = M(R) - Omega x (J Omega)
-
-    where M(R) is taken from the same moment(...) function used in the LGVI code,
-    so the sign convention stays consistent with the rest of this script.
     """
     R_dot = R @ hat(Omega)
     Omega_dot = solve(J, moment(R, m, g, rho_c, e3) - np.cross(Omega, J @ Omega))
@@ -232,13 +195,11 @@ def rk4_rhs(R: np.ndarray, Omega: np.ndarray, J: np.ndarray,
 def rk4_step(R: np.ndarray, Omega: np.ndarray, J: np.ndarray, h: float,
              m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
-    Classical explicit RK4 step for the state y = (R, Omega).
-
+    Explicit RK4 step for the state y = (R, Omega).
     k1 = f(y_n)
     k2 = f(y_n + h/2 k1)
     k3 = f(y_n + h/2 k2)
     k4 = f(y_n + h k3)
-
     y_{n+1} = y_n + h/6 * (k1 + 2k2 + 2k3 + k4)
     """
     k1_R, k1_Om = rk4_rhs(R, Omega, J, m, g, rho_c, e3)
@@ -251,12 +212,10 @@ def rk4_step(R: np.ndarray, Omega: np.ndarray, J: np.ndarray, h: float,
 
     return R_next, Omega_next
 
-# =========================
-# Main simulation
-# =========================
+# Main
 
 def run_simulation():
-    # Parameters from Lee's 3D pendulum example
+    # Parameter Initialization
     m = 1.0
     g = 9.81
     rho_c = np.array([0.0, 0.0, 0.3])
@@ -267,23 +226,21 @@ def run_simulation():
     tf = 1000.0
     N = int(tf / h)
 
-    # Initial conditions
     R = np.eye(3)
     Omega0 = np.array([4.14, 4.14, 4.14])
+    t = np.linspace(0.0, tf, N + 1)
 
-    # LGVI initialization
+
+    # LGVI 
     Pi = J @ Omega0
     a_0 = h * (Pi + 0.5 * h * moment(R, m, g, rho_c, e3))
     f_0 = solve(J, a_0)
 
-    # RK4 initialization
+    # RK4 
     R_rk = np.eye(3)
     Omega_rk = Omega0.copy()
 
-    # Storage
-    t = np.linspace(0.0, tf, N + 1)
-
-    # LGVI histories
+    # Plot Saving Data LGVI
     Omega_hist = np.zeros((N, 3))
     E_hist = np.zeros(N)
     mu_hist = np.zeros(N)
@@ -291,21 +248,18 @@ def run_simulation():
     res_hist = np.zeros(N)
     iter_hist = np.zeros(N)
 
-    # RK4 histories
+    # Plot Saving Data RK4
     Omega_hist_rk = np.zeros((N, 3))
     E_hist_rk = np.zeros(N)
     mu_hist_rk = np.zeros(N)
     orth_hist_rk = np.zeros(N)
 
-    # Initial momentum values
-    # LGVI: keep your original discrete momentum diagnostic
+    # Momentum map values
     mu0 = float(e3 @ R @ Pi)
-
-    # RK4: use the continuous momentum expression
     mu0_rk = float(e3 @ R_rk @ (J @ Omega_rk))
 
     for k in range(N):
-        # ---- LGVI step ----
+        # LGVI step
         R, Pi, F, Omega, M_k, M_k1, f_0, n_iter, residual = lgvi_step(
             R, Pi, f_0, J, h, m, g, rho_c, e3
         )
@@ -317,7 +271,7 @@ def run_simulation():
         res_hist[k] = residual
         iter_hist[k] = n_iter
 
-        # ---- RK4 step ----
+        # RK4 step
         R_rk, Omega_rk = rk4_step(R_rk, Omega_rk, J, h, m, g, rho_c, e3)
 
         Omega_hist_rk[k, :] = Omega_rk
@@ -337,10 +291,6 @@ def run_simulation():
         Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
     )
 
-
-# =========================
-# Plotting
-# =========================
 
 def make_plots(t,
                Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
