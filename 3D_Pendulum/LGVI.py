@@ -58,16 +58,6 @@ def moment(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray)
     return -m * g * np.cross(rho_c, R.T @ e3)
 
 
-def omega_from_F(F: np.ndarray, h: float) -> np.ndarray:
-    """
-    First-order approximation:
-        hat(Omega_k) ≈ (F_k - I)/h
-    but for plotting we use the skew part for robustness.
-    """
-    Omega_hat = 0.5 * (F - F.T) / h
-    return vee(Omega_hat)
-
-
 def potential(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> float:
     """
     Keep sign consistent with your thesis.
@@ -184,7 +174,7 @@ def solve_f_newton(a: np.ndarray, J: np.ndarray, f_init: np.ndarray = None,
 # One LGVI step
 # =========================
 
-def lgvi_step(R_k: np.ndarray, Pi_k: np.ndarray, f_guess: np.ndarray,
+def lgvi_step(R_k: np.ndarray, Pi_k: np.ndarray, f_0: np.ndarray,
               J: np.ndarray, h: float, m: float, g: float,
               rho_c: np.ndarray, e3: np.ndarray,
               tol: float = 1e-12, max_iter: int = 50) -> tuple:
@@ -202,7 +192,7 @@ def lgvi_step(R_k: np.ndarray, Pi_k: np.ndarray, f_guess: np.ndarray,
     f_k, n_iter, residual = solve_f_newton(
         a=a_k,
         J=J,
-        f_init=f_guess,
+        f_init=f_0,
         tol=tol,
         max_iter=max_iter
     )
@@ -241,7 +231,8 @@ def run_simulation():
 
     # Practical initialization
     Pi = J @ Omega0
-    f_guess = h * Omega0
+    a_0 = h * (Pi + 0.5 * h * moment(R, m, g, rho_c, e3))
+    f_0 =  solve(J, a_0)
 
     # Storage
     t = np.linspace(0.0, tf, N + 1)
@@ -255,8 +246,8 @@ def run_simulation():
     mu0 = float(e3 @ R @ Pi)
 
     for k in range(N):
-        R, Pi, F, Omega, M_k, M_k1, f_guess, n_iter, residual = lgvi_step(
-            R, Pi, f_guess, J, h, m, g, rho_c, e3
+        R, Pi, F, Omega, M_k, M_k1, f_0, n_iter, residual = lgvi_step(
+            R, Pi, f_0, J, h, m, g, rho_c, e3
         )
 
         Omega_hist[k, :] = Omega
