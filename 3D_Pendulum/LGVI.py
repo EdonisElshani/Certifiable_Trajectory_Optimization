@@ -368,6 +368,7 @@ def make_plots(t,
     axs[0, 1].set_title("Total energy")
     axs[0, 1].set_xlabel("t")
     axs[0, 1].set_ylabel("E")
+    axs[0, 1].set_ylim(1.6, 2.2)
     axs[0, 1].legend()
 
     # Orthogonality error comparison
