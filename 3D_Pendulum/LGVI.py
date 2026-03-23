@@ -55,16 +55,16 @@ def moment(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray)
     """
     M_k = m g rho_c x (R^T e3)
     """
-    return -m * g * np.cross(rho_c, R.T @ e3)
+    return m * g * np.cross(rho_c, R.T @ e3)
 
 
 def potential(R: np.ndarray, m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> float:
     """
     Keep sign consistent with your thesis.
     Here:
-        U(R) = m g e3^T R rho_c
+        U(R) = -m g e3^T R rho_c
     """
-    return float(m * g * (e3 @ (R @ rho_c)))
+    return float(-m * g * (e3 @ (R @ rho_c)))
 
 
 def energy(R: np.ndarray, Omega: np.ndarray, J: np.ndarray, m: float, g: float,
@@ -204,10 +204,52 @@ def lgvi_step(R_k: np.ndarray, Pi_k: np.ndarray, f_0: np.ndarray,
     Pi_k1 = F_k.T @ Pi_k + 0.5 * h * (F_k.T @ M_k + M_k1)
 
     # For diagnostics
-    Omega_k = f_k / h
+    Omega_k = solve(J, Pi_k1)
 
     return R_k1, Pi_k1, F_k, Omega_k, M_k, M_k1, f_k, n_iter, residual
 
+
+# =========================
+# Continuous 3D pendulum RHS for RK4
+# =========================
+
+def rk4_rhs(R: np.ndarray, Omega: np.ndarray, J: np.ndarray,
+            m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Continuous 3D pendulum equations written as
+
+        R_dot = R * hat(Omega)
+        J * Omega_dot = M(R) - Omega x (J Omega)
+
+    where M(R) is taken from the same moment(...) function used in the LGVI code,
+    so the sign convention stays consistent with the rest of this script.
+    """
+    R_dot = R @ hat(Omega)
+    Omega_dot = solve(J, moment(R, m, g, rho_c, e3) - np.cross(Omega, J @ Omega))
+    return R_dot, Omega_dot
+
+
+def rk4_step(R: np.ndarray, Omega: np.ndarray, J: np.ndarray, h: float,
+             m: float, g: float, rho_c: np.ndarray, e3: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Classical explicit RK4 step for the state y = (R, Omega).
+
+    k1 = f(y_n)
+    k2 = f(y_n + h/2 k1)
+    k3 = f(y_n + h/2 k2)
+    k4 = f(y_n + h k3)
+
+    y_{n+1} = y_n + h/6 * (k1 + 2k2 + 2k3 + k4)
+    """
+    k1_R, k1_Om = rk4_rhs(R, Omega, J, m, g, rho_c, e3)
+    k2_R, k2_Om = rk4_rhs(R + 0.5 * h * k1_R, Omega + 0.5 * h * k1_Om, J, m, g, rho_c, e3)
+    k3_R, k3_Om = rk4_rhs(R + 0.5 * h * k2_R, Omega + 0.5 * h * k2_Om, J, m, g, rho_c, e3)
+    k4_R, k4_Om = rk4_rhs(R + h * k3_R, Omega + h * k3_Om, J, m, g, rho_c, e3)
+
+    R_next = R + (h / 6.0) * (k1_R + 2.0 * k2_R + 2.0 * k3_R + k4_R)
+    Omega_next = Omega + (h / 6.0) * (k1_Om + 2.0 * k2_Om + 2.0 * k3_Om + k4_Om)
+
+    return R_next, Omega_next
 
 # =========================
 # Main simulation
@@ -221,21 +263,27 @@ def run_simulation():
     e3 = np.array([0.0, 0.0, 1.0])
     J = np.diag([0.13, 0.28, 0.17])
 
-    h = 0.01
-    tf = 100.0
+    h = 0.05
+    tf = 1000.0
     N = int(tf / h)
 
     # Initial conditions
     R = np.eye(3)
     Omega0 = np.array([4.14, 4.14, 4.14])
 
-    # Practical initialization
+    # LGVI initialization
     Pi = J @ Omega0
     a_0 = h * (Pi + 0.5 * h * moment(R, m, g, rho_c, e3))
-    f_0 =  solve(J, a_0)
+    f_0 = solve(J, a_0)
+
+    # RK4 initialization
+    R_rk = np.eye(3)
+    Omega_rk = Omega0.copy()
 
     # Storage
     t = np.linspace(0.0, tf, N + 1)
+
+    # LGVI histories
     Omega_hist = np.zeros((N, 3))
     E_hist = np.zeros(N)
     mu_hist = np.zeros(N)
@@ -243,9 +291,21 @@ def run_simulation():
     res_hist = np.zeros(N)
     iter_hist = np.zeros(N)
 
+    # RK4 histories
+    Omega_hist_rk = np.zeros((N, 3))
+    E_hist_rk = np.zeros(N)
+    mu_hist_rk = np.zeros(N)
+    orth_hist_rk = np.zeros(N)
+
+    # Initial momentum values
+    # LGVI: keep your original discrete momentum diagnostic
     mu0 = float(e3 @ R @ Pi)
 
+    # RK4: use the continuous momentum expression
+    mu0_rk = float(e3 @ R_rk @ (J @ Omega_rk))
+
     for k in range(N):
+        # ---- LGVI step ----
         R, Pi, F, Omega, M_k, M_k1, f_0, n_iter, residual = lgvi_step(
             R, Pi, f_0, J, h, m, g, rho_c, e3
         )
@@ -257,59 +317,95 @@ def run_simulation():
         res_hist[k] = residual
         iter_hist[k] = n_iter
 
+        # ---- RK4 step ----
+        R_rk, Omega_rk = rk4_step(R_rk, Omega_rk, J, h, m, g, rho_c, e3)
+
+        Omega_hist_rk[k, :] = Omega_rk
+        E_hist_rk[k] = energy(R_rk, Omega_rk, J, m, g, rho_c, e3)
+        mu_hist_rk[k] = float(e3 @ R_rk @ (J @ Omega_rk))
+        orth_hist_rk[k] = norm(np.eye(3) - R_rk.T @ R_rk, ord="fro")
+
     DeltaE = E_hist - E_hist[0]
     DeltaMu = mu_hist - mu0
 
-    return t[1:], Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist
+    DeltaE_rk = E_hist_rk - E_hist_rk[0]
+    DeltaMu_rk = mu_hist_rk - mu0_rk
+
+    return (
+        t[1:],
+        Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
+        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
+    )
 
 
 # =========================
 # Plotting
 # =========================
 
-def make_plots(t, Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist):
-    fig, axs = plt.subplots(2, 2, figsize=(11, 8))
+def make_plots(t,
+               Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
+               Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk):
 
-    axs[0, 0].plot(t, Omega_hist[:, 0], label=r"$\Omega_1$")
-    axs[0, 0].plot(t, Omega_hist[:, 1], label=r"$\Omega_2$")
-    axs[0, 0].plot(t, Omega_hist[:, 2], label=r"$\Omega_3$")
-    axs[0, 0].set_title("Angular velocity")
+    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+
+    # Angular velocity comparison
+    line1, = axs[0, 0].plot(t, Omega_hist[:, 0], label=r"$\Omega_1$ LGVI")
+    axs[0, 0].plot(t, Omega_hist_rk[:, 0], "--", color=line1.get_color(), label=r"$\Omega_1$ RK4")
+
+    line2, = axs[0, 0].plot(t, Omega_hist[:, 1], label=r"$\Omega_2$ LGVI")
+    axs[0, 0].plot(t, Omega_hist_rk[:, 1], "--", color=line2.get_color(), label=r"$\Omega_2$ RK4")
+
+    line3, = axs[0, 0].plot(t, Omega_hist[:, 2], label=r"$\Omega_3$ LGVI")
+    axs[0, 0].plot(t, Omega_hist_rk[:, 2], "--", color=line3.get_color(), label=r"$\Omega_3$ RK4")
+
+    axs[0, 0].set_title("Angular velocity: LGVI vs RK4")
     axs[0, 0].set_xlabel("t")
     axs[0, 0].set_ylabel(r"$\Omega$")
-    axs[0, 0].legend()
+    axs[0, 0].legend(fontsize=8, ncol=2)
 
-    axs[0, 1].plot(t, E_hist)
+    # Total energy comparison
+    axs[0, 1].plot(t, E_hist, label="LGVI")
+    axs[0, 1].plot(t, E_hist_rk, "--", label="RK4")
     axs[0, 1].set_title("Total energy")
     axs[0, 1].set_xlabel("t")
     axs[0, 1].set_ylabel("E")
+    axs[0, 1].legend()
 
-    axs[1, 0].plot(t, orth_hist)
+    # Orthogonality error comparison
+    axs[1, 0].plot(t, orth_hist, label="LGVI")
+    axs[1, 0].plot(t, orth_hist_rk, "--", label="RK4")
     axs[1, 0].set_title(r"Orthogonality error $\|I - R^T R\|_F$")
     axs[1, 0].set_xlabel("t")
     axs[1, 0].set_ylabel("error")
+    axs[1, 0].legend()
 
-    axs[1, 1].plot(t, DeltaMu)
-    axs[1, 1].set_title(r"Momentum-map error $e_3^T R_k \Pi_k - e_3^T R_0 \Pi_0$")
+    # Momentum error comparison
+    axs[1, 1].plot(t, DeltaMu, label="LGVI")
+    axs[1, 1].plot(t, DeltaMu_rk, "--", label="RK4")
+    axs[1, 1].set_title(r"Momentum error")
     axs[1, 1].set_xlabel("t")
     axs[1, 1].set_ylabel(r"$\Delta \mu$")
+    axs[1, 1].legend()
 
     fig.tight_layout()
     plt.show()
 
     fig2, axs2 = plt.subplots(1, 3, figsize=(14, 4))
 
-    axs2[0].plot(t, DeltaE)
+    axs2[0].plot(t, DeltaE, label="LGVI")
+    axs2[0].plot(t, DeltaE_rk, "--", label="RK4")
     axs2[0].set_title(r"Energy deviation $\Delta E_k$")
     axs2[0].set_xlabel("t")
     axs2[0].set_ylabel(r"$\Delta E$")
+    axs2[0].legend()
 
     axs2[1].plot(t, res_hist)
-    axs2[1].set_title("Newton residual")
+    axs2[1].set_title("LGVI Newton residual")
     axs2[1].set_xlabel("t")
     axs2[1].set_ylabel("residual")
 
     axs2[2].plot(t, iter_hist)
-    axs2[2].set_title("Newton iterations per step")
+    axs2[2].set_title("LGVI Newton iterations per step")
     axs2[2].set_xlabel("t")
     axs2[2].set_ylabel("iterations")
 
@@ -318,12 +414,28 @@ def make_plots(t, Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_h
 
 
 if __name__ == "__main__":
-    t, Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist = run_simulation()
-    make_plots(t, Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist)
+    (
+        t,
+        Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
+        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
+    ) = run_simulation()
 
+    make_plots(
+        t,
+        Omega_hist, E_hist, DeltaE, mu_hist, DeltaMu, orth_hist, res_hist, iter_hist,
+        Omega_hist_rk, E_hist_rk, DeltaE_rk, mu_hist_rk, DeltaMu_rk, orth_hist_rk
+    )
+
+    print("----- LGVI -----")
     print("Final orthogonality error:", orth_hist[-1])
     print("Max orthogonality error:", np.max(orth_hist))
     print("Max |DeltaMu|:", np.max(np.abs(DeltaMu)))
     print("Max |DeltaE|:", np.max(np.abs(DeltaE)))
     print("Max Newton residual:", np.max(res_hist))
     print("Max Newton iterations:", np.max(iter_hist))
+
+    print("\n----- RK4 -----")
+    print("Final orthogonality error:", orth_hist_rk[-1])
+    print("Max orthogonality error:", np.max(orth_hist_rk))
+    print("Max |DeltaMu|:", np.max(np.abs(DeltaMu_rk)))
+    print("Max |DeltaE|:", np.max(np.abs(DeltaE_rk)))
