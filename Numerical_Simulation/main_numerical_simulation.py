@@ -2,7 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from Discrete_Mechanical_Models_Lie_Groups.model_3d_pendulum import Pendulum3DModel
-from solver_lgvi import simulate_lgvi
+
+# For solving with exponential map-based LGVI:
+# from solver_lgvi import simulate_lgvi
+
+from solver_lgvi_cayley import simulate_lgvi
 from solver_rk4 import simulate_rk4
 
 
@@ -83,6 +87,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict):
 if __name__ == "__main__":
     model = Pendulum3DModel()
 
+    # Simulation parameters
     h = 0.05
     tf = 1000.0
 

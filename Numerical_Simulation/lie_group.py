@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.linalg import norm
+from numpy.linalg import norm, solve
 
 
 def hat(v: np.ndarray) -> np.ndarray:
@@ -35,10 +35,21 @@ def rodrigues(f: np.ndarray) -> np.ndarray:
         + ((1.0 - np.cos(theta)) / theta**2) * (f_hat @ f_hat)
     )
 
+def cayley(f: np.ndarray) -> np.ndarray:
+    """
+    Cayley transform on SO(3):
+        F = cay(f) = (I + f^) (I - f^)^{-1}
+
+    This is the convention used in the computational approach you showed.
+    """
+    f_hat = hat(f)
+    I = np.eye(3)
+    return solve(I - f_hat, I + f_hat)
+
 
 def project_to_so3(R: np.ndarray) -> np.ndarray:
     """
-    Project a nearby 3x3 matrix onto SO(3) using the SVD / polar-factor projection.
+    Project 3x3 matrix onto SO(3) using the SVD projection.
     """
     U, _, Vt = np.linalg.svd(R)
     R_proj = U @ Vt
