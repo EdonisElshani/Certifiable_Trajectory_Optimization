@@ -105,7 +105,7 @@ def simulate_lgvi(model, R0: np.ndarray, Omega0: np.ndarray, h: float, tf: float
     Pi = model.J @ Omega0
 
     q_0 = h * (Pi + 0.5 * h * model.moment(R))
-    f_0 = 0.5 * solve(model.J, q_0)
+    f_0 = 0.5 * solve(2* model.J - hat(q_0), q_0)
 
     Omega_hist = np.zeros((N, 3))
     E_hist = np.zeros(N)

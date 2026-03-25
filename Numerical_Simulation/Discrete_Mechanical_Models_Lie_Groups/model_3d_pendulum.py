@@ -7,9 +7,9 @@ from numpy.linalg import solve
 class Pendulum3DModel:
     m: float = 1.0
     g: float = 9.81
-    rho_c: np.ndarray = field(default_factory=lambda: np.array([0.0, 0.0, 0.3]))
+    rho_c: np.ndarray = field(default_factory=lambda: np.array([0.0, 0.0, 0.5]))
     e3: np.ndarray = field(default_factory=lambda: np.array([0.0, 0.0, 1.0]))
-    J: np.ndarray = field(default_factory=lambda: np.diag([0.13, 0.28, 0.17]))
+    J: np.ndarray = field(default_factory=lambda: np.diag([0.1979, 0.1979, 0.125]))
 
     def moment(self, R: np.ndarray) -> np.ndarray:
         return self.m * self.g * np.cross(self.rho_c, R.T @ self.e3)
