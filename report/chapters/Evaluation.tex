@@ -1,0 +1,213 @@
+\chapter{Evaluation}
+
+\section{Numerical Simulation Results} 
+
+In this section, numerical simulations are conducted to evaluate the correctness of the derived discrete integrators for mechanical models on Lie groups. In particular, the structure-preserving properties of the variational discretizations derived in Section~\ref{sec:} are examined. The analysis focuses especially on the preservation of the momentum map associated with the symmetry of the system, the evolution on the Lie-group configuration manifold, and the long-time behaviour of the total energy. This validation is important since discrete mechanical models obtained by variational integration provide a reliable basis for certifiable trajectory optimization. If the discrete flow violates the manifold structure or introduces artificial drift in conserved quantities such as momentum, the resulting optimization model becomes less faithful to the underlying mechanics \cite{Lee2008}. In contrast, variational integrators are constructed from a discrete variational principle and are symplectic, momentum preserving, and consist robust long-time energy behaviour \cite{Marsden2001}. For the evaluation, the evolution of the total energy, the momentum-map behaviour, and the preservation of the Lie-group structure of the unforced 3D-pendulum are compared with the classical fourth-order Runge-Kutta method and a projected Runge-Kutta on \(SO(3)\) as reference integrators \cite{CELLEDONI2003421, Hairer2000} (see Table. \ref{tab:integrator_comparison}).
+
+\begin{table}[h]
+\centering
+\caption{Comparison of the considered integration methods properties.}
+\label{tab:integrator_comparison}
+\begin{tabular}{lcc}
+\hline
+\textbf{Method} & \textbf{Symplectic} & \textbf{Manifold Preserving} \\
+\hline
+Variational Integrator & \cmark & \cmark \\
+RK4 & \xmark & \xmark \\
+Projected RK4 & \xmark & \cmark \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{Runge--Kutta 4th order}
+As a basline integrator, the classical explicit fourth-order Runge-Kutta (RK4) is applied to the continuous rigid-body equations written as as first-order system $(\bm{\dot{R}},\bm{\dot{\omega}}) = \bm{f} (\bm{R},\bm{\omega})$. For a system of the form
+\begin{align}
+    \dot{\bm{y}} = \bm{f}(\bm{y}),
+\end{align}
+the classical RK4 scheme computes the four stage values
+\begin{align}
+    (\bm{k}_1^{R}, \bm{k}_1^{\omega}) &= \bm{f}(\bm{R}_n, \bm{\omega}_n), \\
+    (\bm{k}_2^{R}, \bm{k}_2^{\omega}) &= \bm{f}\!\left(\bm{R}_n+\frac{h}{2}\bm{k}_1^R,\bm{\omega}_n+\frac{h}{2}\bm{k}_1^{\omega}\right), \\
+    (\bm{k}_3^{R}, \bm{k}_3^{\omega}) &= \bm{f}\!\left(\bm{R}_n+\frac{h}{2}\bm{k}_2^{R},\bm{\omega}_n+\frac{h}{2}\bm{k}_2^{\omega}\right), \\
+   (\bm{k}_4^{R}, \bm{k}_4^{\omega}) &= \bm{f}\!\left(\bm{R}_n+h\bm{k}_3^{R}, \bm{\omega}_n+h\bm{k}_3^{\omega}\right),
+\end{align}
+and updates the numerical solution according to
+\begin{align}
+    \bm{R}_{n+1}
+    &=
+    \bm{R}_n
+    +
+    \frac{h}{6}
+    \left(
+    \bm{k}_1^{R} + 2\bm{k}_2^{R} + 2\bm{k}_3^{R} + \bm{k}_4^{R}
+    \right), \\
+    \boldsymbol{\omega}_{n+1}
+    &=
+    \boldsymbol{\omega}_n
+    +
+    \frac{h}{6}
+    \left(
+    \bm{k}_1^{\omega} + 2\bm{k}_2^{\omega} + 2\bm{k}_3^{\omega} + \bm{k}_4^{\omega}
+    \right),
+\end{align}
+for each discrete-time step $n$ \cite{butcher2016numerical}.
+
+The explicit RK4 method does not preserve the orthogonality constraint \(\bm{R}^\top \bm{R}=\bm{I}\) and leaves the manifold configuration of $SO(3)$, since the rotation matrix $\bm{R}_n$ is updated additively in the vector space of $\mathbb{R}^{3 \times 3}$ \cite{CELLEDONI2003421}.
+
+\paragraph{RK4 projected to $SO(3)$}
+
+To satisfy the orthogonality constraint 
+\[
+SO(3)=\left\{\bm{R}\in\mathbb{R}^{3\times 3}\;\middle|\;\bm{R}^\top \bm{R}=\bm{I},\ \det(\bm{R})=1\right\}.
+\]
+the explicit RK4 method is combined with a projection of the discrete-time updated rotation matrix $\bm{R}_n$ on $SO(3)$. Therefore, after performing the RK4 step in $\mathbb{R}^{3 \times 3}$ the obtained rotation matrix \(\widetilde{\bm{R}}_{n+1}\), the singular value decomposition is used  
+\begin{align}
+    \widetilde{\bm{R}}_{n+1}=\bm{U}\bm{\Sigma}\bm{V}^{\top},
+\end{align}
+following a reconstruction to derive the updated rotation matrix
+\begin{align}
+    \bm{R}_{n+1}=\bm{U}\bm{V}^{\top},
+\end{align}
+ which is projected on $SO(3)$. Consequently, $\bm{R}_{n+1}$ satisfy the orthogonality constraint, while the angular velocity $\bm{\omega}_{n+1}$ remains unchanged on the vector space $\mathbb{R}^{3 \times 3}$. However, this method does not inherit structure preserving properties of the Lie group variational integrator, for example, symplecticity or momentum conservation \cite{CELLEDONI2003421}. 
+
+\subsection{Unforced 3D Pendulum}
+
+For evaluating the geometric properties preservation of the previously defined unforced 3D-pendulum (see Section \ref{sec:discrete_3d_pendulum}), numerical simulations are conducted. The rigid body is modeled as a uniform solid cylinder of length $l=\SI{1}{\meter}$ and radius $r=\SI{5}{\cm}$, with its center of mass at $\frac{l}{2}$. Thereby, the physical parameters characterizing the configuration manifold, are chosen as 
+\begin{align}
+    m &= \SI{1}{\kilogram}, &
+    g &= \SI{9.81}{\meter\per\second\squared}, \\
+    \boldsymbol{\rho}_c &=
+    \begin{bmatrix}
+        0 & 0 & 0.5
+    \end{bmatrix}^\top \si{\meter}, &
+    \boldsymbol{e}_3 &=
+    \begin{bmatrix}
+        0 & 0 & 1
+    \end{bmatrix}^\top.
+\end{align}
+ The inertia matrix about the center of mass can be taken from the inertia table given in \cite{RITInertiaTable216}. Here, the rotation of the center of mass in x and y direction are represented about the central diameter $\bm{J}_{11,com}=\bm{J}_{22,com}= \frac{1}{12}m(3r^2 + 4l^2)$, and the rotation of the center of mass in gravity direction z is perpendicular to the axis of rotation $\bm{J}_{33,com}=\frac{1}{2} mr^2$. The off-diagonal terms are equal to zero, because the body-fixed frame is aligned with the principal axes of the cylindrically symmetric body \cite{Lee2008}. Additionally, the inertia matrix about the pivot in body-frame is obtained by the parallel axis theorem of \cite{Benacquista2018ClassicalMechanics} given by
+\begin{align}
+    \mathbf{J}
+    =
+    \mathbf{J}_{\mathrm{com}}
+    +
+    m\left(
+        \|\boldsymbol{\rho}_c\|^2\mathbf{I}
+        -
+        \boldsymbol{\rho}_c\boldsymbol{\rho}_c^{\top}
+    \right).
+\end{align}
+After substituting the chosen values, the 3D-pendulum's inertia matrix is given as
+\begin{align}
+    \mathbf{J}
+    &=
+    \begin{bmatrix}
+        0.33396 & 0 & 0 \\
+        0 & 0.33396 & 0 \\
+        0 & 0 & 0.00125
+    \end{bmatrix}
+    \si{\kilogram\meter\squared}.
+\end{align}
+Given \ref{eq:non-standard_inertia}, the non-standard inertia matrix is calculated to
+\begin{align}
+    \mathbf{J}_d
+    &=
+    \begin{bmatrix}
+        0.000625 & 0 & 0 \\
+        0 & 0.000625 & 0 \\
+        0 & 0 & 0.333333
+    \end{bmatrix}
+    \si{\kilogram\meter\squared}.
+\end{align}
+Using the introduced computational approach of Section \ref{sec:discrete_computational_approach}, the derived discrete-time implicit Hamilton equation \ref{eq:discrete_3D_pendulum_hamilton_1} of the 3D-pendulum is converted to an equivalent vector equation in $\mathbb{R}^3$ using the Cayley transformation. From \cite{ColomboJimenez2012SO3_Cayley}, the corresponding nonlinear vector equation $0 = \bm{A}(\bm{f})$ of the 3D-pendulum is taken as
+\begin{equation}\label{eq:simulation_3D_pendulum_vector_equation}
+    0 = \bm{a}+\bm{a} \times \bm{f} + \bm{f}(\bm{a}^\top \bm{f})-2 \bm{J} \bm{f} = \bm{A}(f),
+\end{equation}
+with $\bm{a}= h (\bm{\Pi}_k + \frac{h}{2} \bm{M}_k)$. Additionally, \cite{ColomboJimenez2012SO3_Cayley} defines its Jacobian $\nabla A\!\left(\bm{f}\right)$ to
+\begin{align}
+\nabla A(\bm{f})
+=
+\hat{\bm{a}}
++
+(\bm{a}^{\top}\bm{f})\mathbf{I}
++
+\bm{f}\bm{a}^{\top}
+-
+2\mathbf{J}.
+\end{align}
+The tolerance for the Newton iteration is defined to $\left\lVert f^{(i+1)} - f^{(i)} \right\rVert < 10^{-12}$. The initial conditions are taken from \cite{Lee2008} 
+\begin{align}
+\bm{f}^0 &= (2 \bm{J} - \hat{\bm{a}})^{-1}\bm{a},&
+    \mathbf{R}_0 &= \mathbf{I}, &
+    \boldsymbol{\Omega}_0 &=
+    \begin{bmatrix}
+        4.14 & 4.14 & 4.14
+    \end{bmatrix}^{\top}\si{\radian\per\second},
+\end{align} where $\bm{f}^0$ is the linearized solution of
+\ref{eq:simulation_3D_pendulum_vector_equation}. The simulation is conducted over $[0,1000]$ discrete-time steps and $h=\SI{0.05}{\second}$. The corresponding implementation is documented in the GitHub repository \cite{Elshani2026CTO_GitHub}.
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Delta_E.pdf}
+        \caption*{(a) Energy deviation $\Delta E_k$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Total_Energy.pdf}
+        \caption*{(b) Total energy $E_k$.}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Momentum_error.pdf}
+        \caption*{(c) Momentum error $\Delta \mu_k$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Orthogonality_error.pdf}
+        \caption*{(d) Orthogonality error $e_{orth}$.}
+    \end{minipage}
+
+    \caption{Comparison of the numerical preservation properties for the unforced $3$D pendulum.}
+    \label{fig:simulation_results_3d_pendulum}
+\end{figure}
+
+Fig. \ref{fig:simulation_results_3d_pendulum} illustrates the results of the numerical simulation of the different methods of Table \ref{tab:integrator_comparison}, by plotting the corresponding total energy
+\[
+ E_k
+    =
+    \frac{1}{2}\boldsymbol{\Omega}_k^{\top}\mathbf{J}\boldsymbol{\Omega}_k
+    -
+    mg\,\boldsymbol{e}_3^{\top}\mathbf{R}_k\boldsymbol{\rho}_c,
+\]
+and its deviation $\Delta E_k = E_k - E_0$, the angular momentum error along the gravity direction
+\[
+\Delta \mu_k= \boldsymbol{e}_3^{\top}\mathbf{R}_k\boldsymbol{\Pi}_k - \boldsymbol{e}_3^{\top}\mathbf{R}_0\boldsymbol{\Pi}_0,
+\]
+defined in \cite{Lee2008}, and the orthogonality error $e_{\mathrm{orth},k} = \left\|\mathbf{I}-\mathbf{R}_k^{\top}\mathbf{R}_k\right\|_F$.
+
+The total energy (see Fig. \ref{fig:simulation_results_3d_pendulum} (a)) and the corresponding energy deviation (see Fig. \ref{fig:simulation_results_3d_pendulum} (b)) illustrates the preserving energy behavior over a long-time in discrete-time flow for the Lie Group Variational Integrator (LGVI). It remains close to the reference level with only small bounded oscillations, because of their symplectic strcuture, which are the exact solution of a pertubed Hamiltonian \cite{Hairer1994}. However, the RK4 and projected RK4 display a clear drift of the energy away from its real value, which remains constant for this model, as the system is unforced.
+
+Moreover, the momentum error (see Fig. \ref{fig:simulation_results_3d_pendulum} (c)) confirms that the LGVI method preserves the momentum, validated for continuous time in \ref{sec:continous_3D_pendulum_momentum_validation}. The computational results of RK4 and its projection on $SO(3)$ show that these methods are not reliable drifting from the momentum initial value, as they not preserve the total linear momentum \cite{Lee2008}. Especially, the projected RK4 consits of a stronger discrepancy, as it fixes $\bm{R}^\top\bm{R} = \bm{I}$, while the angular velocity $\omega$ remains unchanged, which influences the momentum. Therefore, 
+
+Lastly, the orthogonality error highlights that the structure of the Lie group configuration manifold is well preserved in the LGVI, which is depictured in Fig. \ref{fig:simulation_results_3d_pendulum} (d). Similar result is obtained from the projected RK4, while the classic explicit RK4 violates the orthogonality constraint. For RK4 $e_{orth}$ increases linearly with respect to the simulation time-steps.
+
+Consequently, only the LGVI preserves the manifold structure together with the momentum and energy behaviour over a long-time horizon. While RK4 can be projected to the Lie group manifold of $SO(3)$, it can not preserve the momentum and consits of drifting energy behaviour over long-time.
+
+
+\section{Experimental Results}
+
+A thesis almost always has an experimental part, typically some comparison to other approaches. Benchmarking takes time, for running the experiments, but also for thinking them up in the first place, and for analysing the results. Plan accordingly to spend enough time here!
+
+Think about what makes sense to measure, what you want to learn from your measurements. Think about what is really the relevant contribution of your thesis, and how you can prove that you have achieved your goals. Think about what you can measure in order to get a good insight into the performance of various aspects of your design, how you can distinguish between systematic and accidental effects, how you can convince yourself that your results are right. If you get surprising results, do not just say ``surprise, surprise, performance isn't as good as hoped''. Find out why. Surprises without explanation indicate either that you are clueless about what is going on, or that you have made a mistake. Unconvincing results, therefore, tend to imply unconvincing marks. 
+
+\paragraph{Statistics:} Measurements always have statistical (sampling) errors. Owing to the deterministic nature of simulations these are sometimes very small, as disturbing factors can be designed. However, the reader should be given an indication of how statistically significant the results are. This is done by providing at least a standard deviation in addition to averages. Whenever the results of several runs are averaged, a standard deviation can (and must) be supplied. After all, you average to reduce statistical errors.
+
+The reproducibility argument applies here just as much as for the implementation. Give enough detail on what you measure, and how you measure it, so that someone who has your implementation (but not your test code) or has re-done your implementation independently, should be able to repeat your measurements and arrive at essentially the same results. In some cases, results seem outright wrong in a thesis. In those cases, not enough detail is provided to allow the supervisor/reader to pinpoint the likely source of the error. Often the cause is systematic errors resulting from an incorrect measurement technique. If it seems wrong, and the text does not convince the reader that it is not wrong, the reader will assume that it is wrong.
+

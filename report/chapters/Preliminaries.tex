@@ -1,0 +1,58 @@
+\chapter{Preliminaries On Special Embedded Matrix Lie Groups}
+
+\section{Special Matrix Lie Groups}
+
+\section{Special Lie Algebras}
+
+\begin{proposition}[Differential of left translation on a matrix Lie group: $T_{x}L_{h}$]
+Let $G\subset GL(n,\mathbb{R})$ be a matrix Lie group.
+For $h\in G$, define $L_h:G\to G$ by $L_h(g)=hg$ \cite{Hall2000LieGroups}.
+Then for each $x\in G$ the differential
+\[
+T_xL_h: T_xG \to T_{hx}G,
+\]
+of the left translation map $L_h:G\to G$ is given by
+\begin{align}\label{eq:preliminaries_differential_left_translation}
+T_xL_h(v)=hv.
+\end{align}
+\end{proposition}
+\begin{proof}
+By the definition of the tangent space of an embeded submanifold given in \cite{Hall2000LieGroups}, there exists a smooth curve $\gamma: (-\epsilon,\epsilon) \to G$ with $\gamma(0)=x$ and the tangent vector $\dot{\gamma}(0)=v \in T_{x}G$.
+In \cite{Lee2012ISM}, the differential is defined as
+\[
+T_xL_h(v)=\left.\frac{d}{dt}L_h(\gamma(t))\right|_{t=0}
+=\left.\frac{d}{dt}(h\gamma(t))\right|_{t=0},
+\]
+with the left translation map $L_h(g)=hg$. Since $h$ is constant and $\dot{\gamma}(0)=v$, it follows that
+\[
+T_xL_h(v)=h\dot{\gamma}(0)=hv.
+\]
+\end{proof}
+
+It can be observed that $L_{h}(g)=hg$ and $T_xL_{h}(v)=hv$ have the same matrix expression, but acting on different objects. The left translation map $L_{h}(g)$ is multiplying group elements $g \in G$, while the differential of the left translation map is the pushforward of tangent vectors $v \in T_{x}G \subset \mathbb{R}^{n \times n}$. The differential of a left translation can be applied to the special embedded matrix Lie groups $SO(n)$, $SE(n)$ and their corresponding lie algebras $\mathfrak{so}(n)$, $\mathfrak{se}(n)$. 
+
+\paragraph{Differential of left translation $T_RL_H$ on $SO(n)$}
+
+The left translation map in $SO(n)$ is defined as $L_{H}(R) = HR$ with $H,R \in G := SO(n)$. Applied to eq. \ref{eq:preliminaries_differential_left_translation} with $v \in T_{R}G$, it follows that 
+\begin{align*}
+    T_{R}L_{H}(v)= Hv.
+\end{align*}
+The tangent vector $v \in T_RG$ can be represented by $v = T_{e}L_{R}(\omega) = R\omega$ using the left translation map of $\omega \in \mathfrak g := \mathfrak{so}(n)$ resulting in 
+\begin{align}\label{eq:preliminaries_differential_left_SO}
+    T_RL_H(R \omega) = H(R \omega).
+\end{align}
+
+\paragraph{Differential of left translation $T_gL_h$ on $SE(n)$}
+
+The left translation map in $SE(n)$ is defined as $L_{h}(g) = hg$ with $h,g \in G := SE(n)$. Applied to eq. \ref{eq:preliminaries_differential_left_translation} with $v \in T_{g}G$, it follows that 
+\begin{align*}
+    T_{g}L_{h}(v)= hv.
+\end{align*}
+The tangent vector $v \in T_gG$ can be represented by $v = T_{e}L_{g}(\xi) = g\xi$ using the left translation map of $\xi \in \mathfrak g := \mathfrak{se}(n)$ resulting in 
+\begin{align}\label{eq:preliminaries_differential_left_SE}
+    T_gL_h(g \xi) = h(g \xi).
+\end{align}
+
+Explain brackets
+Inner product 
+-> Pairs

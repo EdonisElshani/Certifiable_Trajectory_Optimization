@@ -1,0 +1,541 @@
+\chapter{Discrete Mechanics For Rigid Bodies On Lie Groups}
+
+\section{Discrete Lagrangian Mechanics}
+\label{section:discrete_lagrangian_mechanics}
+
+\subsection{Discrete Euler-Lagrange Equations}
+
+\begin{proposition}[Directional derivative representation of $D_{g_k}L_d(g_k,f_k)$]
+Let $G$ be a Lie group with Lie algebra $\mathfrak g$ \cite{Hall2000LieGroups}. Let 
+$L_d:G\times G\to\mathbb R$ be smooth and $\eta_k$ an arbitrary element of $\mathfrak g$. For all $\delta g_k\in T_{g_k}G$ with $\delta g_k = T_eL_{g_k}(\eta_k)$ \ref{eq:VARIATION},
+we regard the partial derivative $D_{g_k}L_d(g_k,f_k)\in T_{g_k}^*G$ as the covector characterized by
+\begin{equation} \label{eq:derivative_gk}
+\langle D_{g_k}L_d(g_k,f_k),\delta g_k\rangle
+=
+\langle T_{e}^{*}L_{g_k} D_{g_k}L_d(g_k,f_k),\eta_k \rangle
+=
+\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L_d(g_k\exp{(\varepsilon \eta_k)},f_k).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since $G$ is a smooth manifold, the differential of the map $L_d(g_k,f_k)$ is a linear map
+$T_{g_k}G\to\mathbb R$, as $f_k$ is fixed. Therefore, the partial derivative
+$D_{g_k}L_d(g_k,f_k)$ is an element of the dual space $T_{g_k}^*G$. Moreover, for any
+$\eta_k \in \mathfrak g$, let
+\[
+\gamma(\varepsilon)=g_k\exp{(\varepsilon \eta_k)}
+\]
+be a smooth curve on the manifold. Then
+$\gamma(0)=g_k$ and
+\begin{align} \label{eq:delta_gk_TL}
+\delta g_k \;=\; \dot\gamma(0)
+&= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\gamma(\varepsilon)
+= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0} g_k\exp(\varepsilon \eta_k) \notag\\
+&= g_k\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\exp(\varepsilon \eta_k)
+= g_k\,\eta_k \notag\\
+&= T_eL_{g_k}(\eta_k),
+\end{align}
+with $\delta g_k$ being the infinitesimal variation of $g_k$ induced by $\eta_k$ for any
+$\varepsilon \in (-c,c)$ \cite{Lee2008}. The corresponding directional derivative is
+\[
+\langle D_{g_k}L_d(g_k,f_k),\delta g_k\rangle
+=
+\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L_d(\gamma(\varepsilon),f_k)
+=
+\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L_d(g_k\exp{(\varepsilon \eta_k)},f_k),
+\]
+using $\langle D_{g_k}L_d(g_k,f_k),\delta g_k \rangle = D_{g_k}L_d(g_k,f_k)(\delta g_k)$ \cite{Lee2008}.
+Additionally, the directional derivative can be expressed by the pulled-back covector
+\[
+\mu_k = T_e^* L_{g_k} D_{g_k}L_d(g_k,f_k)
+\]
+to obtain
+\begin{align*}    
+\langle D_{g_k}L_d(g_k,f_k),\delta g_k\rangle
+&= \langle D_{g_k}L_d(g_k,f_k),g_k \eta_k \rangle \\
+&= \langle D_{g_k}L_d(g_k,f_k), T_eL_{g_k}(\eta_k) \rangle \\
+&= \langle T_e ^* L_{g_k} D_{g_k}L_d(g_k,f_k), \eta_k \rangle,
+\end{align*}
+using eq. \ref{eq:delta_gk_TL}.
+\end{proof}
+
+\begin{proposition}[Directional derivative representation of $D_{f_k}L_d(g_k,f_k)$]
+Let $G$ be a Lie group with Lie algebra $\mathfrak g$ \cite{Hall2000LieGroups}. Let 
+$L_d:G\times G\to\mathbb R$ be smooth and $X_k$ an arbitrary element of $\mathfrak g$. For all $\delta f_k\in T_{f_k}G$ with $\delta f_k = T_eL_{f_k}(X_k)$ \ref{eq:VARIATION},
+we regard the partial derivative $D_{f_k}L_d(g_k,f_k)\in T_{f_k}^*G$ as the covector characterized by
+\begin{equation} \label{eq:derivative_fk}
+\langle D_{f_k}L_d(g_k,f_k),\delta f_k\rangle
+=
+\langle T_{e}^{*}L_{f_k} D_{f_k}L_d(g_k,f_k),X_k \rangle
+=
+\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L_d(g_k,f_k\exp{(\varepsilon X_k)}).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since $G$ is a smooth manifold, the differential of the map $L_d(g_k,f_k)$ is a linear map
+$T_{f_k}G\to\mathbb R$, as $g_k$ is fixed. Therefore, the partial derivative
+$D_{f_k}L_d(g_k,f_k)$ is an element of the dual space $T_{f_k}^*G$. Moreover, for any
+$X_k \in \mathfrak g$, let
+\[
+\gamma(\varepsilon)=f_k\exp{(\varepsilon X_k)}
+\]
+be a smooth curve on the manifold. Then
+$\gamma(0)=f_k$ and
+\begin{align} \label{eq:delta_fk_TL}
+\delta f_k \;=\; \dot\gamma(0)
+&= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\gamma(\varepsilon)
+= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0} f_k\exp(\varepsilon X_k) \notag\\
+&= f_k\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\exp(\varepsilon X_k)
+= f_k\,X_k \notag\\
+&= T_eL_{f_k}(X_k),
+\end{align}
+with $\delta f_k$ being the infinitesimal variation of $f_k$ induced by $X_k$ for any
+$\varepsilon \in (-c,c)$ \cite{Lee2008}. The corresponding directional derivative is,
+\[
+\langle D_{f_k}L_d(g_k,f_k),\delta f_k\rangle
+=
+\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L_d(g_k,\gamma(\varepsilon))
+=
+\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L_d(g_k,f_k\exp{(\varepsilon X_k)}),
+\]
+using $\langle D_{f_k}L_d(g_k,f_k),\delta f_k \rangle = D_{f_k}L_d(g_k,f_k)(\delta f_k)$ \cite{Lee2008}. Additionally, the directional derivative can be expressed by the pulled-back covector
+\[
+\mu_k = T_e^* L_{f_k} D_{f_k}L_d(g_k,f_k)
+\]
+to obtain
+\begin{align*}    
+\langle D_{f_k}L_d(g_k,f_k),\delta f_k\rangle
+&= \langle D_{f_k}L_d(g_k,f_k),f_k X_k \rangle \\
+&= \langle D_{f_k}L_d(g_k,f_k), T_eL_{f_k}(X_k) \rangle \\
+&= \langle T_e ^* L_{f_k} D_{f_k}L_d(g_k,f_k), X_k \rangle,
+\end{align*}
+using eq. \ref{eq:delta_fk_TL}.
+\end{proof}
+
+\subsection{Forced Discrete Euler-Lagrange Equations}
+
+
+\subsection{Discrete Hamiltonian Mechanics}
+
+\subsection{Discrete Legendre Transformation}
+
+\subsection{Properties of the Discrete Lagrangian Flow}
+
+\subsection{Computational Implementation}
+\label{sec:discrete_computational_approach}
+
+In contrast to the continuous mechanics of \ref{coun}, numerical simulations can be performed for discrete-time mechanical model representations. Therefore, a simulation framework has to be defined. To determine the relative attitude update $\bm{F}_k \in SO(3)$, the implicit Euler-Lagrange \ref{eq:} and Hamilton equations \ref{eq:} have to be solved at every time step $k$. Therefore, an efficient computational algorithm is required to for practical numerical simulations, especially for complex multibody-mechanical models. \cite{Lee2008} proposes an approach of expressing the group element $\bm{F}_k \in G$ on the linear vector space of the Lie algebra, by using the exponential map. Thereby, the implicit equation is solved numerically by a Newton iteration \cite{Marsden2001} in $\mathbb{R}^3$.
+
+Firstly, the implicit discrete-time Euler-Lagrange equations or the discrete-time Hamilton equations have to be converted into an equivalent vector equation in $\mathbb{R}^3$, for example, using the Rodrigures formula
+\begin{align}\label{eq:Rodrigues}
+\bm{F}
+=
+\exp(\hat{\bm{f}})
+=
+\bm{I}_{3 \times 3}
++
+\frac{\sin \lVert \bm{f} \rVert}{\lVert \bm{f} \rVert}\,\hat{\bm{f}}
++
+\frac{1-\cos \lVert \bm{f} \rVert}{\lVert \bm{f} \rVert^2}\,\hat{\bm{f}}^{\,2},
+\end{align}
+for $f \in \mathbb{R}^3$ \cite{MarsdenRatiu1999}. However, it requires the evaluation of expensive $\sin$ and $\cos$ terms, which increase the computational time and costs. In order to imrpove the computational efficiency, the exponential map \ref{eq:Rodrigues} is replaced by the Cayley transformation \cite{Arieh_Cayley_Motivation}.
+
+
+\paragraph{Cayley Transformation}
+
+The Cayley transformation is a local diffeomorphism between $SO(3) \to \mathbb{R}^3$, which is defined as 
+\begin{align} \label{eq:Cayley}
+    F= \operatorname{Cay}(f) = (\bm{I} - \hat{\bm{f}})(\bm{I}+\hat{\bm{f}})^{-1} = \frac{1}{1+\bm{f}^\top \bm{f}}((1-\bm{f}^\top \bm{f}) \bm{I}+2\hat{\bm{f}}+2\bm{f}\bm{f}^\top,
+\end{align}
+representing an rotation $\theta$ given by $\lVert f \rVert = \tan\left(\frac{\theta}{2}\right)$ \cite{Barbero-Linan2023_Cayley_Formula}. Therefore, the Cayley transformation consists of the constraint $\theta < \pi$, which requires the step size $h$ to be chosen sufficiently small. After substituting the Cayley transformation \ref{eq:Cayley} into the implicit equations \ref{eq:} or \ref{eq:}, a equivalent vector equation is obtained
+\begin{align}\label{eq:implicit_vector_equation}
+     0 = A(\bm{f}),
+\end{align}
+ where $A:\mathbb{R}^3 \to \mathbb{R}^3$ \cite{ColomboJimenez2012SO3_Cayley}.
+
+\paragraph{Newton Iteration}
+
+For solving the implicit vector equation \ref{eq:implicit_vector_equation} Newton's method is used \cite{Marsden2001}. The iteration rule is given by 
+\begin{align}
+\bm{f }^{(i+1)} &= \bm{f}^{(i)} - \nabla A\!\left(\bm{f}^{(i)}\right)^{-1} A\!\left(\bm{f}^{(i)}\right),
+\end{align}
+where convergence to the solution is reached until $\left\lVert f^{(i+1)} - f^{(i)} \right\rVert < \epsilon$ for a defined $\epsilon$. A initial guess $\bm{f}^0$ can be obtained by linearizing the vector equation \ref{eq:implicit_vector_equation} \cite{Lee2008}. Finally, the rotation matrix $\bm{F}_k \in SO(3)$ at $k$ is calculated using the Cayley transformation \ref{eq:Cayley}. 
+
+\section{Unforced Discrete Mechanics}
+
+\subsection{3D-Pendulum}
+
+In the following Section, the unforced mechanics of an three degrees of freedom pendulum given by \cite{Lee2008} are presented, using discrete Lagrangian mechanics of section \ref{section:discrete_lagrangian_mechanics}. This will correspond to the equivalent discrete case of the continuous unforced 3D-pendulum of section \ref{section:continous_3D_pendulum}. Following, numerical simulations are performed to verify the momentum conservation and constant energy of the derived mechanical systems equations. 
+
+\paragraph{Configuration Manifold}
+
+The configuration manifold of the unforced 3D-pendulum in a discrete case, consits equal settings of the pendulums space and body-fixed frame. The gravity direction in the space frame is represented by the unit vector $\bm{e}_3$, defining the vector from the pivot to the center of mass to $\bm{\rho_{c}}= \frac{l}{2} \bm{e}_3^b$ in the body frame. As in the continuous formulation of Section \ref{section:continous_3D_pendulum}, the discrete configuration manifold is $SO(3)$. Therefore, the attitude of the 3D-pendulum is described by a rotation matrix $\bm{R}_k \in SO(3)$, which maps the body-fixed frame to the reference frame at the discrete time step $k$. \cite{Lee2008} defines the discrete-time attitude kinematics equation as
+\begin{equation}\label{eq:discrete_attitude_kinematics_equation_SO3}
+    \bm{R}_{k+1}= \bm{R}_k \bm{F}_k,
+\end{equation}
+with the rotation matrix $\bm{F}_k$, representing the relative attitude update between two integration steps. Additionally, \cite{Lee2008} introduces adjoint operator relations for $\bm{F} \in SO(3)$ and the skew-symmetric matrix $\hat{\bm{\eta}} \in \mathfrak{so}(3)$, which are given as
+\begin{align}
+\operatorname{Ad}_{\bm{F}} \hat{\bm{\eta}}
+&=
+\bm{F}\,\hat{\bm{\eta}}\,\bm{F}^{\top}
+=
+(\bm{F}\bm{\eta})^\wedge,
+\\
+\operatorname{Ad}^{*}_{\bm{F}} \hat{\bm{\eta}}
+&=
+\bm{F}^{\top}\,\hat{\bm{\eta}}\,\bm{F}
+=
+(\bm{F}^{\top}\bm{\eta})^\wedge.\label{eq:discrete_coadjoint}
+\end{align}
+
+\paragraph{Discrete Lagrangian}
+
+As introduced in \ref{eq:discrete_exact_lagrangian}, the discrete Lagrangian $L_d(\bm{R}_k, \bm{F}_k):SO(3) \times SO(3) \to \mathbb{R} $ is an approximation of the action integral of the continuous Lagrangian over one time step $h$. In order to discretize the given continuous Lagrangian of \ref{eq:continuous_3D_pendulum_lagrangian}
+\begin{equation}\label{eq:discrete_3D_pendulum_lagrangian}
+    L(\bm{R}, \hat{\bm{\omega}}) = T(\bm{R}, \hat{\bm{\omega}}) - U(\bm{R})
+    = \frac{1}{2}\operatorname{tr}[\hat{\bm{\omega}} \bm{J}_d \hat{\bm{\omega}}^\top] + mg\, \bm{e}_3^\top \bm{R}\bm{\rho}_c,
+\end{equation}
+the time dependent angular velocity $\hat{\bm{\omega}}(t)$ and rotation matrix $\bm{R}(t)$ have to be represented on the discrete time interval $[t_k,t_{k+1}]$ \cite{Marsden2001}. Given the definition of the exponential for an $n\times n$ matrix $\bm{X}$
+\[
+    \exp(\bm{X})=\sum_{m=0}^{\infty} \frac{\bm{X}^m}{m},
+\]
+\cite{Hall2000LieGroups}, its first-order expansion can be written as
+\begin{equation}\label{eq:first_order_expansion_exponential}
+    \exp(\bm{X}) = \bm{I} + \bm{X} + O(\bm{X}^2).
+\end{equation}
+Therefore, for small $h$, the exponential map $\bm{F}_k = \exp(h \hat{\bm{\omega}}_k)$ can be approximated using \ref{eq:first_order_expansion_exponential} to
+\[
+    \bm{F}_k = \exp(h \hat{\bm{\omega}}_k) \approx \bm{I} + h \hat{\bm{\omega}}_k,
+\]
+following the general discrete approximation of the angular velocity
+\begin{equation}\label{eq:discrete_velocity_approximation}
+    \hat{\bm{\omega}}_k \approx \frac{1}{h}(\bm{F}_k - \bm{I}),
+\end{equation}
+\cite{Lee2008}. Secondly, quadrature rules, for example, the midpoint rule and the trapezoidal rule can be applied to create an integrator $F^{L_{d}}: (\bm{R}_0, \bm{F}_0) \to (\bm{R}_1, \bm{F}_1)$, or the symplectic integration method of Str\"{o}mer-Verlet \cite{Marsden2001}. In order to align with \cite{Lee2008}, the trapezodial rule is applied for the approximation for an integral, given by
+\begin{equation}\label{eq:trapezodial_rule}
+    \int_{t_k}^{t_{k+1}} f(t)\,dt
+    \approx
+    \frac{h}{2}\left(f(t_k)+f(t_{k+1})\right),
+\end{equation}
+for $h = t_{k+1}-t_k$ \cite{butcher2016numerical}. Applying \ref{eq:trapezodial_rule} to the Lagrangian \ref{eq:discrete_3D_pendulum_lagrangian}, it follows
+\begin{align}\label{eq:discrete_potential_3D_pendulum}
+    \int_{t_k}^{t_{k+1}} U(\bm{R}) \, dt
+    =
+    \int_{t_k}^{t_{k+1}} mg\,\bm{e}_3^{\top} \bm{R} \bm{\rho}_c \, dt
+    &\approx
+    \frac{h}{2}\, mg\,\bm{e}_3^{\top}  \bm{R}_k \bm{\rho}_c
+    +
+    \frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_{k+1} \bm{\rho}_c \notag \\
+    &=
+    \frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_k \bm{\rho}_c
+    +
+    \frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_k \bm{F}_k \bm{\rho}_c, \notag \\
+    &=U(\bm{R}_k)+U(\bm{R}_k \bm{F}_k),
+\end{align}
+using \ref{eq:discrete_attitude_kinematics_equation_SO3}, as only the potential energy $U(\bm{R})$ of the continuous Lagrangian depends on $\bm{R}$. Substituting \ref{eq:discrete_velocity_approximation} and \ref{eq:discrete_potential_3D_pendulum} into \ref{eq:discrete_3D_pendulum_lagrangian}, the discrete Lagrangian is calculated to
+\begin{align}
+    L_d(\bm{R}_k,\bm{F}_k)
+    &=
+    \frac{1}{2h}\operatorname{tr}\!\left[(\bm{F}_k-\bm{I})\bm{J}_d(\bm{F}_k-\bm{I})^{\top}\right]
+    - \frac{h}{2}\left(U(\bm{R}_k)+U(\bm{R}_k\bm{F}_k)\right)  \notag\\
+    &=
+    \frac{1}{2h}\operatorname{tr}\!\left[
+        \bm{F}_k\bm{J}_d\bm{F}_k^{\top}
+        - \bm{J}_d\bm{F}_k^{\top}
+        - \bm{F}_k\bm{J}_d
+        + \bm{J}_d
+    \right]
+    - \frac{h}{2}\left(U(\bm{R}_k)+U(\bm{R}_k\bm{F}_k)\right) \notag \\
+    &=
+    \frac{1}{2h}\operatorname{tr}\!\left[
+        2\bm{J}_d - 2\bm{F}_k\bm{J}_d
+    \right]
+    - \frac{h}{2}\left(U(\bm{R}_k)+U(\bm{R}_k\bm{F}_k)\right) \notag \\
+    &=
+    \frac{1}{h}\operatorname{tr}\!\left[(\bm{I}-\bm{F}_k)\bm{J}_d\right]
+    - \frac{h}{2}\left(U(\bm{R}_k)+U(\bm{R}_k\bm{F}_k)\right),
+\end{align}
+using $\operatorname{tr}[\bm{F}_k \bm{J}_d \bm{F}_k^\top] = \operatorname{tr}[\bm{J}_d \bm{F}_k^\top \bm{F}_k ] = \operatorname{tr}[\bm{J}_d]$ and $\operatorname{tr}[\bm{J}_d \bm{F}_k^\top] = \operatorname{tr}[\bm{F}_k \bm{J}_d]$, since $\bm{J}_d$ is defined as an diagonal matrix $\bm{J}_d = \bm{J}_d^\top$ \cite{Lee2008}.
+
+\paragraph{Discrete Euler-Lagrange Equations}
+
+In order to define the Euler-Lagrange Equation \ref{eq:discrete_euler_lagrange}, the derivatives of \ref{eq:discrete_3D_pendulum_lagrangian} have to be calculated. Firstly, the directional derivative $\left\langle D_{\bm{F_k}}L(\bm{R}_k, \bm{F}_k), \delta \bm{f}_k \right\rangle = \left\langle
+T_e^*L_{\bm{F}_k}\,D_{\bm{F}_k}L_d(\bm{R}_k,\bm{F}_k),
+\hat{\bm{X}}_k
+\right\rangle$ is given by applying \ref{eq:derivative_fk}, which yields to
+{\small
+\begin{align}
+\left\langle
+T_e^*L_{\bm{F}_k}\,D_{\bm{F}_k}L_d(\bm{R}_k,\bm{F}_k),
+\hat{\bm{X}}_k
+\right\rangle
+&=
+\left.\frac{d}{d\epsilon}\right|_{\epsilon=0}
+L_d\!\left(
+\bm{R}_k,\bm{F}_k\exp(\epsilon\hat{\bm{X}}_k)
+\right)
+\notag\\
+&=
+-\frac{1}{h}\operatorname{tr}\!\left[
+\bm{F}_k\hat{\bm{X}}_k \bm{J}_d
+\right]
++\frac{h}{2}mg\,\bm{e}_3^{\top}\bm{R}_k\bm{F}_k
+\hat{\bm{X}}_k\bm{\rho}_c
+\notag\\
+&=
+-\frac{1}{h}\operatorname{tr}\!\left[
+\hat{\bm{X}}_k\bm{J}_d\bm{F}_k
+\right]
++\frac{h}{2}mg\,
+\left((\bm{R}_k \bm{F}_k)^{\top}\bm{e}_3\right)^{\top}
+\hat{\bm{X}}_k\bm{\rho}_c,
+\notag
+\end{align}}
+using the trace identity $\operatorname{tr}[\bm{A B C}] = \operatorname{tr}[\bm{BCA}]$ for any $\bm{A}, \bm{B}, \bm{C} \in \mathbb{R}^{n \times n}$. Additionally, \cite{Lee2008} introduces the relation $\operatorname{tr}[\hat{\bm{s}}\bm{B}] = - \left\langle \bm{B}-\bm{B}^\top, \hat{\bm{s}} \right\rangle$ for any $\bm{s} \in \mathbb{R}^3,\bm{B} \in \mathbb{R}^{3 \times 3}$. Applying it together with $\bm{a}^\top \hat{\bm{x}}\bm{b} = (\bm{b} \times \bm{a}) \cdot \bm{x}$ for any $\bm{a}, \bm{b}, \bm{x} \in \mathbb{R}^3$, the inner product defeinition \ref{eq:inner_product}, and the linearity of the pairing $\left\langle \bm{A}, \bm{B} \right\rangle + \left\langle \bm{C}, \bm{B} \right\rangle = \left\langle \bm{A}+\bm{C},\bm{B} \right\rangle$ for any $\bm{A}, \bm{B}, \bm{C} \in \mathbb{R}^{n \times n}$, the final directional derivative of the discrete Lagrangian respect to $\bm{F}_k$ is calculated to
+{\small
+\begin{align}
+\left\langle
+T_e^*L_{\bm{F}_k}\,D_{\bm{F}_k}L_d(\bm{R}_k,\bm{F}_k),
+\hat{\bm{X}}_k
+\right\rangle
+&=
+\left\langle
+\frac{1}{h}
+\left(\bm{J}_d\bm{F}_k-\bm{F}_k^{\top}\bm{J}_d\right),
+\hat{\bm{X}}_k
+\right\rangle
++\left\langle
+\frac{h}{2}mg\,
+\left(
+\bm{\rho}_c\times (\bm{R}_k\bm{F}_k)^{\top}\bm{e}_3
+\right)^\wedge,
+\hat{\bm{X}}_k
+\right\rangle
+\notag\\
+&=
+\left\langle
+\frac{1}{h}
+\left(\bm{J}_d\bm{F}_k-\bm{F}_k^{\top}\bm{J}_d\right)
++
+\left(
+\frac{h}{2}mg\,
+\bm{\rho}_c\times \bm{R}_{k+1}^{\top}\bm{e}_3
+\right)^\wedge,
+\hat{\bm{X}}_k
+\right\rangle. \notag
+\end{align}}
+Therefore,
+\begin{equation}\label{eq:discrete_3D_pendulum_derivative_fk}
+    T_e^*L_{\bm{F}_k}\,D_{\bm{F}_k}L_d(\bm{R}_k,\bm{F}_k)
+    \;\widehat{=}\;
+    \frac{1}{h}\left(\bm{J}_d \bm{F}_k - \bm{F}_k^{\top}\bm{J}_d\right)
+    +
+    \frac{h}{2}\,\hat{\bm{M}}_{k+1},
+\end{equation}
+    with the definition of
+\begin{equation}
+    \bm{M}_{k} = mg\,\bm{\rho}_c\times \bm{R}_{k}^{\top}\bm{e}_3,
+\end{equation}
+being the moment due to the potential energy in body frame \cite{Lee2008}.
+
+Moreover, the directional derivative 
+\[
+\left\langle
+D_{\bm{R}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1}),
+\delta \bm{R}_{k+1}
+\right\rangle = \left\langle
+T_e^*L_{\bm{R}_{k+1}}\,D_{\bm{R}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1}),
+\hat{\bm{\eta}}_{k+1}
+\right\rangle,
+\] which is in this model only dependent of the potential energy $U(\bm{R}_{k+1})+U(\bm{R}_{k+1} \bm{F}_{k+1})$, is calculated by \ref{eq:derivative_gk} to
+{\small
+\begin{align}
+\left\langle
+T_e^*L_{\bm{R}_{k+1}}\,D_{\bm{R}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1}),
+\hat{\bm{\eta}}_{k+1}
+\right\rangle
+\notag
+&=
+\left.\frac{d}{d\epsilon}\right|_{\epsilon=0}
+L_d\!\left(
+\bm{R}_{k+1}\exp(\epsilon\hat{\bm{\eta}}_{k+1}),
+\bm{F}_{k+1}
+\right)
+\notag\\
+&=
+\frac{h}{2}mg\,\bm{e}_3^{\top}\bm{R}_{k+1}\hat{\bm{\eta}}_{k+1}\bm{\rho}_c
++
+\frac{h}{2}mg\,\bm{e}_3^{\top}\bm{R}_{k+1}\hat{\bm{\eta}}_{k+1}\bm{F}_{k+1}\bm{\rho}_c
+\notag\\
+&=
+\frac{h}{2}mg
+\left[
+\left(\bm{\rho}_c\times \bm{R}_{k+1}^{\top}\bm{e}_3\right)
++
+\left(\bm{F}_{k+1}\bm{\rho}_c\times \bm{R}_{k+1}^{\top}\bm{e}_3\right)
+\right]\cdot \bm{\eta}_{k+1}
+\notag
+\end{align}}
+Applying the definition of inner products \ref{eq:}, it follows 
+{\small
+\begin{align}  
+ \left\langle
+T_e^*L_{\bm{R}_{k+1}}\,D_{\bm{R}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1}),
+\hat{\bm{\eta}}_{k+1}
+\right\rangle
+&=
+\left\langle
+\frac{h}{2}mg
+\left[
+\left(\bm{\rho}_c\times \bm{R}_{k+1}^{\top}\bm{e}_3\right)
++
+\left(\bm{F}_{k+1}\bm{\rho}_c\times \bm{R}_{k+1}^{\top}\bm{e}_3\right)
+\right]^\wedge,
+\hat{\bm{\eta}}_{k+1}
+\right\rangle.
+\notag \\
+&=
+\left\langle
+\frac{h}{2}
+\left(
+\hat{\bm{M}}_{k+1}
++
+(\bm{F}_{k+1}\bm{M}_{k+2})^\wedge
+\right),
+\hat{\bm{\eta}}_{k+1}
+\right\rangle,
+\notag
+\end{align}
+}
+which implies that the derivative of \ref{eq:discrete_3D_pendulum_lagrangian} with repsect to $\bm{R}_{k+1}$ is given to
+\begin{equation}\label{eq:discrete_3D_pendulum_derivative_gk}
+    D_{\bm{R}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1}) = \frac{h}{2}
+\left[
+\hat{\bm{M}}_{k+1}
++
+(\bm{F}_{k+1}\bm{M}_{k+2})^\wedge
+\right].
+\end{equation}
+
+Since the directional derivative
+$T_e^*L_{\bm{F}_k}\,D_{\bm{F}_k}L_d(\bm{R}_k,\bm{F}_k)$
+was derived in \ref{eq:discrete_3D_pendulum_derivative_fk}, the coadjoint term in the discrete Euler-Lagrange equation \ref{eq:discrete_euler_lagrange} can be written in matrix form to 
+{\small
+\begin{align}
+\operatorname{Ad}^{*}_{\bm{F}_{k+1}^{-1}}
+\!\left(
+T_e^*L_{\bm{F}_{k+1}}
+D_{\bm{F}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1})
+\right)
+&=
+\bm{F}_{k+1}
+\left[
+\frac{1}{h}
+\left(
+\bm{J}_d\bm{F}_{k+1}
+-
+\bm{F}_{k+1}^{\top}\bm{J}_d
+\right)
++
+\frac{h}{2}\hat{\bm{M}}_{k+2}
+\right]
+\bm{F}_{k+1}^{\top}
+\notag\\
+&=
+\frac{1}{h}
+\left(
+\bm{F}_{k+1}\bm{J}_d
+-
+\bm{J}_d\bm{F}_{k+1}^{\top}
+\right)
++
+\frac{h}{2}\bm{F}_{k+1}\hat{\bm{M}}_{k+2}\bm{F}_{k+1}^{\top}
+\notag\\
+&=
+\frac{1}{h}
+\left(
+\bm{F}_{k+1}\bm{J}_d
+-
+\bm{J}_d\bm{F}_{k+1}^{\top}
+\right)
++
+\frac{h}{2}(\bm{F}_{k+1}\bm{M}_{k+2})^\wedge\label{eq:discrete_3D_pendulum_coadjoint},
+\end{align}}
+by using the identity \ref{eq:discrete_coadjoint}.
+
+Finally, the Euler-Lagrange equations of the unforced 3D-pendulum are expressed in $\mathfrak{so}(3)$ $SO(3)$ form, substituting \ref{eq:discrete_3D_pendulum_derivative_fk}, \ref{eq:discrete_3D_pendulum_derivative_gk} and \ref{eq:discrete_3D_pendulum_coadjoint} into \ref{eq:discrete_euler_lagrange}, which results in
+\begin{align}\label{eq:discrete_3D_pednulum_EL_1}
+    \frac{1}{h}\left(
+        \bm{F}_{k+1}\bm{J}_d
+        - \bm{J}_d\bm{F}_{k+1}^{\top}
+        - \bm{J}_d\bm{F}_k
+        + \bm{F}_k^{\top}\bm{J}_d
+    \right)
+    &=
+    h\,\hat{\bm{M}}_{k+1}, \\
+    \bm{R}_{k+1} &= \bm{R}_k \bm{F}_k.\label{eq:discrete_3D_pednulum_EL_2}
+\end{align}
+\cite{Lee2008} describes the procedure of obtaining the discrete-time flow map $(\bm{R}_{k},\bm{R}_{k+1}) \to (\bm{R}_{k+1},\bm{R}_{k+2})$, by solving \ref{eq:discrete_3D_pednulum_EL_1} finding $\bm{F}_{k+1}$ for given $(\bm{R}_{k},\bm{R}_{k+1})$ and $\bm{F}_k = \bm{R}_k^\top\bm{R}_{k+1}$. Secondly, $\bm{R}_{k+2}$ is derived from \ref{eq:discrete_3D_pednulum_EL_2}.  
+
+\paragraph{Discrete Legendre Transformation}
+
+In order to obtain the discrete Hamilton equations for the unforced 3D-pendulum model, the discrete Legendre transformation $\mathbb{F}^+L_d, \mathbb{F}^-L_d:(SO(3)\times SO(3)) \to (SO(3) \times \mathfrak{so}(3)^*)$ with $\mathbb{F}^+L_d(\bm{R}_{k-1}, \bm{F}_{k-1}) = \mathbb{F}^-L_d(\bm{R}_k, \bm{F}_k)$ \ref{eq:discrete_legendre_transformation} have to be applied, which results in the expression for the discrete momentum
+
+\begin{align}
+    \hat{\bm{\Pi}}_k
+    &=
+    -\frac{h}{2}\left(
+        \hat{\bm{M}}_k
+        + \left(\bm{F}_k\bm{M}_{k+1}\right)^\wedge
+    \right)
+    +
+    \frac{1}{h}\left(
+        \bm{F}_k\bm{J}_d
+        - \bm{J}_d\bm{F}_k^{\top}
+    \right)
+    +
+    \frac{h}{2}\left(\bm{F}_k\bm{M}_{k+1}\right)^\wedge
+    \notag \label{eq:discrete_3D_pendulum_momentum_1} \\
+    &=
+    \frac{1}{h}\left(
+        \bm{F}_k\bm{J}_d
+        - \bm{J}_d\bm{F}_k^{\top}
+    \right)
+    - \frac{h}{2}\hat{\bm{M}}_k, \\
+    \hat{\bm{\Pi}}_{k+1}
+    &=
+    \frac{1}{h}\left(
+        \bm{J}_d\bm{F}_k
+        - \bm{F}_k^{\top}\bm{J}_d
+    \right)
+    + \frac{h}{2}\hat{\bm{M}}_{k+1}.\label{eq:discrete_3D_pendulum_momentum_2}
+\end{align}
+where $ \hat{\bm{\Pi}} \in \mathfrak{so}(3)^*$. Either, by substituting \ref{eq:discrete_3D_pendulum_momentum_1} and \ref{eq:discrete_3D_pendulum_momentum_2} into \ref{eq:discrete_3D_pednulum_EL_1} and \ref{eq:discrete_3D_pednulum_EL_2}, or by applying \ref{eq:discrete_hamiltion_equations}, the discrete Hamilton equations of an unforced 3D-pendulum are calculated to
+\begin{align}\label{eq:discrete_3D_pendulum_hamilton_1}
+     \frac{1}{h}\left(
+        \bm{F}_k \bm{J}_d
+        - \bm{J}_d \bm{F}_k^{\top}
+    \right)
+    &=
+    \hat{\bm{\Pi}}_k
+    + \frac{h}{2}\hat{\bm{M}}_k ,\\
+    \label{eq:discrete_3D_pendulum_hamilton_2}
+    \bm{R}_{k+1}
+    &=
+    \bm{R}_k \bm{F}_k ,\\
+    \label{eq:discrete_3D_pendulum_hamilton_3}
+    \hat{\bm{\Pi}}_{k+1}
+    &=
+    (\bm{F}_k^\top \bm{\Pi}_k)^\wedge
+    + \frac{h}{2}(\bm{F}_k^\top \bm{M}_k)^\wedge
++ \frac{h}{2}\hat{\bm{M}}_{k+1}.
+\end{align}
+Finally, the discrete map $(\bm{R}_k, \bm{\Pi}_k)  \to (\bm{R}_{k+1}, \bm{\Pi}_{k+1})$ is obtained by solving implicit the equation \ref{eq:discrete_3D_pendulum_hamilton_1} for $\bm{F}_k$ with given $(\bm{R}_k, \bm{\Pi}_k)$. In consequence, $\bm{R}_{k+1}$ is derived from \ref{eq:discrete_3D_pendulum_hamilton_1}, and $\bm{\Pi}_{k+1}$ from \ref{eq:discrete_3D_pendulum_hamilton_3}.
+
+\section{Forced Discrete Mechanics}
+
+
+\subsection{Acrobot}
+

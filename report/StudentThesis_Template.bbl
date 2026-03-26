@@ -1,0 +1,126 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{TJVG25}
+
+\bibitem[BLdD23]{Barbero-Linan2023_Cayley_Formula}
+Mar{\'i}a Barbero-Li{\~n}{\'a}n and David~Mart{\'i}n de~Diego.
+\newblock Retraction maps: A seed of geometric integrators.
+\newblock {\em Foundations of Computational Mathematics}, 23(4):1335--1380,
+  2023.
+\newblock \href {https://doi.org/10.1007/s10208-022-09571-x}
+  {\path{doi:10.1007/s10208-022-09571-x}}.
+
+\bibitem[BR18]{Benacquista2018ClassicalMechanics}
+Matthew~J. Benacquista and Joseph~D. Romano.
+\newblock {\em Classical Mechanics}.
+\newblock Undergraduate Lecture Notes in Physics. Springer, Cham, 2018.
+\newblock \href {https://doi.org/10.1007/978-3-319-68780-3}
+  {\path{doi:10.1007/978-3-319-68780-3}}.
+
+\bibitem[But16]{butcher2016numerical}
+John~Charles Butcher.
+\newblock {\em Numerical methods for ordinary differential equations}.
+\newblock John Wiley \& Sons, 2016.
+
+\bibitem[CJ12]{ColomboJimenez2012SO3_Cayley}
+Leonardo Colombo and Fernando Jim{\'e}nez.
+\newblock Continuous and discrete mechanics for the attitude dynamics of a
+  rigid body on {SO}(3), 2012.
+\newblock URL:
+  \url{https://gmcnet.webs.ull.es/sites/default/files/GMCNotes1_OK.pdf}.
+
+\bibitem[CO03]{CELLEDONI2003421}
+Elena Celledoni and Brynjulf Owren.
+\newblock Lie group methods for rigid body dynamics and time integration on
+  manifolds.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  192(3):421--438, 2003.
+\newblock URL:
+  \url{https://www.sciencedirect.com/science/article/pii/S0045782502005200},
+  \href {https://doi.org/10.1016/S0045-7825(02)00520-0}
+  {\path{doi:10.1016/S0045-7825(02)00520-0}}.
+
+\bibitem[Els26]{Elshani2026CTO_GitHub}
+Edonis Elshani.
+\newblock Certifiable trajectory optimization.
+\newblock GitHub repository, 2026.
+\newblock Numerical\_Simulation directory, accessed March 25, 2026.
+\newblock URL:
+  \url{https://github.com/EdonisElshani/Certifiable_Trajectory_Optimization}.
+
+\bibitem[Hai94]{Hairer1994}
+Ernst Hairer.
+\newblock Backward analysis of numerical integrators and symplectic methods.
+\newblock {\em Annals of Numerical Mathematics}, 1:107 -- 132, 07 1994.
+
+\bibitem[Hai00]{Hairer2000}
+E.~Hairer.
+\newblock Symmetric projection methods for differential equations on manifolds.
+\newblock {\em BIT Numerical Mathematics}, 40(4):726--734, 12 2000.
+\newblock \href {https://doi.org/10.1023/A:1022344502818}
+  {\path{doi:10.1023/A:1022344502818}}.
+
+\bibitem[Hal00]{Hall2000LieGroups}
+Brian~C. Hall.
+\newblock An elementary introduction to groups and representations, 2000.
+\newblock URL: \url{https://arxiv.org/abs/math-ph/0005032}, \href
+  {https://arxiv.org/abs/math-ph/0005032} {\path{arXiv:math-ph/0005032}}.
+
+\bibitem[Ise01]{Arieh_Cayley_Motivation}
+Arieh Iserles.
+\newblock On cayley-transform methods for the discretization of lie-group
+  equations.
+\newblock {\em Foundations of Computational Mathematics}, 1:129--160, 01 2001.
+\newblock \href {https://doi.org/10.1007/s102080010003}
+  {\path{doi:10.1007/s102080010003}}.
+
+\bibitem[Lee08]{Lee2008}
+Taeyoung Lee.
+\newblock {\em Computational Geometric Mechanics and Control of Rigid Bodies}.
+\newblock Phd dissertation, The University of Michigan, Ann Arbor, Michigan,
+  2008.
+
+\bibitem[MR99]{MarsdenRatiu1999}
+Jerrold~E. Marsden and Tudor~S. Ratiu.
+\newblock {\em Introduction to Mechanics and Symmetry: A Basic Exposition of
+  Classical Mechanical Systems}, volume~17 of {\em Texts in Applied
+  Mathematics}.
+\newblock Springer, New York, NY, 2 edition, 1999.
+\newblock \href {https://doi.org/10.1007/978-0-387-21792-5}
+  {\path{doi:10.1007/978-0-387-21792-5}}.
+
+\bibitem[MW01]{Marsden2001}
+J.~Marsden and Matthew West.
+\newblock Discrete mechanics and variational integrators.
+\newblock {\em Acta Numerica}, 10, 10 2001.
+\newblock \href {https://doi.org/10.1017/S096249290100006X}
+  {\path{doi:10.1017/S096249290100006X}}.
+
+\bibitem[Ric]{RITInertiaTable216}
+Michael Richmond.
+\newblock Table of selected moments of inertia.
+\newblock
+  \url{http://spiff.rit.edu/classes/phys216/workshops/w9b/momi_table.pdf}.
+\newblock Course handout, Rochester Institute of Technology, accessed
+  2026-03-25.
+
+\bibitem[SSC{\etalchar{+}}04]{Shen20043DPendulum}
+Jinglai Shen, A.K. Sanyal, N.A. Chaturvedi, D.~Bernstein, and H.~McClamroch.
+\newblock Dynamics and control of a 3d pendulum.
+\newblock In {\em 2004 43rd IEEE Conference on Decision and Control (CDC) (IEEE
+  Cat. No.04CH37601)}, volume~1, pages 323--328 Vol.1, 2004.
+\newblock \href {https://doi.org/10.1109/CDC.2004.1428650}
+  {\path{doi:10.1109/CDC.2004.1428650}}.
+
+\bibitem[TJVG25]{Sangli2025}
+Sangli Teng, Ashkan Jasour, Ram Vasudevan, and Maani Ghaffari.
+\newblock Convex geometric motion planning of multi-body systems on lie groups
+  via variational integrators and sparse moment relaxation.
+\newblock {\em The International Journal of Robotics Research},
+  44(10-11):1784--1813, 2025.
+\newblock \href
+  {https://arxiv.org/abs/https://doi.org/10.1177/02783649241296160}
+  {\path{arXiv:https://doi.org/10.1177/02783649241296160}}, \href
+  {https://doi.org/10.1177/02783649241296160}
+  {\path{doi:10.1177/02783649241296160}}.
+
+\end{thebibliography}

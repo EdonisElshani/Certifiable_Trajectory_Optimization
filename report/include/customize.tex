@@ -1,0 +1,47 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOMIZING Tex-File for students to be adjusted as needed %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM PACKAGES	%
+%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{bm}
+\usepackage{siunitx}
+\setlength{\parindent}{1.5em}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+
+\usepackage{amsmath, amssymb, amsthm}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+% \usepackage{IEEEtrantools}
+
+%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM COMMANDS	%
+%%%%%%%%%%%%%%%%%%%%%
+% e.g. Math conventions as vectors, Matrices, sets
+\renewcommand{\vec}[1]{\mathbf{\MakeLowercase{#1}}}
+\newcommand{\Mat}[1]{\mathbf{\MakeUppercase{#1}}}
+\newcommand{\set}[1]{\boldsymbol{#1}}
+
+% e.g. use differenc layers in tikz
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{nodelayer}
+\pgfdeclarelayer{edgelayer}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,edgelayer,nodelayer,main,foreground}
+%%%%%%%%%%%%%%%%%%%%%
+% HYPHENATIONS 		%
+%%%%%%%%%%%%%%%%%%%%%
+\hyphenation{Lya-pu-nov}
+

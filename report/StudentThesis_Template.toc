@@ -1,0 +1,82 @@
+\contentsline {chapter}{\numberline {1}Working with this Template}{7}{chapter.1}%
+\contentsline {section}{\numberline {1.1}General Remarks}{7}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Revisions of your thesis}{7}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Structure of your thesis}{7}{subsection.1.1.2}%
+\contentsline {section}{\numberline {1.2}Structuring: Sections}{9}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Subsection}{9}{subsection.1.2.1}%
+\contentsline {subsubsection}{Subsubsection}{9}{section*.6}%
+\contentsline {paragraph}{Paragraphs}{9}{section*.7}%
+\contentsline {section}{\numberline {1.3}Style and Expressions}{9}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Writing}{9}{subsection.1.3.1}%
+\contentsline {section}{\numberline {1.4}References}{10}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Equations}{11}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Figures}{11}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}Tables}{11}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.4.4}Definitions / Assumptions / Theorems / Lemmas}{12}{subsection.1.4.4}%
+\contentsline {section}{\numberline {1.5}Equations}{12}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Notation Consistency}{13}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Symbol Glossary}{14}{subsection.1.5.2}%
+\contentsline {subsection}{\numberline {1.5.3}Style Notes}{14}{subsection.1.5.3}%
+\contentsline {section}{\numberline {1.6}Figures}{14}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Definitions / Assumptions / Theorems / Lemmas}{15}{section.1.7}%
+\contentsline {section}{\numberline {1.8}Citations}{17}{section.1.8}%
+\contentsline {section}{\numberline {1.9}Compiling}{19}{section.1.9}%
+\contentsline {chapter}{\numberline {2}Introduction}{21}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Problem Statement}{21}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Related Work}{21}{section.2.2}%
+\contentsline {chapter}{\numberline {3}Technical Approach}{23}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Design of your solution}{23}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Implementation}{23}{section.3.2}%
+\contentsline {chapter}{\numberline {4}Preliminaries On Special Embedded Matrix Lie Groups}{25}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Special Matrix Lie Groups}{25}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Special Lie Algebras}{25}{section.4.2}%
+\contentsline {paragraph}{Differential of left translation $T_RL_H$ on $SO(n)$}{26}{section*.11}%
+\contentsline {paragraph}{Differential of left translation $T_gL_h$ on $SE(n)$}{26}{section*.12}%
+\contentsline {chapter}{\numberline {5}Continuous Mechanics of Rigid Bodies on Lie Groups}{27}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Lagrangian Mechanics}{27}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Euler-Lagrange Equations}{27}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Hamiltonian Mechanics}{28}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Legendre Transformation}{28}{subsection.5.1.3}%
+\contentsline {subsection}{\numberline {5.1.4}Properties of the Lagrangian Flow}{28}{subsection.5.1.4}%
+\contentsline {section}{\numberline {5.2}Unforced 3D-Pendulum}{28}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Derivation of Lie Group Mechanics}{28}{subsection.5.2.1}%
+\contentsline {paragraph}{Configuration Manifold}{28}{section*.13}%
+\contentsline {paragraph}{Lagrangian}{29}{section*.14}%
+\contentsline {paragraph}{Euler-Lagrange Equations}{30}{section*.15}%
+\contentsline {paragraph}{Legendre Transformation}{31}{section*.16}%
+\contentsline {subsection}{\numberline {5.2.2}Verification Of Momentum Conservation}{31}{subsection.5.2.2}%
+\contentsline {chapter}{\numberline {6}Discrete Mechanics For Rigid Bodies On Lie Groups}{35}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Discrete Lagrangian Mechanics}{35}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Discrete Euler-Lagrange Equations}{35}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Forced Discrete Euler-Lagrange Equations}{37}{subsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.1.3}Discrete Hamiltonian Mechanics}{37}{subsection.6.1.3}%
+\contentsline {subsection}{\numberline {6.1.4}Discrete Legendre Transformation}{37}{subsection.6.1.4}%
+\contentsline {subsection}{\numberline {6.1.5}Properties of the Discrete Lagrangian Flow}{37}{subsection.6.1.5}%
+\contentsline {subsection}{\numberline {6.1.6}Computational Implementation}{37}{subsection.6.1.6}%
+\contentsline {paragraph}{Cayley Transformation}{37}{section*.17}%
+\contentsline {paragraph}{Newton Iteration}{38}{section*.18}%
+\contentsline {section}{\numberline {6.2}Unforced Discrete Mechanics}{38}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}3D-Pendulum}{38}{subsection.6.2.1}%
+\contentsline {paragraph}{Configuration Manifold}{38}{section*.19}%
+\contentsline {paragraph}{Discrete Lagrangian}{39}{section*.20}%
+\contentsline {paragraph}{Discrete Euler-Lagrange Equations}{40}{section*.21}%
+\contentsline {paragraph}{Discrete Legendre Transformation}{42}{section*.22}%
+\contentsline {section}{\numberline {6.3}Forced Discrete Mechanics}{42}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Acrobot}{42}{subsection.6.3.1}%
+\contentsline {chapter}{\numberline {7}Evaluation}{43}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Numerical Simulation Results}{43}{section.7.1}%
+\contentsline {paragraph}{Runge--Kutta 4th order}{43}{section*.24}%
+\contentsline {paragraph}{RK4 projected to $SO(3)$}{44}{section*.25}%
+\contentsline {subsection}{\numberline {7.1.1}Unforced 3D Pendulum}{45}{subsection.7.1.1}%
+\contentsline {section}{\numberline {7.2}Experimental Results}{47}{section.7.2}%
+\contentsline {paragraph}{Statistics:}{48}{section*.27}%
+\contentsline {chapter}{\numberline {8}Discussion}{49}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusion}{51}{chapter.9}%
+\contentsline {chapter}{\numberline {A}BUSTED! Last chance to actually read the HowTo-Section!}{53}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Spellcheck reminder}{53}{section.A.1}%
+\contentsline {chapter}{List of Figures}{55}{section*.29}%
+\contentsline {chapter}{List of Tables}{57}{section*.31}%
+\contentsline {chapter}{Acronyms}{59}{section*.33}%
+\contentsline {chapter}{Notation}{61}{section*.35}%
+\contentsline {chapter}{List of Symbols}{63}{section*.37}%
+\contentsline {chapter}{Bibliography}{65}{section*.39}%

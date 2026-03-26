@@ -1,0 +1,89 @@
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTE: Using this is optional.
+% 	Nonetheless, feel free to include this file and adjust the 
+% 	examples below as needed.
+%   
+%
+% Further reading:
+%	https://ctan.org/pkg/glossaries?lang=en
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% include packages
+\usepackage[acronyms, style=alttree, toc=true, nonumberlist, nogroupskip, nopostdot, automake]{glossaries}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DEFINE HEADINGS AND CATEGORIES %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Notation}{Notation}
+\newcommand{\Symbols}{List of Symbols}
+
+\newglossary{notation}{not}{nt}{\Notation}
+\newglossary{symbols}{sym}{sbl}{\Symbols}
+
+\glssetwidest{THISWIDE} % adjust width of glossary
+
+\makeglossaries
+
+%===========%
+% ACRONYMS	%
+%===========%
+\newacronym{MPC}{MPC}{model-predictive control}
+\newacronym{BIBO}{BIBO}{bounded-input bounded-output}
+\newacronym{HRC}{HRC}{human-robot collaboration}
+
+%============%
+% SYMBOLS	%
+%===========%
+\newglossaryentry{control}{type=symbols,
+	sort={control},
+	name={\ensuremath{\vec{u}}},
+	description={control input vector}
+}
+\newglossaryentry{uk}{type=symbols,
+	sort={control},
+	name={\ensuremath{\vec{u}_k}},
+	description={control input vector with time step}
+}
+
+\newglossaryentry{xk}{type=symbols,
+	sort={state},
+	name={\ensuremath{\vec{x}_k}},
+	description={state vector with time step}
+}
+
+%============%
+% NOTATION	%
+%===========%
+\newglossaryentry{vector}{type=notation,
+	sort={vector},
+	name={\ensuremath{\vec{x}_n}},
+	description={$n$-dimensional vector named $x$}
+}	
+
+\newglossaryentry{matrix}{type=notation,
+	sort={vector-matrix},
+	name={\ensuremath{\Mat{x}_{m\times n}}},
+	plural={matrices},
+	user1={Mat},
+	description={\ensuremath{m\times n} dimensional matrix  named \ensuremath{X}}
+}
+
+\glsaddall % Print all glossary entries
+
+%%%% Add GLOSSARIES at end of thesis
+\newcommand{\AddMyGloss}{
+	\cleardoublepage
+   	\printglossary[type=acronym, nogroupskip]
+	
+	\ifdefined\Notation
+		\cleardoublepage
+		\printglossary[type=notation, nogroupskip]
+	\fi
+	
+  	\ifdefined\Symbols
+  		\cleardoublepage
+		\printglossary[type=symbols, nogroupskip]
+	\fi
+}
+
