@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from Discrete_Mechanical_Models_Lie_Groups.model_3d_pendulum import Pendulum3DModel
+from Discrete_Mechanical_Models_Lie_Groups.model_3d_pendulum_forced import ForcedPendulum3DModel
 
 # For solving with exponential map-based LGVI:
 # from solver_lgvi import simulate_lgvi
@@ -123,7 +124,10 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict):
     
 
 if __name__ == "__main__":
-    model = Pendulum3DModel()
+
+    # Choose the model to simulate:
+    model = ForcedPendulum3DModel()
+    # model = Pendulum3DModel()
 
     # Simulation parameters
     h = 0.05

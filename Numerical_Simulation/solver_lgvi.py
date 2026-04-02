@@ -1,3 +1,5 @@
+from xml.parsers.expat import model
+
 import numpy as np
 from numpy.linalg import norm, solve
 
@@ -84,8 +86,7 @@ def lgvi_step(model, R_k: np.ndarray, Pi_k: np.ndarray, f_0: np.ndarray,
         R_{k+1} = R_k F_k
         Pi_{k+1} = F_k^T Pi_k + h/2 F_k^T M_k + h/2 M_{k+1}
     """
-    M_k = model.moment(R_k)
-    a_k = h * (Pi_k + 0.5 * h * M_k)
+    a_k = model.a_k(R_k, Pi_k, h, t_k)
 
     f_k, n_iter, residual = solve_f_newton(
         a=a_k,
@@ -97,9 +98,7 @@ def lgvi_step(model, R_k: np.ndarray, Pi_k: np.ndarray, f_0: np.ndarray,
 
     F_k = rodrigues(f_k)
     R_k1 = R_k @ F_k
-    M_k1 = model.moment(R_k1)
-
-    Pi_k1 = F_k.T @ Pi_k + 0.5 * h * (F_k.T @ M_k + M_k1)
+    Pi_k1 = model.update_pi_lgvi(R_k, R_k1, F_k, Pi_k, h, t_k)
 
     Omega_k = solve(model.J, Pi_k1)
 
