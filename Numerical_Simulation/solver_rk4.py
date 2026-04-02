@@ -32,7 +32,11 @@ def simulate_rk4(
     R = R0.copy()
     Omega = Omega0.copy()
 
+    R_hist = np.zeros((N, 3, 3))
+    x_hist = np.zeros((N, 3))
     Omega_hist = np.zeros((N, 3))
+    u_hist = np.zeros((N, 3))
+
     E_hist = np.zeros(N)
     mu_hist = np.zeros(N)
     orth_hist = np.zeros(N)
@@ -45,14 +49,24 @@ def simulate_rk4(
         if project:
             R = project_to_so3(R)
 
-        Omega_hist[k, :] = Omega
+        t_out = t[k + 1]
+        u_out = model.control(t_out, R, Omega)
+
+        R_hist[k] = R
+        x_hist[k] = R @ model.rho_c
+        Omega_hist[k] = Omega
+        u_hist[k] = u_out
+
         E_hist[k] = model.energy(R, Omega)
         mu_hist[k] = model.momentum_from_omega(R, Omega)
         orth_hist[k] = norm(np.eye(3) - R.T @ R, ord="fro")
 
     return {
         "t": t[1:],
+        "R_hist": R_hist,
+        "x_hist": x_hist,
         "Omega_hist": Omega_hist,
+        "u_hist": u_hist,
         "E_hist": E_hist,
         "DeltaE": E_hist - E_hist[0],
         "mu_hist": mu_hist,

@@ -5,18 +5,10 @@ from lie_group import hat, cayley
 
 
 def G_of_f(f: np.ndarray, a_k: np.ndarray, J: np.ndarray) -> np.ndarray:
-    """
-    Cayley-based vector equation
-        G(f) = a_k + a_k x f + f (a_k^T f) - 2 J f = 0
-    """
     return a_k + np.cross(a_k, f) + f * (a_k @ f) - 2.0 * (J @ f)
 
 
 def jacobian_G(f: np.ndarray, a_k: np.ndarray, J: np.ndarray) -> np.ndarray:
-    """
-    Jacobian of G(f):
-        ∇G(f) = a_k^ + (a_k^T f) I + f a_k^T - 2 J
-    """
     return hat(a_k) + (a_k @ f) * np.eye(3) + np.outer(f, a_k) - 2.0 * J
 
 
@@ -27,12 +19,8 @@ def solve_f_newton_cayley(
     tol: float = 1e-12,
     max_iter: int = 50,
 ) -> tuple[np.ndarray, int, float]:
-    """
-    Newton iteration solving G(f) = 0:
-        f_{i+1} = f_i - [∇G(f_i)]^{-1} G(f_i)
-    """
     if f_init is None:
-        f = 0.5 * solve(J, a_k)
+        f = solve(2.0 * J - hat(a_k), a_k)
     else:
         f = f_init.copy()
 
@@ -40,7 +28,12 @@ def solve_f_newton_cayley(
         Gf = G_of_f(f, a_k, J)
         JG = jacobian_G(f, a_k, J)
         delta = solve(JG, Gf)
-        f_new = f - delta
+
+        alpha = 1.0
+        f_new = f - alpha * delta
+        while norm(G_of_f(f_new, a_k, J)) > norm(Gf) and alpha > 1e-6:
+            alpha *= 0.5
+            f_new = f - alpha * delta
 
         if norm(f_new - f) < tol:
             res = norm(G_of_f(f_new, a_k, J))
@@ -50,8 +43,7 @@ def solve_f_newton_cayley(
 
     res = norm(G_of_f(f, a_k, J))
     raise RuntimeError(
-        f"Cayley-Newton iteration did not converge in {max_iter} iterations. "
-        f"Residual={res:.3e}"
+        f"Cayley-Newton iteration did not converge in {max_iter} iterations. Residual={res:.3e}"
     )
 
 
@@ -65,10 +57,6 @@ def lgvi_step(
     tol: float = 1e-12,
     max_iter: int = 50,
 ) -> tuple:
-    """
-    One LGVI step using the Cayley transformation.
-    All model-dependent terms are delegated to the model.
-    """
     a_k = model.a_k(R_k, Pi_k, h, t_k)
 
     f_k, n_iter, residual = solve_f_newton_cayley(
@@ -82,8 +70,8 @@ def lgvi_step(
     F_k = cayley(f_k)
     R_k1 = R_k @ F_k
     Pi_k1 = model.update_pi_lgvi(R_k, R_k1, F_k, Pi_k, h, t_k)
-
     Omega_k1 = solve(model.J, Pi_k1)
+
     return R_k1, Pi_k1, Omega_k1, f_k, n_iter, residual
 
 
@@ -103,7 +91,11 @@ def simulate_lgvi(
     Pi = model.J @ Omega0
     f_0 = model.initial_f_guess_cayley(R, Pi, h, t[0])
 
+    R_hist = np.zeros((N, 3, 3))
+    x_hist = np.zeros((N, 3))
     Omega_hist = np.zeros((N, 3))
+    u_hist = np.zeros((N, 3))
+
     E_hist = np.zeros(N)
     mu_hist = np.zeros(N)
     orth_hist = np.zeros(N)
@@ -124,7 +116,14 @@ def simulate_lgvi(
             max_iter=max_iter,
         )
 
-        Omega_hist[k, :] = Omega
+        t_out = t[k + 1]
+        u_out = model.control(t_out, R, Omega)
+
+        R_hist[k] = R
+        x_hist[k] = R @ model.rho_c
+        Omega_hist[k] = Omega
+        u_hist[k] = u_out
+
         E_hist[k] = model.energy(R, Omega)
         mu_hist[k] = model.momentum_from_pi(R, Pi)
         orth_hist[k] = norm(np.eye(3) - R.T @ R, ord="fro")
@@ -133,7 +132,10 @@ def simulate_lgvi(
 
     return {
         "t": t[1:],
+        "R_hist": R_hist,
+        "x_hist": x_hist,
         "Omega_hist": Omega_hist,
+        "u_hist": u_hist,
         "E_hist": E_hist,
         "DeltaE": E_hist - E_hist[0],
         "mu_hist": mu_hist,
