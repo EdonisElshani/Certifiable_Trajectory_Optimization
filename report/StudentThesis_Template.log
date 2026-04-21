@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.26)  26 MAR 2026 12:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.26)  21 APR 2026 14:52
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/ASUS/Desktop/Masterarbeit/report/StudentThesis_Template.tex
-(c:/Users/ASUS/Desktop/Masterarbeit/report/StudentThesis_Template.tex
+**c:/Users/ASUS/Desktop/Masterarbeit/Certifiable_Trajectory_Optimization/report/StudentThesis_Template.tex
+(c:/Users/ASUS/Desktop/Masterarbeit/Certifiable_Trajectory_Optimization/report/StudentThesis_Template.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
 (LSR_thesis.cls
@@ -960,7 +960,7 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 67.
  (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<pics/harvard_logo.png, id=266, 246.9225pt x 284.06125pt>
+<pics/harvard_logo.png, id=270, 246.9225pt x 284.06125pt>
 File: pics/harvard_logo.png Graphic file (type png)
 <use pics/harvard_logo.png>
 Package pdftex.def Info: pics/harvard_logo.png  used on input line 67.
@@ -1045,22 +1045,22 @@ Overfull \hbox (24.4248pt too wide) in paragraph at lines 189--190
  []
 
 [12] [13] [14]
-<pics/velocity_plot.png, id=439, 632.3625pt x 474.27188pt>
+<pics/velocity_plot.png, id=444, 632.3625pt x 474.27188pt>
 File: pics/velocity_plot.png Graphic file (type png)
 <use pics/velocity_plot.png>
 Package pdftex.def Info: pics/velocity_plot.png  used on input line 290.
 (pdftex.def)             Requested size: 256.0774pt x 192.05734pt.
-<pics/Lego_robot3.jpg, id=441, 752.8125pt x 501.97537pt>
+<pics/Lego_robot3.jpg, id=446, 752.8125pt x 501.97537pt>
 File: pics/Lego_robot3.jpg Graphic file (type jpg)
 <use pics/Lego_robot3.jpg>
 Package pdftex.def Info: pics/Lego_robot3.jpg  used on input line 305.
 (pdftex.def)             Requested size: 128.0387pt x 85.37297pt.
-<pics/robot_build.jpg, id=442, 752.8125pt x 501.97537pt>
+<pics/robot_build.jpg, id=447, 752.8125pt x 501.97537pt>
 File: pics/robot_build.jpg Graphic file (type jpg)
 <use pics/robot_build.jpg>
 Package pdftex.def Info: pics/robot_build.jpg  used on input line 310.
 (pdftex.def)             Requested size: 128.0387pt x 85.37297pt.
-<pics/robot_build_withHuman.jpg, id=443, 752.8125pt x 501.97537pt>
+<pics/robot_build_withHuman.jpg, id=448, 752.8125pt x 501.97537pt>
 File: pics/robot_build_withHuman.jpg Graphic file (type jpg)
 <use pics/robot_build_withHuman.jpg>
 Package pdftex.def Info: pics/robot_build_withHuman.jpg  used on input line 315.
@@ -1171,25 +1171,25 @@ LaTeX Warning: Reference `eq:continous_legendre_transformation' on page 31 undef
 
 [31]
 
-LaTeX Warning: Reference `PROPOSITION' on page 32 undefined on input line 257.
+LaTeX Warning: Reference `PROPOSITION' on page 32 undefined on input line 258.
 
 
-Overfull \hbox (19.84982pt too wide) in paragraph at lines 260--262
+Overfull \hbox (19.84982pt too wide) in paragraph at lines 261--263
 \OT1/cmr/m/n/12 consequently pre-serv-ing the La-grangian mo-men-tum map along the flow $\OML/cmm/m/it/12 J[]  [] \OT1/cmr/m/n/12 =
  []
 
 
-LaTeX Warning: Reference `eq:Noether' on page 32 undefined on input line 263.
+LaTeX Warning: Reference `eq:Noether' on page 32 undefined on input line 264.
 
 
-LaTeX Warning: Reference `eq:Noether2' on page 32 undefined on input line 263.
+LaTeX Warning: Reference `eq:Noether2' on page 32 undefined on input line 264.
 
 
-LaTeX Warning: Reference `eq:' on page 32 undefined on input line 317.
+LaTeX Warning: Reference `eq:' on page 32 undefined on input line 318.
 
 [32]
 
-LaTeX Warning: Reference `PROPOSITION' on page 33 undefined on input line 358.
+LaTeX Warning: Reference `PROPOSITION' on page 33 undefined on input line 359.
 
 ) (chapters/Discrete_Mechanics.tex [33] [34
 
@@ -1287,77 +1287,75 @@ LaTeX Warning: Reference `sec:' on page 43 undefined on input line 5.
 LaTeX Warning: Reference `sec:discrete_3d_pendulum' on page 44 undefined on input line 75.
 
 [44]
-<pics/Numerical_Simulation/Delta_E.pdf, id=824, 578.16pt x 361.35pt>
-File: pics/Numerical_Simulation/Delta_E.pdf Graphic file (type pdf)
-<use pics/Numerical_Simulation/Delta_E.pdf>
-Package pdftex.def Info: pics/Numerical_Simulation/Delta_E.pdf  used on input line 153.
-(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-<pics/Numerical_Simulation/Total_Energy.pdf, id=825, 578.16pt x 361.35pt>
+<pics/Numerical_Simulation/Total_Energy.pdf, id=831, 551.47424pt x 369.65508pt>
 File: pics/Numerical_Simulation/Total_Energy.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Total_Energy.pdf>
-Package pdftex.def Info: pics/Numerical_Simulation/Total_Energy.pdf  used on input line 159.
-(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-<pics/Numerical_Simulation/Momentum_error.pdf, id=826, 578.16pt x 361.35pt>
+Package pdftex.def Info: pics/Numerical_Simulation/Total_Energy.pdf  used on input line 153.
+(pdftex.def)             Requested size: 204.85802pt x 137.31735pt.
+<pics/Numerical_Simulation/Delta_E.pdf, id=832, 551.47424pt x 370.03558pt>
+File: pics/Numerical_Simulation/Delta_E.pdf Graphic file (type pdf)
+<use pics/Numerical_Simulation/Delta_E.pdf>
+Package pdftex.def Info: pics/Numerical_Simulation/Delta_E.pdf  used on input line 159.
+(pdftex.def)             Requested size: 204.85802pt x 137.4587pt.
+<pics/Numerical_Simulation/Momentum_error.pdf, id=833, 550.61055pt x 370.03558pt>
 File: pics/Numerical_Simulation/Momentum_error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Momentum_error.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Momentum_error.pdf  used on input line 167.
-(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-<pics/Numerical_Simulation/Orthogonality_error.pdf, id=827, 578.16pt x 361.35pt>
+(pdftex.def)             Requested size: 204.85802pt x 137.67326pt.
+<pics/Numerical_Simulation/Orthogonality_error.pdf, id=834, 552.03708pt x 370.03558pt>
 File: pics/Numerical_Simulation/Orthogonality_error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Orthogonality_error.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Orthogonality_error.pdf  used on input line 173.
-(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
- [45] [46 <./pics/Numerical_Simulation/Delta_E.pdf> <./pics/Numerical_Simulation/Total_Energy.pdf> <./pics/Numerical_Simulation/Momentum_error.pdf> <./pics/Numerical_Simulation/Orthogonality_error.pdf>]
+(pdftex.def)             Requested size: 204.85802pt x 137.31755pt.
+ [45] [46 <./pics/Numerical_Simulation/Total_Energy.pdf> <./pics/Numerical_Simulation/Delta_E.pdf> <./pics/Numerical_Simulation/Momentum_error.pdf> <./pics/Numerical_Simulation/Orthogonality_error.pdf>] [47] [48]
+Overfull \hbox (7.84317pt too wide) in paragraph at lines 347--356
+[]\OT1/cmr/m/n/12 In []--[], the dis-crete Euler--Lagrange con-straints hold for $\OML/cmm/m/it/12 k \OT1/cmr/m/n/12 = 0\OML/cmm/m/it/12 ; [] ; N \OMS/cmsy/m/n/12 ^^@
+ []
 
-LaTeX Warning: Reference `sec:continous_3D_pendulum_momentum_validation' on page 47 undefined on input line 197.
+[49] [50]) (chapters/Discussion.tex [51] [52
 
-
-Underfull \vbox (badness 3514) has occurred while \output is active []
-
- [47]) (chapters/Discussion.tex [48]
+]
 Chapter 8.
-) (chapters/Conclusion.tex [49
-
-] [50
+) (chapters/Conclusion.tex [53] [54
 
 ]
 Chapter 9.
-) (chapters/Appendix.tex [51] [52
+) (chapters/Appendix.tex [55] [56
 
 ]
 Appendix A.
-) [53] [54
+) [57] [58
 
 ] (StudentThesis_Template.lof)
 \tf@lof=\write12
 \openout12 = `StudentThesis_Template.lof'.
 
- [55
+ [59
 
-] [56
+] [60
 
 ] (StudentThesis_Template.lot)
 \tf@lot=\write13
 \openout13 = `StudentThesis_Template.lot'.
 
- [57
-
-] [58
-
-] (StudentThesis_Template.acr) [59
-
-
-] [60
-
-] (StudentThesis_Template.not) [61
-
+ [61
 
 ] [62
 
-] (StudentThesis_Template.sym) [63
+] (StudentThesis_Template.acr) [63
 
 
 ] [64
+
+] (StudentThesis_Template.not) [65
+
+
+] [66
+
+] (StudentThesis_Template.sym) [67
+
+
+] [68
 
 ] (StudentThesis_Template.bbl
 Underfull \hbox (badness 1308) in paragraph at lines 25--30
@@ -1384,17 +1382,17 @@ Underfull \hbox (badness 1184) in paragraph at lines 43--49
 \OT1/cmr/m/n/12 repos-i-tory, 2026.  Nu-mer-i-cal[]Simulation di-rec-tory, ac-cessed March
  []
 
-[65
+[69
 
 ]
 Underfull \hbox (badness 1484) in paragraph at lines 115--125
 []\OT1/cmr/m/n/12 Sangli Teng, Ashkan Ja-sour, Ram Va-sude-van, and Maani Ghaf-
  []
 
-) [66] [67
+) [70] [71
 
 
-] [68
+] [72
 
 ] (StudentThesis_Template.tdo
 Underfull \hbox (badness 10000) in paragraph at lines 3--3
@@ -1405,7 +1403,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 3--3
 \tf@tdo=\write14
 \openout14 = `StudentThesis_Template.tdo'.
 
- [69] (StudentThesis_Template.aux)
+ [73] (StudentThesis_Template.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1418,20 +1416,20 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `StudentThesis_Template.out' has not changed.
-(rerunfilecheck)             Checksum: D3B082B3F91F9485B63B38D6CCECD445;10931.
+(rerunfilecheck)             Checksum: 0CE87D626BB7892A6B68641F25E1339A;11046.
  ) 
 Here is how much of TeX's memory you used:
- 46297 strings out of 467867
- 1105250 string characters out of 5418818
- 1583647 words of memory out of 5000000
- 74158 multiletter control sequences out of 15000+600000
+ 46368 strings out of 467867
+ 1107621 string characters out of 5418818
+ 1585660 words of memory out of 5000000
+ 74176 multiletter control sequences out of 15000+600000
  646089 words of font info for 101 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 114i,13n,134p,2594b,1528s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 114i,14n,134p,2630b,1528s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\ASUS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmbsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on StudentThesis_Template.pdf (73 pages, 2041560 bytes).
+Output written on StudentThesis_Template.pdf (77 pages, 2068136 bytes).
 PDF statistics:
- 1372 PDF objects out of 1440 (max. 8388607)
- 281 named destinations out of 1000 (max. 500000)
- 578 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1443 PDF objects out of 1728 (max. 8388607)
+ 334 named destinations out of 1000 (max. 500000)
+ 586 words of extra memory for PDF output out of 10000 (max. 10000000)
 

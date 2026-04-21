@@ -68,15 +68,16 @@
 \contentsline {paragraph}{Runge--Kutta 4th order}{43}{section*.24}%
 \contentsline {paragraph}{RK4 projected to $SO(3)$}{44}{section*.25}%
 \contentsline {subsection}{\numberline {7.1.1}Unforced 3D Pendulum}{45}{subsection.7.1.1}%
-\contentsline {section}{\numberline {7.2}Experimental Results}{47}{section.7.2}%
-\contentsline {paragraph}{Statistics:}{48}{section*.27}%
-\contentsline {chapter}{\numberline {8}Discussion}{49}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusion}{51}{chapter.9}%
-\contentsline {chapter}{\numberline {A}BUSTED! Last chance to actually read the HowTo-Section!}{53}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Spellcheck reminder}{53}{section.A.1}%
-\contentsline {chapter}{List of Figures}{55}{section*.29}%
-\contentsline {chapter}{List of Tables}{57}{section*.31}%
-\contentsline {chapter}{Acronyms}{59}{section*.33}%
-\contentsline {chapter}{Notation}{61}{section*.35}%
-\contentsline {chapter}{List of Symbols}{63}{section*.37}%
-\contentsline {chapter}{Bibliography}{65}{section*.39}%
+\contentsline {section}{\numberline {7.2}Optimization}{48}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Experimental Results}{51}{section.7.3}%
+\contentsline {paragraph}{Statistics:}{51}{section*.27}%
+\contentsline {chapter}{\numberline {8}Discussion}{53}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusion}{55}{chapter.9}%
+\contentsline {chapter}{\numberline {A}BUSTED! Last chance to actually read the HowTo-Section!}{57}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Spellcheck reminder}{57}{section.A.1}%
+\contentsline {chapter}{List of Figures}{59}{section*.29}%
+\contentsline {chapter}{List of Tables}{61}{section*.31}%
+\contentsline {chapter}{Acronyms}{63}{section*.33}%
+\contentsline {chapter}{Notation}{65}{section*.35}%
+\contentsline {chapter}{List of Symbols}{67}{section*.37}%
+\contentsline {chapter}{Bibliography}{69}{section*.39}%

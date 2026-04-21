@@ -123,4 +123,12 @@ Sangli Teng, Ashkan Jasour, Ram Vasudevan, and Maani Ghaffari.
   {https://doi.org/10.1177/02783649241296160}
   {\path{doi:10.1177/02783649241296160}}.
 
+\bibitem[YTT11]{YanaiTakeuchiTakane2011SVD}
+Haruo Yanai, Kei Takeuchi, and Yoshio Takane.
+\newblock {\em Projection Matrices, Generalized Inverse Matrices, and Singular
+  Value Decomposition}.
+\newblock Springer, New York, 2011.
+\newblock \href {https://doi.org/10.1007/978-1-4419-9887-3}
+  {\path{doi:10.1007/978-1-4419-9887-3}}.
+
 \end{thebibliography}
