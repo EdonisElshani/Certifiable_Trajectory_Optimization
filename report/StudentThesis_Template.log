@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.26)  21 APR 2026 14:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.26)  8 MAY 2026 12:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -650,7 +650,9 @@ Package bm Info: No bold for \OMX/cmex/m/n, using \pmb.
 Package bm Info: No bold for \U/msa/m/n, using \pmb.
 Package bm Info: No bold for \U/msb/m/n, using \pmb.
 LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 149.
-) (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/siunitx\siunitx.sty
+) (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/comment\comment.sty
+\CommentStream=\write5
+ Excluding comment 'comment') (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/siunitx\siunitx.sty
 Package: siunitx 2025-07-09 v3.4.14 A comprehensive (SI) units package
 \l__siunitx_number_uncert_offset_int=\count357
 \l__siunitx_number_exponent_fixed_int=\count358
@@ -861,21 +863,21 @@ runsystem(makeindex -s StudentThesis_Template.ist -t StudentThesis_Template.glg 
 
 runsystem(makeindex -s StudentThesis_Template.ist -t StudentThesis_Template.glg -o StudentThesis_Template.sym StudentThesis_Template.sbl)...executed safely (allowed).
 
-\glswrite=\write5
-\glo@main@file=\write6
-\openout6 = `StudentThesis_Template.glo'.
+\glswrite=\write6
+\glo@main@file=\write7
+\openout7 = `StudentThesis_Template.glo'.
 
 Package glossaries Info: Writing glossary file StudentThesis_Template.glo on input line 26.
-\glo@acronym@file=\write7
-\openout7 = `StudentThesis_Template.acn'.
+\glo@acronym@file=\write8
+\openout8 = `StudentThesis_Template.acn'.
 
 Package glossaries Info: Writing glossary file StudentThesis_Template.acn on input line 26.
-\glo@notation@file=\write8
-\openout8 = `StudentThesis_Template.nt'.
+\glo@notation@file=\write9
+\openout9 = `StudentThesis_Template.nt'.
 
 Package glossaries Info: Writing glossary file StudentThesis_Template.nt on input line 26.
-\glo@symbols@file=\write9
-\openout9 = `StudentThesis_Template.sbl'.
+\glo@symbols@file=\write10
+\openout10 = `StudentThesis_Template.sbl'.
 
 Package glossaries Info: Writing glossary file StudentThesis_Template.sbl on input line 26.
 )
@@ -933,8 +935,8 @@ Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
 ))
 Package hyperref Info: Link coloring OFF on input line 34.
  (StudentThesis_Template.out) (StudentThesis_Template.out)
-\@outlinefile=\write10
-\openout10 = `StudentThesis_Template.out'.
+\@outlinefile=\write11
+\openout11 = `StudentThesis_Template.out'.
 
 
 
@@ -960,7 +962,7 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 67.
  (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<pics/harvard_logo.png, id=270, 246.9225pt x 284.06125pt>
+<pics/harvard_logo.png, id=194, 246.9225pt x 284.06125pt>
 File: pics/harvard_logo.png Graphic file (type png)
 <use pics/harvard_logo.png>
 Package pdftex.def Info: pics/harvard_logo.png  used on input line 67.
@@ -989,373 +991,380 @@ Underfull \hbox (badness 10000) in paragraph at lines 67--67
 Non-PDF special ignored!
 <special> header=psfrag.pro
 
-\openout5 = `StudentThesis_Template.ist'.
+\openout6 = `StudentThesis_Template.ist'.
 
 {C:/Users/ASUS/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./pics/harvard_logo.png (PNG copy)>] [2
 
 ]
-Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 78.
- [3]
+<./include/Master_Thesis_Task_Description.pdf, id=206, 597.50829pt x 845.0471pt>
+File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
+<use ./include/Master_Thesis_Task_Description.pdf>
+Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf  used on input line 90.
+(pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
+<./include/Master_Thesis_Task_Description.pdf, id=208, page=1, 597.50829pt x 845.0471pt>
+File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
+<use ./include/Master_Thesis_Task_Description.pdf, page 1>
+Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf , page1 used on input line 90.
+(pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
+File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
+<use ./include/Master_Thesis_Task_Description.pdf, page 1>
+Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf , page1 used on input line 90.
+(pdftex.def)             Requested size: 597.53416pt x 845.08372pt.
+File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
+<use ./include/Master_Thesis_Task_Description.pdf, page 1>
+Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf , page1 used on input line 90.
+(pdftex.def)             Requested size: 597.53416pt x 845.08372pt.
+File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
+<use ./include/Master_Thesis_Task_Description.pdf, page 1>
+Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf , page1 used on input line 90.
+(pdftex.def)             Requested size: 597.53416pt x 845.08372pt.
+File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
+<use ./include/Master_Thesis_Task_Description.pdf, page 1>
+Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf , page1 used on input line 90.
+(pdftex.def)             Requested size: 597.53416pt x 845.08372pt.
+ [3
+
+ <./include/Master_Thesis_Task_Description.pdf>]
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.101 \begin{abstract}
+l.102 \begin{abstract}
                        [1]
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.109 \end{abstract}
+l.110 \end{abstract}
                      [1]
-LaTeX Font Info:    Trying to load font information for OT1+phv on input line 126.
+LaTeX Font Info:    Trying to load font information for OT1+phv on input line 127.
  (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1phv.fd
 File: ot1phv.fd 2020/03/25 scalable font definitions for OT1/phv.
 )
 
 LaTeX Font Warning: Font shape `OT1/phv/a/n' undefined
-(Font)              using `OT1/phv/m/n' instead on input line 126.
+(Font)              using `OT1/phv/m/n' instead on input line 127.
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.126 \tableofcontents
+l.127 \tableofcontents
                        [2] (StudentThesis_Template.toc
 pdfTeX warning (ext4): destination with the same identifier (name{page.3}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.35 ...Rigid Bodies on Lie Groups}{27}{chapter.5}
+l.47 ...}Sparse Relaxations}{28}{subsection.5.2.2}
                                                   % [3{C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
-] [4])
-\tf@toc=\write11
-\openout11 = `StudentThesis_Template.toc'.
+])
+\tf@toc=\write12
+\openout12 = `StudentThesis_Template.toc'.
 
- (chapters/Tutorial.tex [5] [6
-
-]
+ (chapters/Introduction.tex [4]
 Chapter 1.
-[7] [8] [9] [10] [11]
-Overfull \hbox (42.389pt too wide) in paragraph at lines 175--176
-[]\OT1/cmr/m/n/12 Capital and full word (Definition/Assumption/Theorem/Lemma/Proposition[][]\OT1/cmtt/m/n/12 ~\ref{}[]\OT1/cmr/m/n/12 )
- []
+Excluding 'comment' comment. Excluding 'comment' comment.) (chapters/Preliminaries.tex [5
 
-
-Overfull \hbox (24.4248pt too wide) in paragraph at lines 189--190
-[][] 
- []
-
-[12] [13] [14]
-<pics/velocity_plot.png, id=444, 632.3625pt x 474.27188pt>
-File: pics/velocity_plot.png Graphic file (type png)
-<use pics/velocity_plot.png>
-Package pdftex.def Info: pics/velocity_plot.png  used on input line 290.
-(pdftex.def)             Requested size: 256.0774pt x 192.05734pt.
-<pics/Lego_robot3.jpg, id=446, 752.8125pt x 501.97537pt>
-File: pics/Lego_robot3.jpg Graphic file (type jpg)
-<use pics/Lego_robot3.jpg>
-Package pdftex.def Info: pics/Lego_robot3.jpg  used on input line 305.
-(pdftex.def)             Requested size: 128.0387pt x 85.37297pt.
-<pics/robot_build.jpg, id=447, 752.8125pt x 501.97537pt>
-File: pics/robot_build.jpg Graphic file (type jpg)
-<use pics/robot_build.jpg>
-Package pdftex.def Info: pics/robot_build.jpg  used on input line 310.
-(pdftex.def)             Requested size: 128.0387pt x 85.37297pt.
-<pics/robot_build_withHuman.jpg, id=448, 752.8125pt x 501.97537pt>
-File: pics/robot_build_withHuman.jpg Graphic file (type jpg)
-<use pics/robot_build_withHuman.jpg>
-Package pdftex.def Info: pics/robot_build_withHuman.jpg  used on input line 315.
-(pdftex.def)             Requested size: 170.71393pt x 113.82808pt.
-
-Overfull \hbox (0.2685pt too wide) in paragraph at lines 329--329
-[]\OT1/cmr/bx/n/17.28 Definitions / As-sump-tions / The-o-rems / Lem-
- []
-
-[15 <./pics/velocity_plot.png (PNG copy)>] [16 <./pics/Lego_robot3.jpg> <./pics/robot_build.jpg> <./pics/robot_build_withHuman.jpg>]
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 362.
-
-
-LaTeX Warning: Citation `Jay_87' on page 17 undefined on input line 362.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 364.
-
-
-LaTeX Warning: Citation `Jay_87' on page 17 undefined on input line 364.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 366.
-
-
-LaTeX Warning: Citation `ONeill_2000' on page 17 undefined on input line 366.
-
-
-LaTeX Warning: Citation `ONeill_2000' on page 17 undefined on input line 366.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 372.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 373.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 374.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 378.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 379.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 380.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 381.
-
-
-LaTeX Warning: Citation `Bloe_99' on page 17 undefined on input line 382.
-
-
-Overfull \hbox (1.04741pt too wide) in paragraph at lines 387--388
-[][]\OT1/cmtt/m/n/12 {The {Mungi} {OS} and its Use in Merry-Go-Round Seat Allocation}[]\OT1/cmr/m/n/12 . 
- []
-
-[17] [18]
-Underfull \hbox (badness 10000) in paragraph at lines 435--437
-
- []
-
-) (chapters/Introduction.tex [19] [20
+] [6
 
 ]
 Chapter 2.
 
-LaTeX Warning: Citation `Elphinstone2014' on page 21 undefined on input line 16.
-
-[21]) (chapters/MainPart.tex [22]
-Chapter 3.
-) (chapters/Preliminaries.tex [23
-
-] [24
-
-]
-Chapter 4.
-
-LaTeX Warning: Citation `Lee2012ISM' on page 25 undefined on input line 21.
+LaTeX Warning: Citation `Lee2012ISM' on page 7 undefined on input line 21.
 
 LaTeX Font Info:    Trying to load font information for U+euf on input line 32.
 (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
-) [25]) (chapters/Continuous_Mechanics.tex [26]
-Chapter 5.
-[27
+) [7]) (chapters/Continuous_Mechanics.tex [8]
+Chapter 3.
+[9
 
 ]
 
-LaTeX Warning: Reference `' on page 28 undefined on input line 93.
+LaTeX Warning: Reference `fig:3d_pendulum' on page 10 undefined on input line 101.
 
-[28] [29]
+[10]
+Overfull \hbox (2.28084pt too wide) in paragraph at lines 148--149
+ []\OT1/cmr/bx/n/12 Euler-Lagrange Equa-tions[] \OT1/cmr/m/n/12 In or-der to de-fine the Euler-Lagrange Equa-tion [],
+ []
 
-LaTeX Warning: Reference `INNER PRODUCT' on page 30 undefined on input line 175.
+[11]
 
-
-LaTeX Warning: Reference `eq:' on page 30 undefined on input line 195.
-
-
-LaTeX Warning: Reference `eq:ad_lie_bracket' on page 30 undefined on input line 207.
-
-[30]
-
-LaTeX Warning: Reference `eq:continous_legendre_transformation' on page 31 undefined on input line 236.
-
-[31]
-
-LaTeX Warning: Reference `PROPOSITION' on page 32 undefined on input line 258.
+LaTeX Warning: Reference `INNER PRODUCT' on page 12 undefined on input line 189.
 
 
-Overfull \hbox (19.84982pt too wide) in paragraph at lines 261--263
+LaTeX Warning: Reference `eq:' on page 12 undefined on input line 209.
+
+
+LaTeX Warning: Reference `eq:ad_lie_bracket' on page 12 undefined on input line 221.
+
+[12]
+
+LaTeX Warning: Reference `eq:continuous_legendre_transformation' on page 13 undefined on input line 252.
+
+[13]
+
+LaTeX Warning: Reference `PROPOSITION' on page 14 undefined on input line 276.
+
+
+Overfull \hbox (19.84982pt too wide) in paragraph at lines 279--281
 \OT1/cmr/m/n/12 consequently pre-serv-ing the La-grangian mo-men-tum map along the flow $\OML/cmm/m/it/12 J[]  [] \OT1/cmr/m/n/12 =
  []
 
 
-LaTeX Warning: Reference `eq:Noether' on page 32 undefined on input line 264.
+LaTeX Warning: Reference `eq:Noether' on page 14 undefined on input line 282.
 
 
-LaTeX Warning: Reference `eq:Noether2' on page 32 undefined on input line 264.
+LaTeX Warning: Reference `eq:Noether2' on page 14 undefined on input line 282.
 
 
-LaTeX Warning: Reference `eq:' on page 32 undefined on input line 318.
+LaTeX Warning: Reference `eq:' on page 14 undefined on input line 336.
 
-[32]
+[14]
 
-LaTeX Warning: Reference `PROPOSITION' on page 33 undefined on input line 359.
+LaTeX Warning: Reference `PROPOSITION' on page 15 undefined on input line 377.
 
-) (chapters/Discrete_Mechanics.tex [33] [34
+) (chapters/Discrete_Mechanics.tex [15] [16
 
 ]
-Chapter 6.
+Chapter 4.
 
-LaTeX Warning: Reference `eq:VARIATION' on page 35 undefined on input line 10.
+LaTeX Warning: Reference `eq:VARIATION' on page 17 undefined on input line 10.
 
-[35]
+[17]
 
-LaTeX Warning: Reference `eq:VARIATION' on page 36 undefined on input line 65.
+LaTeX Warning: Reference `eq:VARIATION' on page 18 undefined on input line 65.
 
-[36]
+[18]
 
-LaTeX Warning: Reference `coun' on page 37 undefined on input line 129.
-
-
-LaTeX Warning: Reference `eq:' on page 37 undefined on input line 129.
+LaTeX Warning: Reference `eq:discrete_Euler_Lagrange' on page 19 undefined on input line 126.
 
 
-LaTeX Warning: Reference `eq:' on page 37 undefined on input line 129.
+LaTeX Warning: Reference `eq: action_sum_EL' on page 19 undefined on input line 139.
 
 
-LaTeX Warning: Reference `eq:' on page 37 undefined on input line 152.
+LaTeX Warning: Reference `eq:discrete_EL' on page 19 undefined on input line 143.
+
+[19]
+
+LaTeX Warning: Reference `eq:discrete_EL' on page 20 undefined on input line 226.
 
 
-LaTeX Warning: Reference `eq:' on page 37 undefined on input line 152.
+LaTeX Warning: Reference `eq:Discrete_Legendre_Transformation' on page 20 undefined on input line 229.
 
-[37]
-Overfull \hbox (9.48476pt too wide) in paragraph at lines 174--175
+
+LaTeX Warning: Reference `coun' on page 20 undefined on input line 288.
+
+
+LaTeX Warning: Reference `eq:' on page 20 undefined on input line 288.
+
+
+LaTeX Warning: Reference `eq:' on page 20 undefined on input line 288.
+
+[20]
+
+LaTeX Warning: Reference `eq:' on page 21 undefined on input line 311.
+
+
+LaTeX Warning: Reference `eq:' on page 21 undefined on input line 311.
+
+
+Overfull \hbox (6.4858pt too wide) in paragraph at lines 319--320
+ []\OT1/cmr/bx/n/12 Newton It-er-a-tion[] \OT1/cmr/m/n/12 For solv-ing the im-plicit vec-tor equa-tion [] New-ton's method
+ []
+
+[21]
+Overfull \hbox (9.48476pt too wide) in paragraph at lines 333--334
  []\OT1/cmr/bx/n/12 Configuration Man-i-fold[] \OT1/cmr/m/n/12 The con-fig-u-ra-tion man-i-fold of the un-forced 3D-pendulum
  []
 
-[38]
 
-LaTeX Warning: Reference `eq:discrete_exact_lagrangian' on page 39 undefined on input line 195.
+LaTeX Warning: Reference `eq:discrete_exact_lagrangian' on page 22 undefined on input line 354.
 
-[39]
+[22]
 
-LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 40 undefined on input line 264.
-
-
-LaTeX Warning: Reference `eq:inner_product' on page 40 undefined on input line 296.
+LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 23 undefined on input line 423.
 
 
-Overfull \hbox (32.57716pt too wide) detected at line 328
+LaTeX Warning: Reference `eq:inner_product' on page 23 undefined on input line 455.
+
+[23]
+Overfull \hbox (32.57716pt too wide) detected at line 487
 []
  []
 
 
-Overfull \hbox (5.51337pt too wide) in paragraph at lines 352--354
+Overfull \hbox (5.51337pt too wide) in paragraph at lines 511--513
 \OT1/cmr/m/n/12 which is in this model only de-pen-dent of the po-ten-tial en-ergy $\OML/cmm/m/it/12 U\OT1/cmr/m/n/12 (\OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 ) + \OML/cmm/m/it/12 U\OT1/cmr/m/n/12 (\OML/cmm/b/it/12 R[]F[]\OT1/cmr/m/n/12 )$,
  []
 
-[40]
-Overfull \hbox (25.79805pt too wide) detected at line 380
+
+Overfull \hbox (25.79805pt too wide) detected at line 539
 []
  []
 
 
-LaTeX Warning: Reference `eq:' on page 41 undefined on input line 381.
+LaTeX Warning: Reference `eq:' on page 24 undefined on input line 540.
 
 
-Overfull \hbox (52.03981pt too wide) detected at line 410
+Overfull \hbox (52.03981pt too wide) detected at line 569
 []
  []
 
 
-LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 41 undefined on input line 424.
+LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 24 undefined on input line 583.
+
+[24]
+
+LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 25 undefined on input line 627.
 
 
-LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 41 undefined on input line 468.
-
-
-Overfull \hbox (3.09558pt too wide) in paragraph at lines 479--481
+Overfull \hbox (3.09558pt too wide) in paragraph at lines 641--644
 \OT1/cmr/m/n/12 [[]] de-scribes the pro-ce-dure of ob-tain-ing the discrete-time flow map $(\OML/cmm/b/it/12 R[]\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 !
  []
 
 
-LaTeX Warning: Reference `eq:discrete_legendre_transformation' on page 41 undefined on input line 484.
+Overfull \hbox (6.58966pt too wide) in paragraph at lines 641--644
+\OT1/cmr/m/n/12 (\OML/cmm/b/it/12 R[]\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 )$, by solv-ing [] find-ing $\OML/cmm/b/it/12 F[]$ \OT1/cmr/m/n/12 for given $(\OML/cmm/b/it/12 R[]\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 )$ and $\OML/cmm/b/it/12 F[] \OT1/cmr/m/n/12 = \OML/cmm/b/it/12 R[]R[]$\OT1/cmr/m/n/12 .
+ []
 
-[41]
 
-LaTeX Warning: Reference `eq:discrete_hamiltion_equations' on page 42 undefined on input line 515.
+LaTeX Warning: Reference `eq:discrete_legendre_transformation' on page 25 undefined on input line 647.
 
-) (chapters/Evaluation.tex [42]
-Chapter 7.
 
-LaTeX Warning: Reference `sec:' on page 43 undefined on input line 5.
+LaTeX Warning: Reference `eq:discrete_hamiltion_equations' on page 25 undefined on input line 680.
 
-[43
+[25]) (chapters/Optimization.tex [26]
+Chapter 5.
+[27
+
+] [28] [29] Excluding 'comment' comment. [30]) (chapters/Evaluation.tex
+Chapter 6.
+
+LaTeX Warning: Reference `sec:' on page 31 undefined on input line 5.
+
+[31
 
 ]
 
-LaTeX Warning: Reference `sec:discrete_3d_pendulum' on page 44 undefined on input line 75.
+LaTeX Warning: Reference `sec:discrete_3d_pendulum' on page 32 undefined on input line 85.
 
-[44]
-<pics/Numerical_Simulation/Total_Energy.pdf, id=831, 551.47424pt x 369.65508pt>
+[32] [33]
+<pics/Numerical_Simulation/Total_Energy.pdf, id=765, 551.47424pt x 369.65508pt>
 File: pics/Numerical_Simulation/Total_Energy.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Total_Energy.pdf>
-Package pdftex.def Info: pics/Numerical_Simulation/Total_Energy.pdf  used on input line 153.
+Package pdftex.def Info: pics/Numerical_Simulation/Total_Energy.pdf  used on input line 166.
 (pdftex.def)             Requested size: 204.85802pt x 137.31735pt.
-<pics/Numerical_Simulation/Delta_E.pdf, id=832, 551.47424pt x 370.03558pt>
+<pics/Numerical_Simulation/Delta_E.pdf, id=766, 551.47424pt x 370.03558pt>
 File: pics/Numerical_Simulation/Delta_E.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Delta_E.pdf>
-Package pdftex.def Info: pics/Numerical_Simulation/Delta_E.pdf  used on input line 159.
+Package pdftex.def Info: pics/Numerical_Simulation/Delta_E.pdf  used on input line 172.
 (pdftex.def)             Requested size: 204.85802pt x 137.4587pt.
-<pics/Numerical_Simulation/Momentum_error.pdf, id=833, 550.61055pt x 370.03558pt>
+<pics/Numerical_Simulation/Momentum_error.pdf, id=767, 550.61055pt x 370.03558pt>
 File: pics/Numerical_Simulation/Momentum_error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Momentum_error.pdf>
-Package pdftex.def Info: pics/Numerical_Simulation/Momentum_error.pdf  used on input line 167.
+Package pdftex.def Info: pics/Numerical_Simulation/Momentum_error.pdf  used on input line 180.
 (pdftex.def)             Requested size: 204.85802pt x 137.67326pt.
-<pics/Numerical_Simulation/Orthogonality_error.pdf, id=834, 552.03708pt x 370.03558pt>
+<pics/Numerical_Simulation/Orthogonality_error.pdf, id=768, 552.03708pt x 370.03558pt>
 File: pics/Numerical_Simulation/Orthogonality_error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Orthogonality_error.pdf>
-Package pdftex.def Info: pics/Numerical_Simulation/Orthogonality_error.pdf  used on input line 173.
+Package pdftex.def Info: pics/Numerical_Simulation/Orthogonality_error.pdf  used on input line 186.
 (pdftex.def)             Requested size: 204.85802pt x 137.31755pt.
- [45] [46 <./pics/Numerical_Simulation/Total_Energy.pdf> <./pics/Numerical_Simulation/Delta_E.pdf> <./pics/Numerical_Simulation/Momentum_error.pdf> <./pics/Numerical_Simulation/Orthogonality_error.pdf>] [47] [48]
-Overfull \hbox (7.84317pt too wide) in paragraph at lines 347--356
-[]\OT1/cmr/m/n/12 In []--[], the dis-crete Euler--Lagrange con-straints hold for $\OML/cmm/m/it/12 k \OT1/cmr/m/n/12 = 0\OML/cmm/m/it/12 ; [] ; N \OMS/cmsy/m/n/12 ^^@
+ [34 <./pics/Numerical_Simulation/Total_Energy.pdf> <./pics/Numerical_Simulation/Delta_E.pdf> <./pics/Numerical_Simulation/Momentum_error.pdf> <./pics/Numerical_Simulation/Orthogonality_error.pdf>] [35]
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf, id=964, 578.16pt x 397.19592pt>
+File: pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf Graphic file (type pdf)
+<use pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf>
+Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf  used on input line 322.
+(pdftex.def)             Requested size: 204.85802pt x 140.73582pt.
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf, id=965, 578.16pt x 397.19592pt>
+File: pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf Graphic file (type pdf)
+<use pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf>
+Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf  used on input line 328.
+(pdftex.def)             Requested size: 204.85802pt x 140.73582pt.
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf, id=966, 578.16pt x 397.19592pt>
+File: pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf Graphic file (type pdf)
+<use pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf>
+Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf  used on input line 336.
+(pdftex.def)             Requested size: 204.85802pt x 140.73582pt.
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf, id=967, 650.43pt x 578.16pt>
+File: pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf Graphic file (type pdf)
+<use pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf>
+Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf  used on input line 342.
+(pdftex.def)             Requested size: 204.85802pt x 182.0949pt.
+ [36] [37 <./pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf>]
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf, id=1142, 650.43pt x 505.89pt>
+File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf Graphic file (type pdf)
+<use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf>
+Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf  used on input line 412.
+(pdftex.def)             Requested size: 204.85802pt x 159.33302pt.
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf, id=1143, 578.16pt x 361.35pt>
+File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf Graphic file (type pdf)
+<use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf>
+Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf  used on input line 418.
+(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf, id=1144, 578.16pt x 361.35pt>
+File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf Graphic file (type pdf)
+<use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf>
+Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf  used on input line 426.
+(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
+
+Underfull \hbox (badness 1902) in paragraph at lines 427--427
+[]|\OT1/cmr/m/n/12 (c) Frobe-nius track-ing er-ror $\OMS/cmsy/m/n/12 k\OML/cmm/b/it/12 R[] \OMS/cmsy/m/n/12 ^^@
  []
 
-[49] [50]) (chapters/Discussion.tex [51] [52
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf, id=1145, 578.16pt x 361.35pt>
+File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf Graphic file (type pdf)
+<use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf>
+Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf  used on input line 432.
+(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf, id=1146, 578.16pt x 361.35pt>
+File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf Graphic file (type pdf)
+<use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf>
+Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf  used on input line 440.
+(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf, id=1147, 578.16pt x 361.35pt>
+File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf Graphic file (type pdf)
+<use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf>
+Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf  used on input line 446.
+(pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
+) (chapters/Discussion.tex [38] [39 <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf>] [40
+
+]
+Chapter 7.
+) (chapters/Conclusion.tex [41] [42
 
 ]
 Chapter 8.
-) (chapters/Conclusion.tex [53] [54
-
-]
-Chapter 9.
-) (chapters/Appendix.tex [55] [56
-
-]
-Appendix A.
-) [57] [58
+Excluding 'comment' comment.) (chapters/Appendix.tex) [43] [44
 
 ] (StudentThesis_Template.lof)
-\tf@lof=\write12
-\openout12 = `StudentThesis_Template.lof'.
+\tf@lof=\write13
+\openout13 = `StudentThesis_Template.lof'.
 
- [59
+ [45
 
-] [60
+] [46
 
 ] (StudentThesis_Template.lot)
-\tf@lot=\write13
-\openout13 = `StudentThesis_Template.lot'.
+\tf@lot=\write14
+\openout14 = `StudentThesis_Template.lot'.
 
- [61
+ [47
 
-] [62
+] [48
 
-] (StudentThesis_Template.acr) [63
-
-
-] [64
-
-] (StudentThesis_Template.not) [65
+] (StudentThesis_Template.acr) [49
 
 
-] [66
+] [50
 
-] (StudentThesis_Template.sym) [67
+] (StudentThesis_Template.not) [51
 
 
-] [68
+] [52
+
+] (StudentThesis_Template.sym) [53
+
+
+] [54
 
 ] (StudentThesis_Template.bbl
 Underfull \hbox (badness 1308) in paragraph at lines 25--30
@@ -1382,28 +1391,17 @@ Underfull \hbox (badness 1184) in paragraph at lines 43--49
 \OT1/cmr/m/n/12 repos-i-tory, 2026.  Nu-mer-i-cal[]Simulation di-rec-tory, ac-cessed March
  []
 
-[69
+[55
 
 ]
 Underfull \hbox (badness 1484) in paragraph at lines 115--125
 []\OT1/cmr/m/n/12 Sangli Teng, Ashkan Ja-sour, Ram Va-sude-van, and Maani Ghaf-
  []
 
-) [70] [71
+) [56] [57
 
 
-] [72
-
-] (StudentThesis_Template.tdo
-Underfull \hbox (badness 10000) in paragraph at lines 3--3
- \OT1/cmr/m/n/12 GUIDE-LINES!  
- []
-
-)
-\tf@tdo=\write14
-\openout14 = `StudentThesis_Template.tdo'.
-
- [73] (StudentThesis_Template.aux)
+] (StudentThesis_Template.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1416,20 +1414,20 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `StudentThesis_Template.out' has not changed.
-(rerunfilecheck)             Checksum: 0CE87D626BB7892A6B68641F25E1339A;11046.
+(rerunfilecheck)             Checksum: 2362F58C01EF108A756213E58E9D5D30;8915.
  ) 
 Here is how much of TeX's memory you used:
- 46368 strings out of 467867
- 1107621 string characters out of 5418818
- 1585660 words of memory out of 5000000
- 74176 multiletter control sequences out of 15000+600000
- 646089 words of font info for 101 fonts, out of 8000000 for 9000
+ 46315 strings out of 467867
+ 1110941 string characters out of 5418818
+ 1582365 words of memory out of 5000000
+ 74161 multiletter control sequences out of 15000+600000
+ 646451 words of font info for 103 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 114i,14n,134p,2630b,1528s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\ASUS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmbsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on StudentThesis_Template.pdf (77 pages, 2068136 bytes).
+ 114i,17n,134p,2630b,1211s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmbsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufb10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfding/uzdr.pfb>
+Output written on StudentThesis_Template.pdf (61 pages, 1302483 bytes).
 PDF statistics:
- 1443 PDF objects out of 1728 (max. 8388607)
- 334 named destinations out of 1000 (max. 500000)
- 586 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1677 PDF objects out of 1728 (max. 8388607)
+ 298 named destinations out of 1000 (max. 500000)
+ 479 words of extra memory for PDF output out of 10000 (max. 10000000)
 

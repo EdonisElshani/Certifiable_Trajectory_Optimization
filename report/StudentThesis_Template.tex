@@ -1,4 +1,4 @@
-\documentclass[ITR, MA, english, intermediate, tutorial]{LSR_thesis} 
+\documentclass[ITR, MA, english, intermediate]{LSR_thesis} 
 \graphicspath{{pics/}}
 
 %% Options:
@@ -62,7 +62,7 @@
 
 \supervisor{Dr.-Ing. Stefan Sosnowski} % your supervisor
 
-\finalrep{XX.XX.2026} % submission date
+\finalrep{13.05.2026} % submission date
 
 \maketitle
 
@@ -88,6 +88,7 @@
 \else
 	% in case you want to add the PDF directly add the task description in the include directory
 	\includepdf[pages=1]{./include/Master_Thesis_Task_Description.pdf}
+
 \fi
 \newpage
 
@@ -99,7 +100,7 @@
 \pagenumbering{arabic}
 \phantom{u}
 \begin{abstract}
-  A short (1--3 paragraphs) summary of the work. Should state the problem, major assumptions, basic idea of solution, results. Avoid non--standard terms and acronyms. The abstract must be able to be read completely on its own, detached from any other work (e.g., in collections of paper abstracts). Do not use references in an abstract.
+  %A short (1--3 paragraphs) summary of the work. Should state the problem, major assumptions, basic idea of solution, results. Avoid non--standard terms and acronyms. The abstract must be able to be read completely on its own, detached from any other work (e.g., in collections of paper abstracts). Do not use references in an abstract.
 
 %% German abstract (optional)
 %\begin{center}	
@@ -132,10 +133,11 @@
 	\input{./chapters/Tutorial.tex}
 \fi
 \input{./chapters/Introduction.tex}
-\input{./chapters/MainPart.tex}
+%\input{./chapters/MainPart.tex}
 \input{./chapters/Preliminaries.tex}
 \input{./chapters/Continuous_Mechanics.tex}
 \input{./chapters/Discrete_Mechanics.tex}
+\input{./chapters/Optimization.tex}
 \input{./chapters/Evaluation.tex}
 \input{./chapters/Discussion.tex}
 \input{./chapters/Conclusion.tex}

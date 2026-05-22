@@ -1,0 +1,284 @@
+\chapter{Certifiable Trajectory Optimization via Semidefinite Relaxation}
+\label{chap:certifiable_trajectory_optimization}
+
+\section{Trajectory Optimization with Variational Integrators}
+\label{sec:trajectory_optimization_variational_integrators}
+
+\subsection{Optimization Problem Formulation}
+\label{sec:optimization_problem_formulation}
+
+\newpage
+
+\section{Semidefinite Optimization and Relaxation}
+\label{sec:semidefinite_optimization_and_relaxation}
+
+\subsection{Semidefinite Relaxation and the Moment-SOS Hierarchy}
+\label{sec:sdp_moment_sos_relaxation}
+
+\subsubsection{Sum of Squares (SOS) Relaxation}
+\label{subsec:sos_relaxation}
+
+\subsubsection{Moment Relaxation}
+\label{subsec:moment_relaxation}
+
+\subsection{Sparse Relaxations}
+\label{sec:sparse_relaxations_cliques}
+
+\newpage
+
+\section{Optimization Formulation}
+
+\subsection{Control of 3D Pendulum}
+\label{sec:control_3d_pendulum}
+
+\begin{subequations}\label{eq:forced_3d_pendulum_pop}
+\begin{align}
+\min_{\substack{\{R_k\}_{k=0}^{N}\\[0.1em]\{F_k\}_{k=0}^{N-1},\,\{u_{p,k}\}_{k=1}^{N-1}}}
+\quad
+&
+\rho_R \left\| R_N - R_N^{\mathrm{des}} \right\|_F^2
++
+\rho_F \left\| F_{N-1} - F^{\mathrm{des}} \right\|_F^2
+\notag\\
+&\quad
++
+\sum_{k=0}^{N-1}
+\alpha_R \left\| R_k - R_N^{\mathrm{des}} \right\|_F^2
++
+\sum_{k=0}^{N-2}
+\alpha_F \left\| F_k - F^{\mathrm{des}} \right\|_F^2
+\notag\\
+&\quad
++
+\sum_{k=1}^{N-1}
+\gamma^{-1}\left\|u_{p,k}\right\|_2^2 .
+\label{eq:forced_3d_pendulum_pop_obj}
+\\[0.4em]
+\text{s.t.}\quad
+&
+\delta_2 f_{32,k+1}-\delta_3 f_{23,k+1}
+-\delta_3 f_{32,k}+\delta_2 f_{23,k}
+-h^2\!\left(M_{1,k+1}+u_{1,k+1}\right)=0,
+\label{eq:forced_3d_pendulum_pop_dyn1}
+\\
+&
+\delta_3 f_{13,k+1}-\delta_1 f_{31,k+1}
+-\delta_1 f_{13,k}+\delta_3 f_{31,k}
+-h^2\!\left(M_{2,k+1}+u_{2,k+1}\right)=0,
+\label{eq:forced_3d_pendulum_pop_dyn2}
+\\
+&
+\delta_1 f_{21,k+1}-\delta_2 f_{12,k+1}
+-\delta_2 f_{21,k}+\delta_1 f_{12,k}
+-h^2\!\left(M_{3,k+1}+u_{3,k+1}\right)=0,
+\label{eq:forced_3d_pendulum_pop_dyn3}
+\\
+&
+(R_{k+1})_{ij}-\sum_{\ell=1}^{3}(R_k)_{i\ell}(F_k)_{\ell j}=0,
+\label{eq:forced_3d_pendulum_pop_kin}
+\\
+&
+\|r_{1,k}\|_2^2-1=\|r_{2,k}\|_2^2-1=\|r_{3,k}\|_2^2-1=0,
+\label{eq:forced_3d_pendulum_pop_R1}
+\\
+&
+r_{1,k}^\top r_{2,k}=r_{2,k}^\top r_{3,k}=r_{1,k}^\top r_{3,k}=0,
+\label{eq:forced_3d_pendulum_pop_R2}
+\\
+&
+r_{1,k}\times r_{2,k}-r_{3,k}
+=
+r_{2,k}\times r_{3,k}-r_{1,k}
+=
+r_{3,k}\times r_{1,k}-r_{2,k}
+=
+0_{3\times1},
+\label{eq:forced_3d_pendulum_pop_R3}
+\\
+&
+\|f_{1,k}\|_2^2-1=\|f_{2,k}\|_2^2-1=\|f_{3,k}\|_2^2-1=0,
+\label{eq:forced_3d_pendulum_pop_F1}
+\\
+&
+f_{1,k}^\top f_{2,k}=f_{2,k}^\top f_{3,k}=f_{1,k}^\top f_{3,k}=0,
+\label{eq:forced_3d_pendulum_pop_F2}
+\\
+&
+f_{1,k}\times f_{2,k}-f_{3,k}
+=
+f_{2,k}\times f_{3,k}-f_{1,k}
+=
+f_{3,k}\times f_{1,k}-f_{2,k}
+=
+0_{3\times1},
+\label{eq:forced_3d_pendulum_pop_F3}
+\\
+&
+\frac{\operatorname{tr}(F_k)-1}{2}\ge f_{c,\min},
+\label{eq:forced_3d_pendulum_pop_step}
+\\
+&
+u_{\max}^2-\|u_{p,k}\|_2^2\ge 0.
+\label{eq:forced_3d_pendulum_pop_u}
+\end{align}
+\end{subequations}
+
+\begin{equation}
+\text{with}\qquad
+M_{k+1}
+=
+\begin{bmatrix}
+M_{1,k+1}\\
+M_{2,k+1}\\
+M_{3,k+1}
+\end{bmatrix}
+=
+mg
+\begin{bmatrix}
+\rho_2 r_{33,k+1}-\rho_3 r_{32,k+1}\\
+\rho_3 r_{31,k+1}-\rho_1 r_{33,k+1}\\
+\rho_1 r_{32,k+1}-\rho_2 r_{31,k+1}
+\end{bmatrix},
+\end{equation}
+
+\begin{equation}
+u_{k+1}
+=
+\begin{bmatrix}
+u_{1,k+1}\\
+u_{2,k+1}\\
+u_{3,k+1}
+\end{bmatrix}
+=
+\begin{bmatrix}
+r_{32,k+1}u_{p3,k+1}-r_{33,k+1}u_{p2,k+1}\\
+r_{33,k+1}u_{p1,k+1}-r_{31,k+1}u_{p3,k+1}\\
+r_{31,k+1}u_{p2,k+1}-r_{32,k+1}u_{p1,k+1}
+\end{bmatrix},
+\end{equation}
+
+\begin{equation}
+R_k=[r_{1,k}\;r_{2,k}\;r_{3,k}]\in\mathbb{R}^{3\times 3},
+\qquad
+r_{1,k},r_{2,k},r_{3,k}\in\mathbb{R}^{3\times 1},
+\end{equation}
+
+\begin{equation}
+F_k=[f_{1,k}\;f_{2,k}\;f_{3,k}]\in\mathbb{R}^{3\times 3},
+\qquad
+f_{1,k},f_{2,k},f_{3,k}\in\mathbb{R}^{3\times 1},
+\end{equation}
+
+\begin{equation}
+J_d=\operatorname{diag}(\delta_1,\delta_2,\delta_3),
+\qquad
+\rho_c=
+\begin{bmatrix}
+\rho_1\\
+\rho_2\\
+\rho_3
+\end{bmatrix},
+\qquad
+u_{p,k}=
+\begin{bmatrix}
+u_{p1,k}\\
+u_{p2,k}\\
+u_{p3,k}
+\end{bmatrix}.
+\end{equation}
+
+
+In \eqref{eq:forced_3d_pendulum_pop_dyn1}--\eqref{eq:forced_3d_pendulum_pop_dyn3},
+the discrete Euler--Lagrange constraints hold for $k=0,\dots,N-2$.
+The kinematic constraint \eqref{eq:forced_3d_pendulum_pop_kin} holds for
+$i,j=1,2,3$ and $k=0,\dots,N-1$.
+The constraints \eqref{eq:forced_3d_pendulum_pop_R1}--\eqref{eq:forced_3d_pendulum_pop_R3}
+hold for $k=0,\dots,N$, while
+\eqref{eq:forced_3d_pendulum_pop_F1}--\eqref{eq:forced_3d_pendulum_pop_F3},
+\eqref{eq:forced_3d_pendulum_pop_step}, and
+\eqref{eq:forced_3d_pendulum_pop_u} hold for $k=0,\dots,N-1$.
+
+
+\begin{comment}
+For each stage the decision variables are
+\[
+R_k\in\mathbb{R}^{3\times 3},\qquad
+F_k\in\mathbb{R}^{3\times 3},\qquad
+u_{p,k}\in\mathbb{R}^3.
+\]
+Hence, each stage contributes
+\[
+9+9+3=21
+\]
+scalar decision variables. Since the terminal attitude $R_N\in\mathbb{R}^{3\times 3}$ is also optimized, the total number of scalar decision variables is
+\[
+9(N+1)+9N+3N = 21N+9.
+\]
+If the fixed initial values $R_0=\bar R_0$ and $F_0=\bar F_0$ are eliminated from the decision vector in the implementation, the number of free scalar decision variables reduces to
+\[
+21N+9-18 = 21N-9.
+\]
+
+$\operatorname{tr}(\bm{R}_k)= 1+2\cos(\theta_k)$ \cite{GallierQuaintance2025LinearAlgebra}
+
+From (7.18a)
+
+\begin{equation}
+\begin{aligned}
+&p_f\sum_{i=1}^{3}\sum_{j=1}^{3}\bigl(r_{ij,N}-r_{ij,N}^{\mathrm{des}}\bigr)^2
+\\
+&\quad
++\sum_{k=0}^{N-1}
+\alpha_R
+\sum_{i=1}^{3}\sum_{j=1}^{3}\bigl(r_{ij,k}-r_{ij,N}^{\mathrm{des}}\bigr)^2
+\\
+&\quad
++\sum_{k=1}^{N-1}\gamma^{-1}\bigl(u_{p1,k}^2+u_{p2,k}^2+u_{p3,k}^2\bigr).
+\end{aligned}
+\end{equation}
+
+From (7.18e)
+
+\begin{align}
+r_{11,k+1} - r_{11,k}f_{11,k} - r_{12,k}f_{21,k} - r_{13,k}f_{31,k} &= 0,\\
+r_{12,k+1} - r_{11,k}f_{12,k} - r_{12,k}f_{22,k} - r_{13,k}f_{32,k} &= 0,\\
+r_{13,k+1} - r_{11,k}f_{13,k} - r_{12,k}f_{23,k} - r_{13,k}f_{33,k} &= 0,\\[0.3em]
+r_{21,k+1} - r_{21,k}f_{11,k} - r_{22,k}f_{21,k} - r_{23,k}f_{31,k} &= 0,\\
+r_{22,k+1} - r_{21,k}f_{12,k} - r_{22,k}f_{22,k} - r_{23,k}f_{32,k} &= 0,\\
+r_{23,k+1} - r_{21,k}f_{13,k} - r_{22,k}f_{23,k} - r_{23,k}f_{33,k} &= 0,\\[0.3em]
+r_{31,k+1} - r_{31,k}f_{11,k} - r_{32,k}f_{21,k} - r_{33,k}f_{31,k} &= 0,\\
+r_{32,k+1} - r_{31,k}f_{12,k} - r_{32,k}f_{22,k} - r_{33,k}f_{32,k} &= 0,\\
+r_{33,k+1} - r_{31,k}f_{13,k} - r_{32,k}f_{23,k} - r_{33,k}f_{33,k} &= 0.
+\end{align}
+
+From (7.18h)
+
+\begin{align}
+r_{21,k}r_{32,k}-r_{31,k}r_{22,k}-r_{13,k} &= 0,\\
+r_{31,k}r_{12,k}-r_{11,k}r_{32,k}-r_{23,k} &= 0,\\
+r_{11,k}r_{22,k}-r_{21,k}r_{12,k}-r_{33,k} &= 0,\\[0.3em]
+r_{22,k}r_{33,k}-r_{32,k}r_{23,k}-r_{11,k} &= 0,\\
+r_{32,k}r_{13,k}-r_{12,k}r_{33,k}-r_{21,k} &= 0,\\
+r_{12,k}r_{23,k}-r_{22,k}r_{13,k}-r_{31,k} &= 0,\\[0.3em]
+r_{23,k}r_{31,k}-r_{33,k}r_{21,k}-r_{12,k} &= 0,\\
+r_{33,k}r_{11,k}-r_{13,k}r_{31,k}-r_{22,k} &= 0,\\
+r_{13,k}r_{21,k}-r_{23,k}r_{11,k}-r_{32,k} &= 0.
+\end{align}
+
+From (7.18.k)
+
+\begin{align}
+f_{21,k}f_{32,k}-f_{31,k}f_{22,k}-f_{13,k} &= 0,\\
+f_{31,k}f_{12,k}-f_{11,k}f_{32,k}-f_{23,k} &= 0,\\
+f_{11,k}f_{22,k}-f_{21,k}f_{12,k}-f_{33,k} &= 0,\\[0.3em]
+f_{22,k}f_{33,k}-f_{32,k}f_{23,k}-f_{11,k} &= 0,\\
+f_{32,k}f_{13,k}-f_{12,k}f_{33,k}-f_{21,k} &= 0,\\
+f_{12,k}f_{23,k}-f_{22,k}f_{13,k}-f_{31,k} &= 0,\\[0.3em]
+f_{23,k}f_{31,k}-f_{33,k}f_{21,k}-f_{12,k} &= 0,\\
+f_{33,k}f_{11,k}-f_{13,k}f_{31,k}-f_{22,k} &= 0,\\
+f_{13,k}f_{21,k}-f_{23,k}f_{11,k}-f_{32,k} &= 0.
+\end{align}
+
+\end{comment}
+
+\newpage

@@ -12,15 +12,11 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: refs/mybib.bib
 Warning--entry type for "ColomboJimenez2012SO3_Cayley" isn't style-file defined
 --line 88 of file refs/mybib.bib
-Warning--I didn't find a database entry for "Bloe_99"
-Warning--I didn't find a database entry for "Jay_87"
-Warning--I didn't find a database entry for "ONeill_2000"
-Warning--I didn't find a database entry for "Elphinstone2014"
 Warning--I didn't find a database entry for "Lee2012ISM"
 Reallocating 'wiz_functions' (item size: 4) to 6000 items.
 You've used 17 entries,
             3368 wiz_defined-function locations,
-            842 strings with 9348 characters,
+            834 strings with 9270 characters,
 and the built_in function-call counts, 8705 in all, are:
 = -- 937
 > -- 293
@@ -59,4 +55,4 @@ warning$ -- 0
 while$ -- 53
 width$ -- 19
 write$ -- 252
-(There were 6 warnings)
+(There were 2 warnings)

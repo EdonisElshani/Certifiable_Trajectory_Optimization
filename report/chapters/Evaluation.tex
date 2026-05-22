@@ -2,7 +2,7 @@
 
 \section{Numerical Simulation Results} 
 
-In this section, numerical simulations are conducted to evaluate the correctness of the derived discrete integrators for mechanical models on Lie groups. In particular, the structure-preserving properties of the variational discretizations derived in Section~\ref{sec:} are examined. The analysis focuses especially on the preservation of the momentum map associated with the symmetry of the system, the evolution on the Lie-group configuration manifold, and the long-time behaviour of the total energy. This validation is important since discrete mechanical models obtained by variational integration provide a reliable basis for certifiable trajectory optimization. If the discrete flow violates the manifold structure or introduces artificial drift in conserved quantities such as momentum, the resulting optimization model becomes less faithful to the underlying mechanics \cite{Lee2008}. In contrast, variational integrators are constructed from a discrete variational principle and are symplectic, momentum preserving, and consist robust long-time energy behaviour \cite{Marsden2001}. For the evaluation, the evolution of the total energy, the momentum-map behaviour, and the preservation of the Lie-group structure of the unforced 3D-pendulum are compared with the classical fourth-order Runge-Kutta method and a projected Runge-Kutta on \(SO(3)\) as reference integrators \cite{CELLEDONI2003421, Hairer2000} (see Table. \ref{tab:integrator_comparison}).
+In this section, numerical simulations are conducted to evaluate the correctness of the derived discrete integrators for mechanical models on Lie groups. In particular, the structure-preserving properties of the variational discretizations derived in Section~\ref{sec:} are examined. The analysis focuses especially on the preservation of the momentum map associated with the symmetry of the system, the evolution on the Lie-group configuration manifold, and the long-time behaviour of the total energy. This validation is important since discrete mechanical models obtained by variational integration provide a reliable basis for certifiable trajectory optimization. If the discrete flow violates the manifold structure or introduces artificial drift in conserved quantities such as momentum, the resulting optimization model becomes less faithful to the underlying mechanics \cite{Lee2008}. In contrast, variational integrators are constructed from a discrete variational principle and are symplectic, momentum preserving, and consist robust long-time energy behaviour \cite{Marsden2001}. For the evaluation, the evolution of the total energy, the momentum-map behaviour, and the preservation of the Lie-group structure of the 3D-pendulum are compared with the classical fourth-order Runge-Kutta method and a projected Runge-Kutta on \(SO(3)\) as reference integrators \cite{CELLEDONI2003421, Hairer2000} (see Table. \ref{tab:integrator_comparison}).
 
 \begin{table}[h]
 \centering
@@ -25,13 +25,16 @@ As a basline integrator, the classical explicit fourth-order Runge-Kutta (RK4) i
     \dot{\bm{y}} = \bm{f}(\bm{y}),
 \end{align}
 the classical RK4 scheme computes the four stage values
+\begin{subequations}\label{eq:rk4_stages}
 \begin{align}
     (\bm{k}_1^{R}, \bm{k}_1^{\omega}) &= \bm{f}(\bm{R}_n, \bm{\omega}_n), \\
     (\bm{k}_2^{R}, \bm{k}_2^{\omega}) &= \bm{f}\!\left(\bm{R}_n+\frac{h}{2}\bm{k}_1^R,\bm{\omega}_n+\frac{h}{2}\bm{k}_1^{\omega}\right), \\
     (\bm{k}_3^{R}, \bm{k}_3^{\omega}) &= \bm{f}\!\left(\bm{R}_n+\frac{h}{2}\bm{k}_2^{R},\bm{\omega}_n+\frac{h}{2}\bm{k}_2^{\omega}\right), \\
    (\bm{k}_4^{R}, \bm{k}_4^{\omega}) &= \bm{f}\!\left(\bm{R}_n+h\bm{k}_3^{R}, \bm{\omega}_n+h\bm{k}_3^{\omega}\right),
 \end{align}
+\end{subequations}
 and updates the numerical solution according to
+\begin{subequations}\label{eq:rk4_update}
 \begin{align}
     \bm{R}_{n+1}
     &=
@@ -41,15 +44,16 @@ and updates the numerical solution according to
     \left(
     \bm{k}_1^{R} + 2\bm{k}_2^{R} + 2\bm{k}_3^{R} + \bm{k}_4^{R}
     \right), \\
-    \boldsymbol{\omega}_{n+1}
+    \bm{\omega}_{n+1}
     &=
-    \boldsymbol{\omega}_n
+    \bm{\omega}_n
     +
     \frac{h}{6}
     \left(
     \bm{k}_1^{\omega} + 2\bm{k}_2^{\omega} + 2\bm{k}_3^{\omega} + \bm{k}_4^{\omega}
     \right),
 \end{align}
+\end{subequations}
 for each discrete-time step $n$ \cite{butcher2016numerical}.
 
 The explicit RK4 method does not preserve the orthogonality constraint \(\bm{R}^\top \bm{R}=\bm{I}\) and leaves the manifold configuration of $SO(3)$, since the rotation matrix $\bm{R}_n$ is updated additively in the vector space of $\mathbb{R}^{3 \times 3}$ \cite{CELLEDONI2003421}.
@@ -58,8 +62,14 @@ The explicit RK4 method does not preserve the orthogonality constraint \(\bm{R}^
 
 To satisfy the orthogonality constraint 
 \[
-SO(3)=\left\{\bm{R}\in\mathbb{R}^{3\times 3}\;\middle|\;\bm{R}^\top \bm{R}=\bm{I},\ \det(\bm{R})=1\right\}.
-\]
+SO(3)
+=
+\left\{
+\bm{R}\in\mathbb{R}^{3\times 3}
+\;\middle|\;
+\bm{R}^\top \bm{R}=\bm{I}_3,\ 
+\det(\bm{R})=1
+\right\}.\]
 the explicit RK4 method is combined with a projection of the discrete-time updated rotation matrix $\bm{R}_n$ on $SO(3)$. Therefore, after performing the RK4 step in $\mathbb{R}^{3 \times 3}$ the obtained rotation matrix \(\widetilde{\bm{R}}_{n+1}\), the singular value decomposition is used  
 \begin{align}
     \widetilde{\bm{R}}_{n+1}=\bm{U}\bm{\Sigma}\bm{V}^{\top},
@@ -70,36 +80,36 @@ following a reconstruction to derive the updated rotation matrix
 \end{align}
  which is projected on $SO(3)$ \cite{YanaiTakeuchiTakane2011SVD}. Consequently, $\bm{R}_{n+1}$ satisfy the orthogonality constraint, while the angular velocity $\bm{\omega}_{n+1}$ remains unchanged on the vector space $\mathbb{R}^{3 \times 3}$. However, this method does not inherit structure preserving properties of the Lie group variational integrator, for example, symplecticity or momentum conservation \cite{CELLEDONI2003421}. 
 
-\subsection{Unforced 3D Pendulum}
+\subsection{3D Pendulum}
 
-For evaluating the geometric properties preservation of the previously defined unforced 3D-pendulum (see Section \ref{sec:discrete_3d_pendulum}), numerical simulations are conducted. The rigid body is modeled as a uniform solid cylinder of length $l=\SI{1}{\meter}$ and radius $r=\SI{5}{\cm}$, with its center of mass at $\frac{l}{2}$. Thereby, the physical parameters characterizing the configuration manifold, are chosen as 
+For evaluating the geometric properties preservation of the previously defined 3D-pendulum (see Section \ref{sec:discrete_3d_pendulum}), numerical simulations are conducted for the unforced and controlled cases. The rigid body is modeled as a uniform solid cylinder of length $l=\SI{1}{\meter}$ and radius $r=\SI{5}{\cm}$, with its center of mass at $\frac{l}{2}$. Thereby, the physical parameters characterizing the configuration manifold, are chosen as 
 \begin{align}
     m &= \SI{1}{\kilogram}, &
     g &= \SI{9.81}{\meter\per\second\squared}, \\
-    \boldsymbol{\rho}_c &=
+    \bm{\rho}_c &=
     \begin{bmatrix}
         0 & 0 & 0.5
     \end{bmatrix}^\top \si{\meter}, &
-    \boldsymbol{e}_3 &=
+    \bm{e}_3 &=
     \begin{bmatrix}
         0 & 0 & 1
     \end{bmatrix}^\top.
 \end{align}
  The inertia matrix about the center of mass can be taken from the inertia table given in \cite{RITInertiaTable216}. Here, the rotation of the center of mass in x and y direction are represented about the central diameter $\bm{J}_{11,com}=\bm{J}_{22,com}= \frac{1}{12}m(3r^2 + 4l^2)$, and the rotation of the center of mass in gravity direction z is perpendicular to the axis of rotation $\bm{J}_{33,com}=\frac{1}{2} mr^2$. The off-diagonal terms are equal to zero, because the body-fixed frame is aligned with the principal axes of the cylindrically symmetric body \cite{Lee2008}. Additionally, the inertia matrix about the pivot in body-frame is obtained by the parallel axis theorem of \cite{Benacquista2018ClassicalMechanics} given by
 \begin{align}
-    \mathbf{J}
+    \bm{J}
     =
-    \mathbf{J}_{\mathrm{com}}
+    \bm{J}_{\mathrm{com}}
     +
     m\left(
-        \|\boldsymbol{\rho}_c\|^2\mathbf{I}
+        \|\bm{\rho}_c\|^2\bm{I}
         -
-        \boldsymbol{\rho}_c\boldsymbol{\rho}_c^{\top}
+        \bm{\rho}_c\bm{\rho}_c^{\top}
     \right).
 \end{align}
 After substituting the chosen values, the 3D-pendulum's inertia matrix is given as
 \begin{align}
-    \mathbf{J}
+    \bm{J}
     &=
     \begin{bmatrix}
         0.33396 & 0 & 0 \\
@@ -108,9 +118,9 @@ After substituting the chosen values, the 3D-pendulum's inertia matrix is given 
     \end{bmatrix}
     \si{\kilogram\meter\squared}.
 \end{align}
-Given \ref{eq:non-standard_inertia}, the non-standard inertia matrix is calculated to
+Given \eqref{eq:non-standard_inertia}, the non-standard inertia matrix is calculated to
 \begin{align}
-    \mathbf{J}_d
+    \bm{J}_d
     &=
     \begin{bmatrix}
         0.000625 & 0 & 0 \\
@@ -119,32 +129,35 @@ Given \ref{eq:non-standard_inertia}, the non-standard inertia matrix is calculat
     \end{bmatrix}
     \si{\kilogram\meter\squared}.
 \end{align}
-Using the introduced computational approach of Section \ref{sec:discrete_computational_approach}, the derived discrete-time implicit Hamilton equation \ref{eq:discrete_3D_pendulum_hamilton_1} of the 3D-pendulum is converted to an equivalent vector equation in $\mathbb{R}^3$ using the Cayley transformation. From \cite{ColomboJimenez2012SO3_Cayley}, the corresponding nonlinear vector equation $0 = \bm{A}(\bm{f})$ of the 3D-pendulum is taken as
+Using the introduced computational approach of Section \ref{sec:discrete_computational_approach}, the derived discrete-time implicit Hamilton equations
+of the unforced \eqref{eq:discrete_3D_pendulum_hamilton} and controlled \eqref{eq:forced_3D_pendulum_hamilton} 3D-pendulum are converted to an equivalent vector equation in $\mathbb{R}^3$ using the Cayley transformation. From \cite{ColomboJimenez2012SO3_Cayley}, the corresponding nonlinear vector equation $0 = \bm{A}(\bm{f})$ of the 3D-pendulum is taken as
 \begin{equation}\label{eq:simulation_3D_pendulum_vector_equation}
     0 = \bm{a}+\bm{a} \times \bm{f} + \bm{f}(\bm{a}^\top \bm{f})-2 \bm{J} \bm{f} = \bm{A}(f),
 \end{equation}
 with $\bm{a}= h (\bm{\Pi}_k + \frac{h}{2} \bm{M}_k)$. Additionally, \cite{ColomboJimenez2012SO3_Cayley} defines its Jacobian $\nabla A\!\left(\bm{f}\right)$ to
-\begin{align}
+\begin{align}\label{eq:Caley_Jacobian}
 \nabla A(\bm{f})
 =
 \hat{\bm{a}}
 +
-(\bm{a}^{\top}\bm{f})\mathbf{I}
+(\bm{a}^{\top}\bm{f})\bm{I}
 +
 \bm{f}\bm{a}^{\top}
 -
-2\mathbf{J}.
+2\bm{J}.
 \end{align}
 The tolerance for the Newton iteration is defined to $\left\lVert f^{(i+1)} - f^{(i)} \right\rVert < 10^{-12}$. The initial conditions are taken from \cite{Lee2008} 
 \begin{align}
 \bm{f}^0 &= (2 \bm{J} - \hat{\bm{a}})^{-1}\bm{a},&
-    \mathbf{R}_0 &= \mathbf{I}, &
-    \boldsymbol{\Omega}_0 &=
+    \bm{R}_0 &= \bm{I}, &
+    \bm{\Omega}_0 &=
     \begin{bmatrix}
         4.14 & 4.14 & 4.14
     \end{bmatrix}^{\top}\si{\radian\per\second},
 \end{align} where $\bm{f}^0$ is the linearized solution of
-\ref{eq:simulation_3D_pendulum_vector_equation}. The simulation is conducted over $[0,1000]$ discrete-time steps and $h=\SI{0.05}{\second}$. The corresponding implementation is documented in the GitHub repository \cite{Elshani2026CTO_GitHub}.
+\eqref{eq:simulation_3D_pendulum_vector_equation}. The corresponding implementation is documented in the GitHub repository \cite{Elshani2026CTO_GitHub}.
+
+\subsubsection{Unforced 3D-Pendulum}
 
 \begin{figure}[t]
     \centering
@@ -178,269 +191,294 @@ The tolerance for the Newton iteration is defined to $\left\lVert f^{(i+1)} - f^
     \label{fig:simulation_results_3d_pendulum}
 \end{figure}
 
-Fig. \ref{fig:simulation_results_3d_pendulum} illustrates the results of the numerical simulation of the different methods of Table \ref{tab:integrator_comparison}, by plotting the corresponding total energy
+The results of the numerical simulation for the unforced case, with 
+$\bm{u}_k=\bm{0}$, are shown in Fig.~\ref{fig:simulation_results_3d_pendulum}. 
+The simulation is performed over $1000$ discrete-time steps with a step size of 
+$h=\SI{0.05}{\second}$. Thereby, the accuracy of the different integrator methods, given in Table \ref{tab:integrator_comparison}, are compared to each other, by plotting the corresponding total energy
 \[
  E_k
     =
-    \frac{1}{2}\boldsymbol{\Omega}_k^{\top}\mathbf{J}\boldsymbol{\Omega}_k
+    \frac{1}{2}\bm{\Omega}_k^{\top}\bm{J}\bm{\Omega}_k
     -
-    mg\,\boldsymbol{e}_3^{\top}\mathbf{R}_k\boldsymbol{\rho}_c,
+    mg\,\bm{e}_3^{\top}\bm{R}_k\bm{\rho}_c,
 \]
 and its deviation $\Delta E_k = E_k - E_0$, the angular momentum error along the gravity direction
 \[
-\Delta \mu_k= \boldsymbol{e}_3^{\top}\mathbf{R}_k\boldsymbol{\Pi}_k - \boldsymbol{e}_3^{\top}\mathbf{R}_0\boldsymbol{\Pi}_0,
+\Delta \mu_k= \bm{e}_3^{\top}\bm{R}_k\bm{\Pi}_k - \bm{e}_3^{\top}\bm{R}_0\bm{\Pi}_0,
 \]
-defined in \cite{Lee2008}, and the orthogonality error $e_{\mathrm{orth},k} = \left\|\mathbf{I}-\mathbf{R}_k^{\top}\mathbf{R}_k\right\|_F$.
+defined in \cite{Lee2008}, and the orthogonality error 
+\[
+e_{\mathrm{orth},k} = \left\|\bm{I}-\bm{R}_k^{\top}\bm{R}_k\right\|_F.
+\]
 
 The total energy (see Fig. \ref{fig:simulation_results_3d_pendulum} (a)) and the corresponding energy deviation (see Fig. \ref{fig:simulation_results_3d_pendulum} (b)) illustrates the preserving energy behavior over a long-time in discrete-time flow for the Lie Group Variational Integrator (LGVI). It remains close to the reference level with only small bounded oscillations, because of their symplectic strcuture, which are the exact solution of a pertubed Hamiltonian \cite{Hairer1994}. However, the RK4 and projected RK4 display a clear drift of the energy away from its real value, which remains constant for this model, as the system is unforced.
 
-Moreover, the momentum error (see Fig. \ref{fig:simulation_results_3d_pendulum} (c)) confirms that the LGVI method preserves the momentum, validated for continuous time in \ref{sec:continous_3D_pendulum_momentum_validation}. The computational results of RK4 and its projection on $SO(3)$ show that these methods are not reliable drifting from the momentum initial value, as they not preserve the total linear momentum \cite{Lee2008}. Especially, the projected RK4 consits of a stronger discrepancy, as it fixes $\bm{R}^\top\bm{R} = \bm{I}$, while the angular velocity $\omega$ remains unchanged, which influences the momentum.
+Moreover, the momentum error (see Fig. \ref{fig:simulation_results_3d_pendulum} (c)) confirms that the LGVI method preserves the momentum, validated for continuous time in \ref{sec:continuous_3D_pendulum_momentum_validation}. The computational results of RK4 and its projection on $SO(3)$ show that these methods are not reliable drifting from the momentum initial value, as they not preserve the total linear momentum \cite{Lee2008}. Especially, the projected RK4 consists of a stronger discrepancy, as it fixes $\bm{R}^\top\bm{R} = \bm{I}$, while the angular velocity $\bm{\omega}$ remains unchanged, which influences the momentum.
 
 Lastly, the orthogonality error highlights that the structure of the Lie group configuration manifold is well preserved in the LGVI, which is depictured in Fig. \ref{fig:simulation_results_3d_pendulum} (d). Similar result is obtained from the projected RK4, while the classic explicit RK4 violates the orthogonality constraint. For RK4 $e_{orth}$ increases linearly with respect to the simulation time-steps.
 
-Consequently, only the LGVI preserves the manifold structure together with the momentum and energy behaviour over a long-time horizon. While RK4 can be projected to the Lie group manifold of $SO(3)$, it can not preserve the momentum and consits of drifting energy behaviour over long-time.
+Consequently, only the LGVI preserves the manifold structure together with the momentum and energy behaviour over a long-time horizon. While RK4 can be projected to the Lie group manifold of $SO(3)$, it can not preserve the momentum and consists of drifting energy behaviour over long-time.
 
-\section{Optimization}
+\subsubsection{Controlled 3D-Pendulum}
 
-\begin{subequations}\label{eq:forced_3d_pendulum_pop}
+In the controlled case, the previously derived free dynamics of the 3D-pendulum
+are extended by an external body-fixed control moment. Following defined control
+structure of \eqref{eq:external_control_moment_3D_pendulum}, the time-dependent control parameter is chosen as
 \begin{align}
-\min_{\substack{\{R_k\}_{k=0}^{N}\\[0.1em]\{F_k\}_{k=0}^{N-1},\,\{u_{p,k}\}_{k=1}^{N-1}}}
-\quad
-&
-\rho_f\|R_N-R_N^{\mathrm{des}}\|_F^2 +\sum_{k=0}^{N-1} \left(\alpha_R\|R_k-R_N^{\mathrm{des}}\|_F^2\right) +\sum_{k=1}^{N-1}\gamma^{-1}\|u_{p,k}\|_2^2,
-\label{eq:forced_3d_pendulum_pop_obj}
-\\[0.4em]
-\text{s.t.}\quad
-&
-\delta_2 f_{32,k+1}-\delta_3 f_{23,k+1}
--\delta_3 f_{32,k}+\delta_2 f_{23,k}
--h^2\!\left(M_{1,k+1}+u_{1,k+1}\right)=0,
-\label{eq:forced_3d_pendulum_pop_dyn1}
-\\
-&
-\delta_3 f_{13,k+1}-\delta_1 f_{31,k+1}
--\delta_1 f_{13,k}+\delta_3 f_{31,k}
--h^2\!\left(M_{2,k+1}+u_{2,k+1}\right)=0,
-\label{eq:forced_3d_pendulum_pop_dyn2}
-\\
-&
-\delta_1 f_{21,k+1}-\delta_2 f_{12,k+1}
--\delta_2 f_{21,k}+\delta_1 f_{12,k}
--h^2\!\left(M_{3,k+1}+u_{3,k+1}\right)=0,
-\label{eq:forced_3d_pendulum_pop_dyn3}
-\\
-&
-(R_{k+1})_{ij}-\sum_{\ell=1}^{3}(R_k)_{i\ell}(F_k)_{\ell j}=0,
-\label{eq:forced_3d_pendulum_pop_kin}
-\\
-&
-\|r_{1,k}\|_2^2-1=\|r_{2,k}\|_2^2-1=\|r_{3,k}\|_2^2-1=0,
-\label{eq:forced_3d_pendulum_pop_R1}
-\\
-&
-r_{1,k}^\top r_{2,k}=r_{2,k}^\top r_{3,k}=r_{1,k}^\top r_{3,k}=0,
-\label{eq:forced_3d_pendulum_pop_R2}
-\\
-&
-r_{1,k}\times r_{2,k}-r_{3,k}
-=
-r_{2,k}\times r_{3,k}-r_{1,k}
-=
-r_{3,k}\times r_{1,k}-r_{2,k}
-=
-0_{3\times1},
-\label{eq:forced_3d_pendulum_pop_R3}
-\\
-&
-\|f_{1,k}\|_2^2-1=\|f_{2,k}\|_2^2-1=\|f_{3,k}\|_2^2-1=0,
-\label{eq:forced_3d_pendulum_pop_F1}
-\\
-&
-f_{1,k}^\top f_{2,k}=f_{2,k}^\top f_{3,k}=f_{1,k}^\top f_{3,k}=0,
-\label{eq:forced_3d_pendulum_pop_F2}
-\\
-&
-f_{1,k}\times f_{2,k}-f_{3,k}
-=
-f_{2,k}\times f_{3,k}-f_{1,k}
-=
-f_{3,k}\times f_{1,k}-f_{2,k}
-=
-0_{3\times1},
-\label{eq:forced_3d_pendulum_pop_F3}
-\\
-&
-\frac{\operatorname{tr}(F_k)-1}{2}\ge f_{c,\min},
-\label{eq:forced_3d_pendulum_pop_step}
-\\
-&
-u_{\max}^2-\|u_{p,k}\|_2^2\ge 0.
-\label{eq:forced_3d_pendulum_pop_u}
+    \label{eq:controlled_3d_pendulum_input_parameter}
+    \bm{u}_p(t)
+    =
+    \begin{bmatrix}
+        0.15\sin(0.5t) \\
+        0.10\cos(0.25t) \\
+        0
+    \end{bmatrix}.
+\end{align}
+The corresponding discrete control input is obtained by evaluating the control law
+at the discrete time nodes $\bm{u}_{p,k} =\bm{u}_p(t_k)$. Thus, the control input acts as a body-fixed external moment that is orthogonal to
+the gravity direction expressed in the body frame, given by
+$\bm{R}_k^{\top}\bm{e}_3$. Consequently, the control moment has no component
+along this direction.
+
+For the RK4 simulation, the continuous-time Hamilton equations \eqref{eq:continuous_3D_pendulum_hamilton} are used, 
+adding the contol input $\bm{u(t)}$, based on Lagrange-d' Alembert principle of Section \ref{sec:discrete_forced_lagrangian}.
+With the body angular momentum defined by $\bm{\Pi} = \bm{J}\bm{\Omega}$,
+the forced continuous-time equations of motion are written as
+\begin{subequations}
+\label{eq:controlled_3d_pendulum_continuous_RK4}
+\begin{align}
+    \dot{\bm{\Pi}}
+    &=
+    mg\,\bm{\rho}_c
+    \times
+    \bm{R}^{\top}\bm{e}_3
+    -
+    \bm{J}^{-1}\bm{\Pi}
+    \times
+    \bm{\Pi}
+    +
+    \bm{u}(t),
+    \label{eq:controlled_3d_pendulum_continuous_momentum}
+    \\
+    \dot{\bm{R}}
+    &=
+    \bm{R}
+    \left(
+        \bm{J}^{-1}\bm{\Pi}
+    \right)^{\wedge}.
+    \label{eq:controlled_3d_pendulum_continuous_kinematics}
 \end{align}
 \end{subequations}
+In contrast to the unforced case, the external input acts on the system.
+Therefore, the total energy and the momentum map are no longer expected to be
+conserved.
 
-\begin{equation}
-\text{with}\qquad
-M_{k+1}
-=
-\begin{bmatrix}
-M_{1,k+1}\\
-M_{2,k+1}\\
-M_{3,k+1}
-\end{bmatrix}
-=
-mg
-\begin{bmatrix}
-\rho_2 r_{33,k+1}-\rho_3 r_{32,k+1}\\
-\rho_3 r_{31,k+1}-\rho_1 r_{33,k+1}\\
-\rho_1 r_{32,k+1}-\rho_2 r_{31,k+1}
-\end{bmatrix},
-\end{equation}
-
-\begin{equation}
-u_{k+1}
-=
-\begin{bmatrix}
-u_{1,k+1}\\
-u_{2,k+1}\\
-u_{3,k+1}
-\end{bmatrix}
-=
-\begin{bmatrix}
-r_{32,k+1}u_{p3,k+1}-r_{33,k+1}u_{p2,k+1}\\
-r_{33,k+1}u_{p1,k+1}-r_{31,k+1}u_{p3,k+1}\\
-r_{31,k+1}u_{p2,k+1}-r_{32,k+1}u_{p1,k+1}
-\end{bmatrix},
-\end{equation}
-
-\begin{equation}
-R_k=[r_{1,k}\;r_{2,k}\;r_{3,k}]\in\mathbb{R}^{3\times 3},
-\qquad
-r_{1,k},r_{2,k},r_{3,k}\in\mathbb{R}^{3\times 1},
-\end{equation}
-
-\begin{equation}
-F_k=[f_{1,k}\;f_{2,k}\;f_{3,k}]\in\mathbb{R}^{3\times 3},
-\qquad
-f_{1,k},f_{2,k},f_{3,k}\in\mathbb{R}^{3\times 1},
-\end{equation}
-
-\begin{equation}
-J_d=\operatorname{diag}(\delta_1,\delta_2,\delta_3),
-\qquad
-\rho_c=
-\begin{bmatrix}
-\rho_1\\
-\rho_2\\
-\rho_3
-\end{bmatrix},
-\qquad
-u_{p,k}=
-\begin{bmatrix}
-u_{p1,k}\\
-u_{p2,k}\\
-u_{p3,k}
-\end{bmatrix}.
-\end{equation}
-
-
-In \eqref{eq:forced_3d_pendulum_pop_dyn1}--\eqref{eq:forced_3d_pendulum_pop_dyn3},
-the discrete Euler--Lagrange constraints hold for $k=0,\dots,N-2$.
-The kinematic constraint \eqref{eq:forced_3d_pendulum_pop_kin} holds for
-$i,j=1,2,3$ and $k=0,\dots,N-1$.
-The constraints \eqref{eq:forced_3d_pendulum_pop_R1}--\eqref{eq:forced_3d_pendulum_pop_R3}
-hold for $k=0,\dots,N$, while
-\eqref{eq:forced_3d_pendulum_pop_F1}--\eqref{eq:forced_3d_pendulum_pop_F3},
-\eqref{eq:forced_3d_pendulum_pop_step}, and
-\eqref{eq:forced_3d_pendulum_pop_u} hold for $k=0,\dots,N-1$.
-
-For each stage $k=0,\dots,N-1$, the decision variables are
-\[
-R_k\in\mathbb{R}^{3\times 3},\qquad
-F_k\in\mathbb{R}^{3\times 3},\qquad
-u_{p,k}\in\mathbb{R}^3.
-\]
-Hence, each stage contributes
-\[
-9+9+3=21
-\]
-scalar decision variables. Since the terminal attitude $R_N\in\mathbb{R}^{3\times 3}$ is also optimized, the total number of scalar decision variables is
-\[
-9(N+1)+9N+3N = 21N+9.
-\]
-If the fixed initial values $R_0=\bar R_0$ and $F_0=\bar F_0$ are eliminated from the decision vector in the implementation, the number of free scalar decision variables reduces to
-\[
-21N+9-18 = 21N-9.
-\]
-
-From (7.18a)
-
-\begin{equation}
-\begin{aligned}
-&p_f\sum_{i=1}^{3}\sum_{j=1}^{3}\bigl(r_{ij,N}-r_{ij,N}^{\mathrm{des}}\bigr)^2
-\\
-&\quad
-+\sum_{k=0}^{N-1}
-\alpha_R
-\sum_{i=1}^{3}\sum_{j=1}^{3}\bigl(r_{ij,k}-r_{ij,N}^{\mathrm{des}}\bigr)^2
-\\
-&\quad
-+\sum_{k=1}^{N-1}\gamma^{-1}\bigl(u_{p1,k}^2+u_{p2,k}^2+u_{p3,k}^2\bigr).
-\end{aligned}
-\end{equation}
-
-From (7.18e)
-
+For the Lie group variational integrator, the forced discrete Hamilton equations
+derived in \eqref{eq:forced_3D_pendulum_hamilton} are applied. The implicit
+equation for the relative update $\bm{F}_k$ is again solved by using the Cayley
+transformation. Compared to the unforced case, only the vector
+$\bm{a}$ in \eqref{eq:simulation_3D_pendulum_vector_equation} changes due to
+the additional control input. For the controlled dynamics, it is given by
 \begin{align}
-r_{11,k+1} - r_{11,k}f_{11,k} - r_{12,k}f_{21,k} - r_{13,k}f_{31,k} &= 0,\\
-r_{12,k+1} - r_{11,k}f_{12,k} - r_{12,k}f_{22,k} - r_{13,k}f_{32,k} &= 0,\\
-r_{13,k+1} - r_{11,k}f_{13,k} - r_{12,k}f_{23,k} - r_{13,k}f_{33,k} &= 0,\\[0.3em]
-r_{21,k+1} - r_{21,k}f_{11,k} - r_{22,k}f_{21,k} - r_{23,k}f_{31,k} &= 0,\\
-r_{22,k+1} - r_{21,k}f_{12,k} - r_{22,k}f_{22,k} - r_{23,k}f_{32,k} &= 0,\\
-r_{23,k+1} - r_{21,k}f_{13,k} - r_{22,k}f_{23,k} - r_{23,k}f_{33,k} &= 0,\\[0.3em]
-r_{31,k+1} - r_{31,k}f_{11,k} - r_{32,k}f_{21,k} - r_{33,k}f_{31,k} &= 0,\\
-r_{32,k+1} - r_{31,k}f_{12,k} - r_{32,k}f_{22,k} - r_{33,k}f_{32,k} &= 0,\\
-r_{33,k+1} - r_{31,k}f_{13,k} - r_{32,k}f_{23,k} - r_{33,k}f_{33,k} &= 0.
+    \label{eq:controlled_3d_pendulum_cayley_a}
+    \bm{a}
+    =
+    h
+    \left(
+        \bm{\Pi}_k
+        +
+        \frac{h}{2}
+        \left(
+            \bm{M}_k+\bm{u}_k
+        \right)
+    \right).
 \end{align}
+Therefore, the nonlinear vector equation \eqref{eq:simulation_3D_pendulum_vector_equation}
+and its Jacobian \eqref{eq:Caley_Jacobian} are solved equaly for the unforced simulation, with
+the modified vector $\bm{a}$ including the control contribution. After computing
+$\bm{f}_k$, the relative attitude update is obtained from the Cayley transformation
+and the discrete-time states are propagated according to the forced LGVI. The corresponding implementation
+is documented in the GitHub repository \cite{Elshani2026CTO_GitHub}
 
-From (7.18h)
+The numerical simulation of the controlled 3D-pendulum compares the classical RK4 method with the forced
+LGVI. Since the purpose of this experiment is to evaluate the behaviour of the
+forced variational discretization under an external input, the projected RK4 method
+is not considered in this comparison. The same physical parameters and initial
+conditions as in the unforced case are used.
 
+Fig.~\ref{fig:forced_3d_pendulum_results} shows the numerical results for the
+controlled 3D-pendulum. The simulation is performed over $N=100$ discrete-time
+steps with step size $h=\SI{0.001}{\second}$. This shorter time interval is chosen
+because the differences between the RK4 method and the forced LGVI already become
+visible after a small number of time steps. During approximately the first eight
+time steps, both methods show almost identical behaviour, which indicates that the
+derived forced equations and their implementation are consistent. As the simulation
+progresses, however, the trajectories begin to separate.
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf}
+        \caption*{(a) Position error norm $\Delta \bm{x}_k$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf}
+        \caption*{(b) Total energy $E_k$.}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf}
+        \caption*{(c) Orthogonality error $e_{\mathrm{orth},k}$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf}
+        \caption*{(d) Angular velocity components $\bm{\Omega}_k$.}
+    \end{minipage}
+
+    \caption{Comparison of the forced LGVI and RK4 simulation for the controlled $3$D pendulum.}
+    \label{fig:forced_3d_pendulum_results}
+\end{figure}
+
+The position error in Fig.~\ref{fig:forced_3d_pendulum_results}~(a) is computed
+from the center-of-mass position $\bm{x}_k=\bm{R}_k\bm{\rho}_c$,
+as
 \begin{align}
-r_{21,k}r_{32,k}-r_{31,k}r_{22,k}-r_{13,k} &= 0,\\
-r_{31,k}r_{12,k}-r_{11,k}r_{32,k}-r_{23,k} &= 0,\\
-r_{11,k}r_{22,k}-r_{21,k}r_{12,k}-r_{33,k} &= 0,\\[0.3em]
-r_{22,k}r_{33,k}-r_{32,k}r_{23,k}-r_{11,k} &= 0,\\
-r_{32,k}r_{13,k}-r_{12,k}r_{33,k}-r_{21,k} &= 0,\\
-r_{12,k}r_{23,k}-r_{22,k}r_{13,k}-r_{31,k} &= 0,\\[0.3em]
-r_{23,k}r_{31,k}-r_{33,k}r_{21,k}-r_{12,k} &= 0,\\
-r_{33,k}r_{11,k}-r_{13,k}r_{31,k}-r_{22,k} &= 0,\\
-r_{13,k}r_{21,k}-r_{23,k}r_{11,k}-r_{32,k} &= 0.
+    \Delta \bm{x}_k
+    =
+    \left\|
+        \bm{x}_{k,\mathrm{RK4}}
+        -
+        \bm{x}_{k,\mathrm{LGVI}}
+    \right\|_2 .
 \end{align}
+The plot shows that the position error $\Delta \bm{x}_k$ is initially close to zero, but increases
+over the simulation. Therefore, both methods reproduce the same short-time motion,
+while their trajectories separate after a certain number of time steps. This behaviour is
+expected for forced rigid-body dynamics, where small numerical
+differences in the attitude $\bm{R}_k$ and momentum update $\bm{\Pi}_k$ can accumulate over time.
 
-From (7.18.k)
+The total energy is shown in Fig.~\ref{fig:forced_3d_pendulum_results}~(b).
+In contrast to the unforced case, the total mechanical energy is not expected to be
+conserved, since the external input $u_{p,k}$ acts on the system. It is observed that
+energetic behaviour of LGVI and RK4 under the same applied control
+input follow a similar trend at the beginning, but small deviations
+appear as the trajectories begin to separate, which is consistent with the position error.
 
+The orthogonality error $e_{\mathrm{orth},k}$ is illustrated in Fig.~\ref{fig:forced_3d_pendulum_results}~(c).
+Again, the plot confirms that the LGVI preserves the Lie group structure staying on the manifold by updating the attitude through
+$\bm{R}_{k+1}=\bm{R}_k\bm{F}_k$ with $\bm{F}_k\in SO(3)$. For RK4, the attitude is
+updated additively in the surrounding vector space using the discrete update map \eqref{eq:rk4_update}. Over the short interval and due
+to the small step size $h$, the orthogonality error remains small, but it is not preserved and increased over time, especially for a long time horizon and smaller step sizes $h$.
+
+Finally, Fig.~\ref{fig:forced_3d_pendulum_results}~(d) compares the angular
+velocity components $\bm{\Omega}_k$. In the discrete Hamiltonian formulation, the angular velocity
+is recovered from the body angular momentum by
 \begin{align}
-f_{21,k}f_{32,k}-f_{31,k}f_{22,k}-f_{13,k} &= 0,\\
-f_{31,k}f_{12,k}-f_{11,k}f_{32,k}-f_{23,k} &= 0,\\
-f_{11,k}f_{22,k}-f_{21,k}f_{12,k}-f_{33,k} &= 0,\\[0.3em]
-f_{22,k}f_{33,k}-f_{32,k}f_{23,k}-f_{11,k} &= 0,\\
-f_{32,k}f_{13,k}-f_{12,k}f_{33,k}-f_{21,k} &= 0,\\
-f_{12,k}f_{23,k}-f_{22,k}f_{13,k}-f_{31,k} &= 0,\\[0.3em]
-f_{23,k}f_{31,k}-f_{33,k}f_{21,k}-f_{12,k} &= 0,\\
-f_{33,k}f_{11,k}-f_{13,k}f_{31,k}-f_{22,k} &= 0,\\
-f_{13,k}f_{21,k}-f_{23,k}f_{11,k}-f_{32,k} &= 0.
+    \hat{\bm{\Omega}}_k
+    =
+    (\bm{J}^{-1}\bm{\Pi}_k)^\wedge,
 \end{align}
+discretizing and solving \eqref{eq:continuous_3D_pendulum_momentum} for $\hat{\bm{\Omega}}_k$.
+The angular velocity components of LGVI and RK4 are equal at the beginning of the
+simulation, but begin to differ after a small number of steps. This confirms the
+same behaviour observed in the position error $\Delta \bm{x}_k$ and the ploted Energy $E_k$.
+The 3D-Pendulum numerical simulation using external control inputs produces
+consistent short-time dynamics of LGVI and RK4, while the numerical trajectories between both methods separate as the
+simulation continues.
+
+\section{Optimization Results}
+\label{sec:optimization_results}
+
+SPOT-Based Implementation
+
+\subsection{Controlled 3D-Pendulum}
+\label{subsec:optimizedcontrolled_3d_pendulum}
+
+\subsubsection{Minimal degree chordal extension}
+\label{subsec:minimal_degree_chordal_extension}
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf}
+        \caption*{(a) Center-of-mass trajectory.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf}
+        \caption*{(b) Control inputs $\bm{u}_{p,k}$.}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf}
+        \caption*{(c) Frobenius tracking error $\|\bm{R}_k-\bm{R}_{\mathrm{des}}\|_F$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf}
+        \caption*{(d) Relative rotation speed $\theta(\bm{F}_k)/h$.}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf}
+        \caption*{(e) Orthogonality errors of $\bm{R}_k$ and $\bm{F}_k$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf}
+        \caption*{(f) Determinant errors of $\bm{R}_k$ and $\bm{F}_k$.}
+    \end{minipage}
+
+    \caption{SPOT optimization results for the controlled $3$D pendulum performing a $90^\circ$ rotation about the $x$-axis using the MD sparsity setting.}
+    \label{fig:optimization_results_x90_md}
+\end{figure}
+
+%\begin{figure}[h]
+%	\centering
+%	\includegraphics[width=1.0\textwidth]{pics/Optimization/3D_Pendulum/ordered_extraction_diagnostics_x_20.png}
+%	\caption{Rotation around e1 20 degrees}
+%	\label{fig:ordered_extraction}
+%\end{figure}
+
+%\subsubsection{Infulence of Sparsity Settings}
+%\label{subsec:influence_sparsity_settings}
+
+%\begin{figure}[h]
+%	\centering
+%	\includegraphics[width=1.0\textwidth]{}
+%	\caption{}
+%	\label{fig:}
+%\end{figure}
+
+%\subsubsection{Limitations}
+%\label{subsec:optimization_limitations}
 
 
-\newpage
 
-\section{Experimental Results}
+%\section{Experimental Results}
 
-A thesis almost always has an experimental part, typically some comparison to other approaches. Benchmarking takes time, for running the experiments, but also for thinking them up in the first place, and for analysing the results. Plan accordingly to spend enough time here!
+%A thesis almost always has an experimental part, typically some comparison to other approaches. Benchmarking takes time, for running the experiments, but also for thinking them up in the first place, and for analysing the results. Plan accordingly to spend enough time here!
 
-Think about what makes sense to measure, what you want to learn from your measurements. Think about what is really the relevant contribution of your thesis, and how you can prove that you have achieved your goals. Think about what you can measure in order to get a good insight into the performance of various aspects of your design, how you can distinguish between systematic and accidental effects, how you can convince yourself that your results are right. If you get surprising results, do not just say ``surprise, surprise, performance isn't as good as hoped''. Find out why. Surprises without explanation indicate either that you are clueless about what is going on, or that you have made a mistake. Unconvincing results, therefore, tend to imply unconvincing marks. 
+%Think about what makes sense to measure, what you want to learn from your measurements. Think about what is really the relevant contribution of your thesis, and how you can prove that you have achieved your goals. Think about what you can measure in order to get a good insight into the performance of various aspects of your design, how you can distinguish between systematic and accidental effects, how you can convince yourself that your results are right. If you get surprising results, do not just say ``surprise, surprise, performance isn't as good as hoped''. Find out why. Surprises without explanation indicate either that you are clueless about what is going on, or that you have made a mistake. Unconvincing results, therefore, tend to imply unconvincing marks. 
 
-\paragraph{Statistics:} Measurements always have statistical (sampling) errors. Owing to the deterministic nature of simulations these are sometimes very small, as disturbing factors can be designed. However, the reader should be given an indication of how statistically significant the results are. This is done by providing at least a standard deviation in addition to averages. Whenever the results of several runs are averaged, a standard deviation can (and must) be supplied. After all, you average to reduce statistical errors.
+%\paragraph{Statistics:} Measurements always have statistical (sampling) errors. Owing to the deterministic nature of simulations these are sometimes very small, as disturbing factors can be designed. However, the reader should be given an indication of how statistically significant the results are. This is done by providing at least a standard deviation in addition to averages. Whenever the results of several runs are averaged, a standard deviation can (and must) be supplied. After all, you average to reduce statistical errors.
 
-The reproducibility argument applies here just as much as for the implementation. Give enough detail on what you measure, and how you measure it, so that someone who has your implementation (but not your test code) or has re-done your implementation independently, should be able to repeat your measurements and arrive at essentially the same results. In some cases, results seem outright wrong in a thesis. In those cases, not enough detail is provided to allow the supervisor/reader to pinpoint the likely source of the error. Often the cause is systematic errors resulting from an incorrect measurement technique. If it seems wrong, and the text does not convince the reader that it is not wrong, the reader will assume that it is wrong.
-
+%The reproducibility argument applies here just as much as for the implementation. Give enough detail on what you measure, and how you measure it, so that someone who has your implementation (but not your test code) or has re-done your implementation independently, should be able to repeat your measurements and arrive at essentially the same results. In some cases, results seem outright wrong in a thesis. In those cases, not enough detail is provided to allow the supervisor/reader to pinpoint the likely source of the error. Often the cause is systematic errors resulting from an incorrect measurement technique. If it seems wrong, and the text does not convince the reader that it is not wrong, the reader will assume that it is wrong.
