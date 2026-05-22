@@ -141,7 +141,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
         axes_pos[j].grid(True, alpha=0.3)
 
     axes_pos[0].set_title("Pendulum Position Components", fontsize=14)
-    axes_pos[-1].set_xlabel("Time [s]", fontsize=12)
+    axes_pos[-1].set_xlabel(r"discrete time-steps $k$", fontsize=20)
     axes_pos[0].legend(fontsize=10)
 
     plt.tight_layout()
@@ -159,7 +159,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
         axes_u[j].grid(True, alpha=0.3)
 
     axes_u[0].set_title("Applied Body Torque Components", fontsize=14)
-    axes_u[-1].set_xlabel("Time [s]", fontsize=12)
+    axes_u[-1].set_xlabel(r"discrete time-steps $k$", fontsize=20)
     axes_u[0].legend(fontsize=10)
 
     plt.tight_layout()
@@ -173,12 +173,11 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
         for label, data in zip(labels, datas):
             axes_omega[j].plot(data["t"], data["Omega_hist"][:, j], linewidth=1.8, label=label)
 
-        axes_omega[j].set_ylabel(rf"$\Omega_{j+1}$", fontsize=12)
+        axes_omega[j].set_ylabel(rf"$\Omega_{j+1}$", fontsize=20, fontweight="bold")
         axes_omega[j].grid(True, alpha=0.3)
 
-    axes_omega[0].set_title("Angular Velocity Components", fontsize=14)
-    axes_omega[-1].set_xlabel("Time [s]", fontsize=12)
-    axes_omega[0].legend(fontsize=10)
+    axes_omega[-1].set_xlabel(r"discrete time-steps $k$", fontsize=20)
+    axes_omega[0].legend(fontsize=16)
 
     plt.tight_layout()
 
@@ -200,11 +199,10 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
             label=r"$\|x_{\mathrm{RK4proj}} - x_{\mathrm{LGVI}}\|$"
         )
 
-    ax_err.set_xlabel("Time [s]")
-    ax_err.set_ylabel("Position error norm")
-    ax_err.set_title("Trajectory Difference Relative to LGVI")
+    ax_err.set_xlabel(r"discrete time-steps $k$")
+    ax_err.set_ylabel(r"$\Delta x_k$")
     ax_err.grid(True, alpha=0.3)
-    ax_err.legend(fontsize=10)
+    ax_err.legend(fontsize=16)
 
     plt.tight_layout()
 
@@ -228,7 +226,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     if rk4_proj is not None:
         plt.plot(t, rk4_proj["Omega_hist"][:, 2], ":", color=line3.get_color(), label=r"$\Omega_3$ RK4-proj")
 
-    plt.xlabel("Time [s]")
+    plt.xlabel(r"discrete time-steps $k$")
     plt.ylabel(r"$\Omega$")
     plt.legend(ncol=3, loc="best")
     plt.tight_layout()
@@ -239,7 +237,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     plt.plot(t, rk4["E_hist"], "--", label="RK4")
     if rk4_proj is not None:
         plt.plot(t, rk4_proj["E_hist"], ":", label="RK4-proj")
-    plt.xlabel("Time [s]")
+    plt.xlabel(r"discrete time-steps $k$")
     plt.ylabel(r"$E_k$")
     plt.legend(loc="best")
     plt.tight_layout()
@@ -250,7 +248,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     plt.plot(t, rk4["orth_hist"], "--", label="RK4")
     if rk4_proj is not None:
         plt.plot(t, rk4_proj["orth_hist"], ":", label="RK4-proj")
-    plt.xlabel("Time [s]")
+    plt.xlabel(r"discrete time-steps $k$")
     plt.ylabel(r"$e_{\mathrm{orth}}$")
     plt.legend(loc="best")
     plt.tight_layout()
@@ -261,7 +259,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     plt.plot(t, rk4["DeltaMu"], "--", label="RK4")
     if rk4_proj is not None:
         plt.plot(t, rk4_proj["DeltaMu"], ":", label="RK4-proj")
-    plt.xlabel("Time [s]")
+    plt.xlabel(r"discrete time-steps $k$")
     plt.ylabel(r"$\Delta \mu_k$")
     plt.legend(loc="best")
     plt.tight_layout()
@@ -272,7 +270,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     plt.plot(t, rk4["DeltaE"], "--", label="RK4")
     if rk4_proj is not None:
         plt.plot(t, rk4_proj["DeltaE"], ":", label="RK4-proj")
-    plt.xlabel("Time [s]")
+    plt.xlabel(r"discrete time-steps $k$")
     plt.ylabel(r"$\Delta E_k$")
     plt.legend(loc="best")
     plt.tight_layout()
