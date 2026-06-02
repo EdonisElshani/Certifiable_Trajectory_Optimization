@@ -322,9 +322,10 @@ For solving the implicit vector equation \eqref{eq:implicit_vector_equation} New
 \end{align}
 where convergence to the solution is reached until $\left\lVert f^{(i+1)} - f^{(i)} \right\rVert < \epsilon$ for a defined $\epsilon$. A initial guess $\bm{f}^0$ can be obtained by linearizing the vector equation \eqref{eq:implicit_vector_equation} \cite{Lee2008}. Finally, the rotation matrix $\bm{F}_k \in SO(3)$ at $k$ is calculated using the Cayley transformation \eqref{eq:Cayley}. 
 
-\section{Forced Discrete Mechanics}
+\section{Single Rigid Body Systems}
 
 \subsection{3D-Pendulum}
+\label{sec:discrete_3D_pendulum}
 
 In the following Section, the unforced mechanics of a three-degree-of-freedom pendulum given by \cite{Lee2008} are presented, using discrete Lagrangian mechanics of section \ref{section:discrete_lagrangian_mechanics}. This will correspond to the equivalent discrete case of the continuous unforced 3D-pendulum of section \ref{section:continuous_3D_pendulum}. Following, numerical simulations are performed to verify the momentum conservation and constant energy of the derived mechanical systems equations. 
 
@@ -624,7 +625,7 @@ D_{\bm{F}_{k+1}}L_d(\bm{R}_{k+1},\bm{F}_{k+1})
 \end{align}}
 by using the identity \eqref{eq:discrete_coadjoint}.
 
-Finally, the Euler-Lagrange equations of the unforced 3D-pendulum are expressed in $\mathfrak{so}(3)$ $SO(3)$ form, substituting \eqref{eq:discrete_3D_pendulum_derivative_fk}, \eqref{eq:discrete_3D_pendulum_derivative_gk} and \eqref{eq:discrete_3D_pendulum_coadjoint} into \eqref{eq:discrete_euler_lagrange}, which results in
+Finally, the discrete Euler-Lagrange equations of the unforced 3D-pendulum are expressed in $\mathfrak{so}(3)$ $SO(3)$ form, substituting \eqref{eq:discrete_3D_pendulum_derivative_fk}, \eqref{eq:discrete_3D_pendulum_derivative_gk} and \eqref{eq:discrete_3D_pendulum_coadjoint} into \eqref{eq:discrete_euler_lagrange}, which results in
 \begin{subequations}\label{eq:discrete_3D_pendulum_EL}
 \begin{align}
     \label{eq:discrete_3D_pednulum_EL_1}
@@ -780,13 +781,1094 @@ Respectively, substituting \eqref{eq:generalized_forced_3D_pendulum} and
 It can be observed that, for $\bm{u}_k=\bm{0}$, the forced discrete Euler-Lagrange \eqref{eq:forced_3D_pendulum_EL} and Hamilton \eqref{eq:forced_3D_pendulum_hamilton} equations 
 reduce to the corresponding unforced equations \eqref{eq:discrete_3D_pendulum_EL}, \eqref{eq:discrete_3D_pendulum_hamilton} derived previously.
 
+\section{Multi-body Systems}
 
+The previous sections considered the discrete mechanics of a single rigid body whose
+configuration evolves directly on a Lie group. For multibody systems, the individual
+rigid bodies are connected through mechanical joints. These joints impose holonomic
+constraints on the configuration and therefore have to be included in the variational
+principle. In this work, constrained multibody systems are represented in maximal
+coordinates, following the formulation used for variational integrators in
+maximal coordinates in \cite{BrudigamManchester2021LQR} and for constrained
+Lie group variational dynamics in \cite{Sangli2025}.
 
+In minimal coordinates, the configuration is described directly by the independent
+degrees of freedom of the mechanism. This representation is compact, but the
+resulting kinematics and dynamics may contain nonlinear trigonometric expressions
+and dense coupling terms. This is disadvantageous for the polynomial optimization
+formulation considered later in this thesis. In contrast, maximal coordinates assign
+each rigid body its own position and orientation variables. The reduction to the
+physical degrees of freedom is then achieved by imposing algebraic joint constraints
+with Lagrange multipliers. Therefore, the constraints are not artificial state
+constraints, but hard mechanical constraints induced by the joints of the system
+\cite{BrudigamManchester2021VariationalIntegrators}.
 
+For a multi-body system with \(n_b\) rigid bodies in dimension
+\(d\in\{2,3\}\), the maximal-coordinate configuration manifold is given by
+\begin{equation}
+    Q_{\mathrm{max}}
+    =
+    \prod_{i=1}^{n_b}
+    \left(
+    \mathbb{R}^{d} \times SO(d)
+    \right).
+    \label{eq:q_max_general}
+\end{equation}
+Each rigid body \(i\) is described by its center of mass position
+\(\bm{x}_i\in\mathbb{R}^{d}\) and its orientation
+\(\bm{R}_i\in SO(d)\). Consequently, the full configuration is written as
+\begin{equation}
+    q =
+    \left(
+    \bm{x}_1,\bm{R}_1,\ldots,\bm{x}_{n_b},\bm{R}_{n_b}
+    \right)
+    \in Q_{\mathrm{max}}.
+    \label{eq:q_max_state_general}
+\end{equation}
+The joint structure is encoded by holonomic constraints
+\begin{equation}
+    \bm{\phi}(q)=\bm{0},
+    \qquad
+    \bm{\phi}:Q_{\mathrm{max}}\rightarrow\mathbb{R}^{n_c},
+    \label{eq:holonomic_constraints_general}
+\end{equation}
+where \(n_c\) denotes the number of scalar constraint equations.
 
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.60\textwidth]{pics/Maximal_Coordinates_Joint.pdf}
+    \caption{Two rigid bodies connected by a holonomic joint in maximal coordinates. Adapted from \cite{BrudigamManchester2021LQR}.}
+    \label{fig:maximal_joint_constraint}
+\end{figure}
 
-
-
-
+A typical holonomic joint constraint can be written by equating two points
+attached to different rigid bodies. This is illustrated in
+Fig.~\ref{fig:maximal_joint_constraint}. Let \(\bm{\rho}_i\) and \(\bm{\rho}_j\) denote
+constant vectors from the corresponding center of mass to the joint location in
+each body-fixed frame. Then a link-connecting constraint is given by
+\begin{equation}
+    \bm{\phi}_{ij}(q)
+    =
+    \bm{x}_i+\bm{R}_i\bm{\rho}_i
+    -
+    \bm{x}_j-\bm{R}_j\bm{\rho}_j
+    =
+    \bm{0}.
+    \label{eq:general_joint_constraint_maximal}
+\end{equation}
+To include the holonomic constraints in the discrete variational principle, the
+discrete action sum is augmented by Lagrange multipliers
+\(\bm{\lambda}_k\in\mathbb{R}^{n_c}\). Using a trapezoidal approximation for the
+constraint contribution gives
+\begin{equation}
+    S_{d}
+    =
+    \sum_{k=0}^{N-1}
+    \left[
+    L_d(q_k,q_{k+1})
+    +
+    \frac{h}{2}
+    \left(
+    \bm{\lambda}_k^\top \bm{\phi}(q_k)
+    +
+    \bm{\lambda}_{k+1}^\top \bm{\phi}(q_{k+1})
+    \right)
+    \right].
+    \label{eq:constrained_discrete_action}
+\end{equation}
+The variation with respect to \(q_k\), together with the discrete
+Lagrange--d'Alembert force contribution introduced in
+Section~\ref{sec:forced_discrete_euler_lagrange}, yields the forced and
+constrained discrete Euler-Lagrange equations
+\begin{equation}
+    D_1 L_d(q_k,q_{k+1})
+    +
+    D_2 L_d(q_{k-1},q_k)
+    +
+    \bm{u}_k
+    -
+    h\,\bm{G}(q_k)^\top \bm{\lambda}_k = 0,
+    \qquad
+    \bm{\phi}(q_k)=\bm{0},
+    \label{eq:forced_constrained_del_general}
+\end{equation}
+where
+\begin{equation}
+    \bm{G}(q_k)
+    =
+    \frac{\partial \bm{\phi}(q_k)}{\partial q_k}
+    \label{eq:constraint_jacobian_general}
+\end{equation}
+denotes the constraint Jacobian.
+Equation~\eqref{eq:forced_constrained_del_general} provides the general
+forced and constrained discrete Euler-Lagrange equation used for deriving multi-body dynamics.
 
 \subsection{Acrobot}
+
+\paragraph{Configuration Manifold}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.50\textwidth]{pics/Acrobot.pdf}
+    \caption{Acrobot configuration manifold in maximal coordinates.}
+    \label{fig:acrobot_maximal_coordinates}
+\end{figure}
+
+The Acrobot model, illustrated in Fig.~\ref{fig:acrobot_maximal_coordinates},
+consists of two planar rigid links connected by a revolute joint. The first link is
+attached to the inertial frame by a fixed revolute joint, while the second link is
+connected to the first link at the elbow. In contrast to the 3D-pendulum, the
+system is described in maximal coordinates. Therefore, each link is assigned its own
+center of mass position and orientation.
+
+For each link \(i\in\{1,2\}\), the center of mass position is denoted by
+\(\bm{x}_i\in\mathbb{R}^2\), and the orientation of the body-fixed frame with
+respect to the inertial frame is described by the rotation matrix
+\(\bm{R}_i\in SO(2)\). The special orthogonal group in two dimensions is defined as
+\begin{equation}
+    SO(2)
+    =
+    \left\{
+    \bm{R}\in\mathbb{R}^{2\times 2}
+    \mid
+    \bm{R}^{\top}\bm{R}=\bm{I}_{2},
+    \ \det(\bm{R})=1
+    \right\}.
+    \label{eq:so2_definition}
+\end{equation}
+Every element \(\bm{R}_i\in SO(2)\) can be written in terms of an angle
+\(\theta_i\in\mathbb{R}\) as
+\begin{equation}
+    \bm{R}_i
+    =
+    \begin{bmatrix}
+        \cos\theta_i & -\sin\theta_i \\
+        \sin\theta_i &  \cos\theta_i
+    \end{bmatrix}.
+    \label{eq:so2_rotation_matrix}
+\end{equation} 
+Thus, the unconstrained maximal-coordinate configuration
+manifold is given by
+\begin{equation}
+    Q_{\mathrm{max}}
+    =
+    \left(
+    \mathbb{R}^2 \times SO(2)
+    \right)^2 .
+    \label{eq:acrobot_q_max}
+\end{equation}
+The configuration of the Acrobot is written as
+\begin{equation}
+    q
+    =
+    \left(
+    \bm{x}_1,\bm{R}_1,\bm{x}_2,\bm{R}_2
+    \right)
+    \in Q_{\mathrm{max}} .
+    \label{eq:acrobot_configuration}
+\end{equation}
+Here, \(\bm{R}_i\) maps vectors from the \(i\)-th body-fixed frame to the inertial
+frame.
+
+Let \(\bm{\rho}_{1,0}\in\mathbb{R}^2\) denote the vector from the center of mass of
+link~1 to the base joint, expressed in the first body-fixed frame. Furthermore, let
+\(\bm{\rho}_{1,12}\in\mathbb{R}^2\) and \(\bm{\rho}_{2,12}\in\mathbb{R}^2\) denote the
+vectors from the corresponding centers of mass to the elbow joint, expressed in
+the body-fixed frames of link~1 and link~2. The fixed base joint is imposed by
+\begin{equation}
+    \bm{\phi}_{0}(q)
+    =
+    \bm{x}_1
+    +
+    \bm{R}_1\bm{\rho}_{1,0}
+    -
+    \bm{p}_0
+    =
+    \bm{0},
+    \label{eq:acrobot_base_constraint}
+\end{equation}
+where \(\bm{p}_0\in\mathbb{R}^2\) is the fixed base position in the inertial frame.
+The elbow joint is imposed by requiring the two joint points on link~1 and link~2
+to coincide, yielding
+\begin{equation}
+    \bm{\phi}_{12}(q)
+    =
+    \bm{x}_1
+    +
+    \bm{R}_1\bm{\rho}_{1,12}
+    -
+    \bm{x}_2
+    -
+    \bm{R}_2\bm{\rho}_{2,12}
+    =
+    \bm{0}.
+    \label{eq:acrobot_elbow_constraint}
+\end{equation}
+Consequently, the full holonomic constraint vector is defined as
+\begin{equation}
+    \bm{\phi}(q)
+    =
+    \begin{bmatrix}
+        \bm{\phi}_{0}(q) \\
+        \bm{\phi}_{12}(q)
+    \end{bmatrix}
+    =
+    \bm{0}.
+    \label{eq:acrobot_constraints}
+\end{equation}
+
+In the discrete setting, the attitude of each link is updated by a relative rotation
+\(\bm{F}_{i,k}\in SO(2)\), such that
+\begin{equation}
+    \bm{R}_{i,k+1}
+    =
+    \bm{R}_{i,k}\bm{F}_{i,k},
+    \qquad i\in\{1,2\}.
+    \label{eq:acrobot_rotation_update}
+\end{equation}
+The discrete configuration at time step \(k\) is therefore
+\begin{equation}
+    q_k
+    =
+    \left(
+    \bm{x}_{1,k},\bm{R}_{1,k},
+    \bm{x}_{2,k},\bm{R}_{2,k}
+    \right)
+    \in Q_c .
+    \label{eq:acrobot_discrete_configuration}
+\end{equation}
+
+\paragraph{Continuous Lagrangian}
+
+To derive the continuous Lagrangian of the Acrobot in maximal coordinates, the
+kinetic and potential energy of both rigid links are introduced. For each link
+\(i\in\{1,2\}\), the translational velocity of the center of mass is denoted by
+\(\dot{\bm{x}}_i=\bm{v}_i\in\mathbb{R}^2\). Let $\bm{M}_i = m_i\bm{I}_2$ be the mass matrix of link \(i\), and let \(\bm{J}_{d,i}\in\mathbb{R}^{2\times 2}\)
+denote the non-standard inertia matrix, similar to Section \ref{sec:discrete_3D_pendulum}. Then, the
+kinetic energy with its translational $T_T$ and rotational $T_R$ components is written as
+\begin{equation}
+    T
+    =
+    \underbrace{
+    \sum_{i=1}^{2}
+    \frac{1}{2}\bm{v}_i^{\top}\bm{M}_i\bm{v}_i
+    }_{T_T}
+    +
+    \underbrace{
+    \sum_{i=1}^{2}
+    \frac{1}{2}
+    \mathrm{tr}
+    \left[
+        \hat{\omega}_i
+        \bm{J}_{d,i}
+        \hat{\omega}_i^{\top}
+    \right]
+    }_{T_R}.
+    \label{eq:acrobot_kinetic_energy_split}
+\end{equation}
+The gravitational potential energy is expressed directly by the center of mass
+positions. In contrast to the 3D-pendulum, zero potential is assumed for the rotational setting \cite{BrudigamManchester2021VariationalIntegrators}, 
+which gives 
+\begin{equation}
+    V_R(\bm{R}_1,\bm{R}_2)=0.
+    \label{eq:acrobot_rotation_potential_zero}
+\end{equation}
+Therefore, the gravitational potential energy is given by the translational case
+\begin{equation}
+    V_T(\bm{x}_1,\bm{x}_2)
+    =
+    \sum_{i=1}^{2}
+    g\,\bm{e}_2^{\top}\bm{M}_i\bm{x}_i,
+    \label{eq:acrobot_potential_energy}
+\end{equation}
+where \(\bm{e}_2\in\mathbb{R}^2\) denotes the vertical unit vector in the inertial frame.
+Consequently, the continuous Lagrangian
+\(L:TQ_{\mathrm{max}}\rightarrow\mathbb{R}\) is defined as
+\begin{equation}
+    \begin{aligned}
+    L(q,\dot{q})
+    &=
+    \sum_{i=1}^{2}
+    \left(
+    \frac{1}{2}\bm{v}_i^{\top}\bm{M}_i\bm{v}_i
+    +
+    \frac{1}{2}
+    \mathrm{tr}
+    \left[
+        \hat{\omega}_i
+        \bm{J}_{d,i}
+        \hat{\omega}_i^{\top}
+    \right]
+    \right)
+    -
+    \sum_{i=1}^{2}
+    g\,\bm{e}_2^{\top}\bm{M}_i\bm{x}_i .
+    \end{aligned}
+    \label{eq:acrobot_continuous_lagrangian}
+\end{equation}
+
+\paragraph{Discrete Lagrangian}
+
+For the Acrobot in maximal coordinates, the translational and rotational parts are
+discretized separately, following the structure of maximal-coordinate variational
+integrators in \cite{BrudigamManchester2021VariationalIntegrators}. Therefore,
+the discrete Lagrangian is written as
+\begin{equation}
+    L_d(q_k,q_{k+1})
+    =
+    T_{d,T}(q_k,q_{k+1})
+    +
+    T_{d,R}(q_k,q_{k+1})
+    -
+    V_{d,T}(q_k,q_{k+1}).
+    \label{eq:acrobot_discrete_lagrangian_split}
+\end{equation}
+
+For the translational part, the center of mass velocity of each link is approximated
+by
+\begin{equation}
+    \bm{v}_{i,k}
+    \approx
+    \frac{\bm{x}_{i,k+1}-\bm{x}_{i,k}}{h},
+    \qquad i\in\{1,2\}.
+    \label{eq:acrobot_discrete_translational_velocity}
+\end{equation}
+\cite{BrudigamManchester2021VariationalIntegrators} defines the discrete translational kinetic energy contribution to be
+\begin{equation}
+    T_{d,T}(q_k,q_{k+1})
+    =
+    \sum_{i=1}^{2}
+    \frac{1}{2h}
+    \left(
+    \bm{x}_{i,k+1}-\bm{x}_{i,k}
+    \right)^{\top}
+    \bm{M}_i
+    \left(
+    \bm{x}_{i,k+1}-\bm{x}_{i,k}
+    \right).
+    \label{eq:acrobot_discrete_translational_lagrangian}
+\end{equation}
+Substituting the angular velocity approximation \eqref{eq:discrete_velocity_approximation} into the rotational kinetic energy
+$T_R$ of \eqref{eq:acrobot_kinetic_energy_split}, the discrete rotational kinetic
+energy contribution is derived to
+\begin{equation}
+\begin{aligned}
+    T_{d,R}(q_k,q_{k+1})
+    &=
+    \sum_{i=1}^{2}
+    \frac{1}{2h}
+    \mathrm{tr}
+    \left[
+    \left(
+    \bm{F}_{i,k}-\bm{I}_{2}
+    \right)
+    \bm{J}_{d,i}
+    \left(
+    \bm{F}_{i,k}-\bm{I}_{2}
+    \right)^{\top}
+    \right] \\
+    &=
+    \sum_{i=1}^{2}
+    \frac{1}{h}
+    \mathrm{tr}
+    \left[
+    \left(
+    \bm{I}_{2}
+    -
+    \bm{F}_{i,k}
+    \right)
+    \bm{J}_{d,i}
+    \right].
+\end{aligned}
+\label{eq:acrobot_discrete_rotational_lagrangian}
+\end{equation}
+which calculation corresponds to the discrete rotational kinetic energy of the 3D-pendulum in Section \ref{sec:discrete_3D_pendulum}.
+
+Finally, using the trapezoidal rule for the discretization of the potential energy integral, the discrete translational potential contribution $V_{d,T}$
+is given by
+\begin{equation}
+    V_{d,T}(q_k,q_{k+1})
+    =
+    \frac{h}{2}
+    \sum_{i=1}^{2}
+    m_i g
+    \bm{e}_{2}^{\top}
+    \left(
+    \bm{x}_{i,k}
+    +
+    \bm{x}_{i,k+1}
+    \right).
+    \label{eq:acrobot_discrete_potential_lagrangian}
+\end{equation}
+
+Combining the translational \eqref{eq:acrobot_discrete_translational_lagrangian}, rotational \eqref{eq:acrobot_discrete_rotational_lagrangian}, and potential \eqref{eq:acrobot_discrete_potential_lagrangian} contributions gives the
+discrete Lagrangian
+\begin{equation}
+    \begin{aligned}
+    L_d(q_k,q_{k+1})
+    =
+    &
+    \text{  }
+    L_d
+    \left(
+    \bm{x}_{1,k},\bm{x}_{1,k+1},
+    \bm{x}_{2,k},\bm{x}_{2,k+1},
+    \bm{F}_{1,k},\bm{F}_{2,k}
+    \right)  \\
+    =
+    &
+    \sum_{i=1}^{2}
+    \frac{1}{2h}
+    \left(
+    \bm{x}_{i,k+1}-\bm{x}_{i,k}
+    \right)^{\top}
+    \bm{M}_i
+    \left(
+    \bm{x}_{i,k+1}-\bm{x}_{i,k}
+    \right)  \\
+    &
+    +
+    \sum_{i=1}^{2}
+    \frac{1}{h}
+    \mathrm{tr}
+    \left[
+    \left(
+    \bm{I}_{2}
+    -
+    \bm{F}_{i,k}
+    \right)
+    \bm{J}_{d,i}
+    \right]   \\
+    &
+    -
+    \frac{h}{2}
+    \sum_{i=1}^{2}
+    g
+    \bm{e}_{2}^{\top}
+    \bm{M}_i
+    \left(
+    \bm{x}_{i,k}
+    +
+    \bm{x}_{i,k+1}
+    \right).
+    \end{aligned}
+    \label{eq:acrobot_discrete_lagrangian}
+\end{equation}
+
+\paragraph{Discrete Euler-Lagrange Equations}
+
+The discrete equations of motion are obtained from the stationary condition of the
+constrained discrete action. 
+The holonomic constraints introduced in
+\eqref{eq:acrobot_constraints} are included by extending the action integral with
+Lagrange multipliers. Let
+\begin{equation}
+    \bm{\lambda}
+    =
+    \begin{bmatrix}
+        \bm{\lambda}_{0} \\
+        \bm{\lambda}_{12}
+    \end{bmatrix}
+    \in\mathbb{R}^{4},
+    \label{eq:acrobot_lagrange_multipliers}
+\end{equation}
+where \(\bm{\lambda}_{0}\in\mathbb{R}^2\) enforces the base constraint and
+\(\bm{\lambda}_{12}\in\mathbb{R}^2\) enforces the elbow constraint.
+Using the constrained action sum defined in \eqref{eq:constrained_discrete_action}, the
+variation is written as
+\begin{equation}
+    \delta S_{d}
+    =
+    \delta
+    \sum_{k=0}^{N-1}
+    \left[
+    L_d(q_k,q_{k+1})
+    +
+    \frac{h}{2}
+    \left(
+    \bm{\lambda}_{k}^{\top}\bm{\phi}(q_k)
+    +
+    \bm{\lambda}_{k+1}^{\top}\bm{\phi}(q_{k+1})
+    \right)
+    \right]
+    = 0.
+    \label{eq:acrobot_variation_constrained_discrete_action}
+\end{equation}
+The translational and rotational components are treated separately, following the
+maximal-coordinate variational-integrator structure. In \cite{BrudigamManchester2021VariationalIntegrators},
+the variation of the translational component is given as
+\begin{equation}
+    \delta_{\bm{x}_{i,k+1}} S_{d,c}
+    =
+    \left\langle
+    \frac{1}{h}\bm{M}_i
+    \left(
+    \bm{v}_{i,k}
+    -
+    \bm{v}_{i,k+1}
+    \right)
+    -
+    g\bm{M}_i\bm{e}_2
+    +
+    \bm{G}_{x_i,k+1}^{\top}\bm{\lambda}_{k+1},
+    \delta\bm{x}_{i,k+1}
+    \right\rangle .
+    \label{eq:acrobot_translational_variation}
+\end{equation}
+using the relation \eqref{eq:acrobot_discrete_translational_velocity}.
+The constraint contribution is calculated to
+\begin{equation}
+    \bm{G}_{x,k+1}^{\top}\bm{\lambda}_{k+1}
+    =
+    \begin{bmatrix}
+        \dfrac{\partial \bm{\phi}_{0,k+1}}{\partial \bm{x}_{1,k+1}}
+        &
+        \dfrac{\partial \bm{\phi}_{0,k+1}}{\partial \bm{x}_{2,k+1}}
+        \\[0.8em]
+        \dfrac{\partial \bm{\phi}_{12,k+1}}{\partial \bm{x}_{1,k+1}}
+        &
+        \dfrac{\partial \bm{\phi}_{12,k+1}}{\partial \bm{x}_{2,k+1}}
+    \end{bmatrix}^{\top}
+    \begin{bmatrix}
+        \bm{\lambda}_{0,k+1} \\
+        \bm{\lambda}_{12,k+1}
+    \end{bmatrix}  
+    =
+    \begin{bmatrix}
+        \bm{\lambda}_{0,k+1}+\bm{\lambda}_{12,k+1} \\
+        -\bm{\lambda}_{12,k+1}
+    \end{bmatrix}.
+    \label{eq:acrobot_translational_constraint_force}
+\end{equation}
+with the discretized constraints
+\begin{equation}
+    \bm{\phi}(q_{k+1})
+    =
+    \begin{bmatrix}
+        \bm{\phi}_{0,k+1} \\
+        \bm{\phi}_{12,k+1}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+    \bm{x}_{1,k+1}
+    +
+    \bm{R}_{1,k+1}\bm{\rho}_{1,0}
+    -
+    \bm{p}_0
+    \\
+    \bm{x}_{1,k+1}
+    +
+    \bm{R}_{1,k+1}\bm{\rho}_{1,12}
+    -
+    \bm{x}_{2,k+1}
+    -
+    \bm{R}_{2,k+1}\bm{\rho}_{2,12}
+    \end{bmatrix}.
+    \label{eq:acrobot_discrete_constraints_vector}
+\end{equation}
+Therefore, substituting the gradient \eqref{eq:acrobot_translational_constraint_force} into \eqref{eq:acrobot_translational_variation}, the translational discrete Euler-Lagrange equations for link 1 and link 2 are
+\begin{subequations}
+\label{eq:acrobot_translational_del_links}
+\begin{align}
+    \frac{1}{h}\bm{M}_{1}
+    \left(
+    \bm{v}_{1,k+1}
+    -
+    \bm{v}_{1,k}
+    \right)
+    +
+    g\bm{M}_{1}\bm{e}_{2}
+    -
+    \left(
+    \bm{\lambda}_{0,k+1}
+    +
+    \bm{\lambda}_{12,k+1}
+    \right)
+    &=
+    \bm{0},
+    \label{eq:acrobot_translational_del_link_1}
+    \\
+    \frac{1}{h}\bm{M}_{2}
+    \left(
+    \bm{v}_{2,k+1}
+    -
+    \bm{v}_{2,k}
+    \right)
+    +
+    g\bm{M}_{2}\bm{e}_{2}
+    +
+    \bm{\lambda}_{12,k+1}
+    &=
+    \bm{0}.
+    \label{eq:acrobot_translational_del_link_2}
+\end{align}
+\end{subequations}
+
+For the rotational part, the derivatives of \ref{eq:euler} have to be taken for each link, analogously to the 3D-pendulum of Section \ref{sec:discrete_3D_pendulum}.
+Firstly, the directional derivative $\left\langle D_{\bm{F_{i,k}}}L_d(\bm{F}_{i,k}), \delta \bm{f}_{i,k} \right\rangle$ is given by applying \eqref{eq:derivative_fk}, which yields to
+\begin{equation}
+    \begin{aligned}
+    \left\langle
+    T_e^*L_{\bm{F}_{i,k}}
+    D_{\bm{F}_{i,k}}L_{d,R,i},
+    \hat{\chi}_k
+    \right\rangle
+    &=
+    \left.
+    \frac{d}{d\epsilon}
+    \right|_{\epsilon=0}
+    L_{d}
+    \left(
+    \bm{F}_{i,k}
+    \exp(\epsilon\hat{\chi}_k)
+    \right)
+    \\
+    &=
+    -
+    \frac{1}{h}
+    \mathrm{tr}
+    \left[
+    \bm{F}_{i,k}
+    \hat{\chi}_k
+    \bm{J}_{d,i}
+    \right]
+    \\
+    &=
+    \left\langle
+    \frac{1}{h}
+    \left(
+    \bm{J}_{d,i}\bm{F}_{i,k}
+    -
+    \bm{F}_{i,k}^{\top}\bm{J}_{d,i}
+    \right),
+    \hat{\chi}_k
+    \right\rangle
+    \\
+    &=
+    \left\langle
+    \bm{\Pi}_{i,k}
+    ,
+    \hat{\chi}_k
+    \right\rangle
+    , 
+    \end{aligned}
+    \label{eq:acrobot_rotational_derivative_pairing}
+\end{equation}
+corresponding to the derivative of the single body 3D-pendulum derived in Section \ref{sec:discrete_3D_pendulum}. 
+Here,
+\begin{equation}
+    \bm{\Pi}_{i,k}
+    =
+    \frac{1}{h}
+    \left(
+        \bm{J}_{d,i}\bm{F}_{i,k}
+        -
+        \bm{F}_{i,k}^{\top}\bm{J}_{d,i}
+    \right),
+    \qquad i\in\{1,2\},
+    \label{eq:acrobot_discrete_angular_momentum}
+\end{equation}
+denotes the discrete angular momentum
+of link \(i\) associated with the relative rotation\(\bm{F}_{i,k}\).
+It is the analogue of the discrete Legendre momentum \eqref{eq:discrete_3D_pendulum_momentum_1} used for
+the 3D-pendulum in Section \ref{sec:discrete_3D_pendulum}, now defined separately for each rigid link \cite{Lee2008}.
+
+Since \(SO(2)\) is abelian, it follows that \(\mathrm{Ad}_{\bm{F}_{i,k}}=I\) \cite{Lee2008}.
+Therefore, the coadjoint term is equal to \eqref{eq:acrobot_rotational_derivative_pairing} at time step $k+1$, which gives
+\begin{equation}\label{eq:acrobot_Ad_variation}
+\operatorname{Ad}^{*}_{\bm{F}_{i,k+1}^{-1}}
+\!\left(
+T_e^*L_{\bm{F}_{i,k+1}}
+D_{\bm{F}_{i,k+1}}L_d(\bm{F}_{i,k+1})
+\right)
+= 
+\frac{1}{h}
+\left(
+\bm{J}_{d,i}\bm{F}_{i,k+1}
+-
+\bm{F}_{i,k+1}^{\top}\bm{J}_{d,i}
+\right).
+\end{equation}
+It remains to derive the directional derivative of the rotations $R_{i,k+1}$. 
+From \eqref{eq:acrobot_variation_constrained_discrete_action}, it is observed that only the constraints $\bm{\phi}(q_k)$ are dependent on
+the rotation matrices \(\bm{R}_{1,k}\) and \(\bm{R}_{2,k}\). 
+Hence, the variation of the constraint contribution 
+\begin{equation*}
+    \left\langle D_{\bm{R}_{i,k+1}}(h \bm{\lambda}_{k+1}^\top \bm{\phi}_{k+1}), \delta \bm{R}_{i,k+1} \right\rangle=\left\langle T_e^* L_{\bm{R}_{i,k+1}} D_{\bm{R}_{i,k+1}}(h \bm{\lambda}_{k+1}^\top \bm{\phi}_{k+1}), \hat{\eta}_{i,k+1} \right\rangle,
+\end{equation*}
+has to be evaluated for each link $i$, using \eqref{eq:derivative_gk}. For link $i=1$, the variation of the constraint contribution is given by
+\begin{equation}
+    \begin{aligned}
+    &
+    \left\langle
+    T_e^*L_{\bm{R}_{1,k+1}}
+    D_{\bm{R}_{1,k+1}}
+    \left(
+    h\bm{\lambda}_{k+1}^{\top}\bm{\phi}_{k+1}
+    \right),
+    \hat{\eta}_{1,k+1}
+    \right\rangle
+    \\
+    &=
+    \left.
+    \frac{d}{d\epsilon}
+    \right|_{\epsilon=0}
+    h
+    \left[
+    \bm{\lambda}_{0,k+1}^{\top}
+    \bm{\phi}_{0,k+1}^{\epsilon}
+    +
+    \bm{\lambda}_{12,k+1}^{\top}
+    \bm{\phi}_{12,k+1}^{\epsilon}
+    \right]
+    \\
+    &=
+    h 
+    \left[
+    \bm{\lambda}_{0,k+1}^{\top}
+    \bm{R}_{1,k+1}\hat{\eta}_{1,k+1}\bm{\rho}_{1,0}
+    +
+    \bm{\lambda}_{12,k+1}^{\top}
+    \bm{R}_{1,k+1}\hat{\eta}_{1,k+1}\bm{\rho}_{1,12}
+    \right]
+    \\
+    &=
+    h
+    \left[
+    \left(
+    \bm{\rho}_{1,0}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{0,k+1}
+    \right)
+    +
+    \left(
+    \bm{\rho}_{1,12}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    \right]
+    \cdot
+    \eta_{1,k+1}
+    \\
+    &=
+    \left\langle
+    h
+    \left[
+    \left(
+    \bm{\rho}_{1,0}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{0,k+1}
+    \right)
+    +
+    \left(
+    \bm{\rho}_{1,12}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    \right]^{\wedge},
+    \hat{\eta}_{1,k+1}
+    \right\rangle,
+    \end{aligned}
+    \label{eq:acrobot_R1_constraint_derivative_kp1}
+\end{equation}
+which calculation corresponts to the derivative of the 3D-pendulum with respect to the rotation matrix $R_k$ derived in Section \ref{sec:discrete_3D_pendulum}. 
+In contrast, the variation of the constraint contribution for link $i=2$ only depends on $\phi_{12,k+1}$ and is derived to
+\begin{equation}
+    \begin{aligned}
+    &
+    \left\langle
+    T_e^*L_{\bm{R}_{2,k+1}}
+    D_{\bm{R}_{2,k+1}}
+    \left(
+    h\bm{\lambda}_{k+1}^{\top}\bm{\phi}_{k+1}
+    \right),
+    \hat{\eta}_{2,k+1}
+    \right\rangle
+    \\
+    &=
+    \left.
+    \frac{d}{d\epsilon}
+    \right|_{\epsilon=0}
+    h
+    \left[
+    \bm{\lambda}_{12,k+1}^{\top}
+    \bm{\phi}_{12,k+1}^{\epsilon}
+    \right]
+    \\
+    &=
+    \left.
+    \frac{d}{d\epsilon}
+    \right|_{\epsilon=0}
+    h
+    \left[
+    \bm{\lambda}_{12,k+1}^{\top}
+    \left(
+    -
+    \bm{R}_{2,k+1}
+    \exp(\epsilon\hat{\eta}_{2,k+1})
+    \bm{\rho}_{2,12}
+    \right)
+    \right]
+    \\
+    &=
+    -h
+    \left[
+    \bm{\lambda}_{12,k+1}^{\top}
+    \bm{R}_{2,k+1}
+    \hat{\eta}_{2,k+1}
+    \bm{\rho}_{2,12}
+    \right]
+    \\
+    &=
+    -h
+    \left(
+    \bm{\rho}_{2,12}
+    \times
+    \bm{R}_{2,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    \cdot
+    \eta_{2,k+1}
+    \\
+    &=
+    \left\langle
+    -h
+    \left(
+    \bm{\rho}_{2,12}
+    \times
+    \bm{R}_{2,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)^{\wedge},
+    \hat{\eta}_{2,k+1}
+    \right\rangle .
+    \end{aligned}
+    \label{eq:acrobot_R2_constraint_derivative_kp1}
+\end{equation}
+
+The full rotational contribution is described, by substituting \eqref{eq:acrobot_rotational_derivative_pairing}, \eqref{eq:acrobot_Ad_variation}, \eqref{eq:acrobot_R1_constraint_derivative_kp1} and \eqref{eq:acrobot_R2_constraint_derivative_kp1} for each link $i = 1,2$ into \eqref{eq:discrete_euler_lagrange}. Moreover, \eqref{eq:acrobot_translational_derivative} gives the translational description.
+Finally, the full discrete Euler-Lagrange equations of the unforced Acrobot in maximal coordinates are expressed on \(\left(\mathbb{R}^2\times SO(2)\right)^2\) as
+\begin{subequations}
+\label{eq:acrobot_full_del_shifted}
+\begingroup
+\small
+\setlength{\jot}{0.35em}
+\vspace{-0.3cm}
+\begin{align}
+    \intertext{\textit{Translation:}}
+    \vspace{-0.1cm}
+    \frac{1}{h}\bm{M}_{1}
+    \left(
+        \bm{v}_{1,k+1}
+        -
+        \bm{v}_{1,k}
+    \right)
+    +
+    g\bm{M}_{1}\bm{e}_2
+    -
+    \left(
+        \bm{\lambda}_{0,k+1}
+        +
+        \bm{\lambda}_{12,k+1}
+    \right)
+    &=
+    \bm{0},
+    \label{eq:acrobot_full_del_shifted_translation_1}
+    \\
+\hspace{-2em}
+    \frac{1}{h}\bm{M}_{2}
+    \left(
+        \bm{v}_{2,k+1}
+        -
+        \bm{v}_{2,k}
+    \right)
+    +
+    g\bm{M}_{2}\bm{e}_2
+    +
+    \bm{\lambda}_{12,k+1}
+    &=
+    \bm{0},
+    \label{eq:acrobot_full_del_shifted_translation_2}
+\end{align}
+\vspace{-0.4cm}
+\vspace{-0.6cm}
+\begin{align}
+    \intertext{\textit{Rotation:}}
+    \vspace{-0.1cm}
+    \bm{\Pi}_{1,k}
+    -
+    \bm{\Pi}_{1,k+1}
+    +
+    h
+    \left[
+    \left(
+    \bm{\rho}_{1,0}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{0,k+1}
+    \right)
+    +
+    \left(
+    \bm{\rho}_{1,12}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    \right]^{\wedge}
+    &=
+    \bm{0},
+    \label{eq:acrobot_full_del_shifted_rotation_1}
+    \\
+\hspace{-2em}
+    \bm{\Pi}_{2,k}
+    -
+    \bm{\Pi}_{2,k+1}
+    -
+    h
+    \left[
+    \left(
+    \bm{\rho}_{2,12}
+    \times
+    \bm{R}_{2,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    \right]^{\wedge}
+    &=
+    \bm{0},
+    \label{eq:acrobot_full_del_shifted_rotation_2}
+\end{align}
+\vspace{-0.4cm}
+\vspace{-0.6cm}
+\begin{align}
+    \intertext{\textit{Constraints:}}    
+    \bm{\phi}_{0,k+1}
+    =
+    \bm{x}_{1,k+1}
+    +
+    \bm{R}_{1,k+1}\bm{\rho}_{1,0}
+    -
+    \bm{p}_0
+    &=
+    \bm{0},
+    \label{eq:acrobot_full_del_shifted_base_constraint}
+    \\
+\hspace{-2em}
+    \bm{\phi}_{12,k+1}
+    =
+    \bm{x}_{1,k+1}
+    +
+    \bm{R}_{1,k+1}\bm{\rho}_{1,12}
+    -
+    \bm{x}_{2,k+1}
+    -
+    \bm{R}_{2,k+1}\bm{\rho}_{2,12}
+    &=
+    \bm{0},
+    \label{eq:acrobot_full_del_shifted_elbow_constraint}
+\end{align}
+\vspace{-0.4cm}    
+\vspace{-0.6cm}
+\begin{align}
+    \intertext{\textit{Kinematics:}}    
+    \bm{R}_{1,k+1}
+    &=
+    \bm{R}_{1,k}\bm{F}_{1,k},
+    \label{eq:acrobot_full_del_shifted_kinematics_1}
+    \\
+\hspace{-2em}
+    \bm{R}_{2,k+1}
+    &=
+    \bm{R}_{2,k}\bm{F}_{2,k}.
+    \label{eq:acrobot_full_del_shifted_kinematics_2}
+\end{align}
+\endgroup
+\end{subequations}
+in dependence to its constraints \eqref{eq:acrobot_constraints}.
+
+\paragraph{Controlled Acrobot}
+
+As in the controlled 3D-pendulum case (Section \ref{sec:discrete_3D_pendulum}), the trapezoidal approximation distributes
+the virtual work equally to both endpoints of the interval. Therefore, the discrete
+Legendre force contributions of \eqref{eq:discrete_forces_special} are given by
+\begin{equation}
+    u_{d,k}^{-}=u_{d,k}^{+}=\frac{h}{2}u_k .
+\end{equation}
+The Acrobot is actuated by a single motor located at the elbow joint \cite{BrudigamManchester2021LQR}. In contrast
+to the controlled 3D-pendulum, the input is therefore not an external moment acting
+on one rigid body, but an internal joint torque acting between the two links. The generalized torque vector
+is defined as
+\begin{equation}
+    \bm{\tau}_k
+    =
+    \begin{bmatrix}
+        -u_k \\
+         u_k
+    \end{bmatrix},
+    \label{eq:acrobot_generalized_torque}
+\end{equation}
+with \(u_k\in\mathbb{R}\) being the scalar elbow torque, applying 
+opposite moments between the two links.
+
+Since the Acrobot is actuated by a motor at the elbow joint, the control input is a
+pure rotational torque acting between the two links. Hence, there is no external
+translational force acting directly on the centers of mass, and the translational
+force contribution is set to
+\begin{equation}
+    \bm{f}^{x}_{1,k}
+    =
+    \bm{f}^{x}_{2,k}
+    =
+    \bm{0}.
+    \label{eq:acrobot_zero_translational_force}
+\end{equation}
+Using the discrete Lagrange-d'Alembert principle \eqref{eq:forced_discrete_EL_compact}, the generalized torque
+contribution \eqref{eq:acrobot_generalized_torque} is added only to the unforced 
+rotational equations \eqref{eq:acrobot_full_del_shifted_rotation_1} and \eqref{eq:acrobot_full_del_shifted_rotation_2}. 
+Therefore, the controlled rotational discrete Euler-Lagrange equations are derived to
+\begin{subequations}
+\label{eq:forced_acrobot_rotational_equations}
+\begingroup
+\footnotesize
+\setlength{\jot}{0.25em}
+\begin{align}
+    \bm{\Pi}_{1,k}
+    -
+    \bm{\Pi}_{1,k+1}
+    +
+    h
+    \left[
+    \left(
+    \bm{\rho}_{1,0}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{0,k+1}
+    \right)
+    +
+    \left(
+    \bm{\rho}_{1,12}
+    \times
+    \bm{R}_{1,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    -
+    u_{k+1}
+    \right]^{\wedge}
+    &=
+    \bm{0},
+    \label{eq:forced_acrobot_rotation_link1}
+    \\
+    \bm{\Pi}_{2,k}
+    -
+    \bm{\Pi}_{2,k+1}
+    +
+    h
+    \left[
+    u_{k+1}
+    -
+    \left(
+    \bm{\rho}_{2,12}
+    \times
+    \bm{R}_{2,k+1}^{\top}\bm{\lambda}_{12,k+1}
+    \right)
+    \right]^{\wedge}
+    &=
+    \bm{0}.
+    \label{eq:forced_acrobot_rotation_link2}
+\end{align}
+\endgroup
+\end{subequations}
+For \(u_{k+1}=0\), these equations reduce to the corresponding unforced rotational
+equations derived previously.
+

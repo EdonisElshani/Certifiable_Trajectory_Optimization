@@ -9,6 +9,23 @@ Mar{\'i}a Barbero-Li{\~n}{\'a}n and David~Mart{\'i}n de~Diego.
 \newblock \href {https://doi.org/10.1007/s10208-022-09571-x}
   {\path{doi:10.1007/s10208-022-09571-x}}.
 
+\bibitem[BM21a]{BrudigamManchester2021LQR}
+Jan Br{\"u}digam and Zachary Manchester.
+\newblock Linear-quadratic optimal control in maximal coordinates.
+\newblock In {\em 2021 IEEE International Conference on Robotics and Automation
+  (ICRA)}, pages 9775--9781, Xi'an, China, 2021. IEEE.
+\newblock \href {https://doi.org/10.1109/ICRA48506.2021.9561871}
+  {\path{doi:10.1109/ICRA48506.2021.9561871}}.
+
+\bibitem[BM21b]{BrudigamManchester2021VariationalIntegrators}
+Jan Br{\"u}digam and Zachary Manchester.
+\newblock Linear-time variational integrators in maximal coordinates.
+\newblock In {\em Algorithmic Foundations of Robotics XIV}, volume~17 of {\em
+  Springer Proceedings in Advanced Robotics}, pages 194--209. Springer, Cham,
+  2021.
+\newblock \href {https://doi.org/10.1007/978-3-030-66723-8_12}
+  {\path{doi:10.1007/978-3-030-66723-8_12}}.
+
 \bibitem[BR18]{Benacquista2018ClassicalMechanics}
 Matthew~J. Benacquista and Joseph~D. Romano.
 \newblock {\em Classical Mechanics}.
