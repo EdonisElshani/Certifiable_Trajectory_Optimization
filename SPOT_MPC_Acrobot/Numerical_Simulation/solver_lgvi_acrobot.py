@@ -1,27 +1,24 @@
-"""Implicit constrained LGVI simulator for the unforced/forced planar Acrobot on SO(2).
-
-The step solves the maximal-coordinate discrete Euler--Lagrange equations
-for unknowns
-
-    z_k = [X_{k+1}, dtheta1_k, dtheta2_k, lambda0_k, lambda12_k].
-
-For the unforced preservation test, pass u_fun=None or u_fun(t)=0.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional
+from typing import Optional, Callable, Dict, List, Tuple
 
 import numpy as np
 from scipy.optimize import root
 
-try:
-    from Acrobot.lie_group_so2 import F_from_delta, angle_from_R, vee2, orth_error_so2, det_error_so2
-    from Acrobot.Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import AcrobotSO2Model
-except ImportError:  # support running from inside Acrobot
-    from lie_group_so2 import F_from_delta, angle_from_R, vee2, orth_error_so2, det_error_so2
-    from Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import AcrobotSO2Model
+from Numerical_Simulation.lie_group_so2 import (
+    F_from_delta,
+    angle_from_R,
+    vee2,
+    orth_error_so2,
+    det_error_so2,
+)
+
+from Numerical_Simulation.Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import (
+    AcrobotSO2Model,
+)
+
+from Numerical_Simulation.state import AcrobotLGVIState
 
 
 @dataclass
@@ -290,4 +287,252 @@ def diagnostics_lgvi(model: AcrobotSO2Model, sim: Dict[str, np.ndarray]) -> Dict
         "omega": omega,
         "energy": energy,
         "energy_error": energy - energy[0] if n_steps > 0 else energy,
+    }
+
+def reconstruct_X_from_R(
+    model: AcrobotSO2Model,
+    R1: np.ndarray,
+    R2: np.ndarray,
+) -> np.ndarray:
+    """
+    Reconstruct maximal COM coordinates X = [x1; x2] from R1, R2
+    using the holonomic constraints.
+
+    phi0  = x1 + R1 rho10 - p0 = 0
+    phi12 = x1 + R1 rho112 - x2 - R2 rho212 = 0
+    """
+    x1 = model.p0 - R1 @ model.rho10
+    x2 = x1 + R1 @ model.rho112 - R2 @ model.rho212
+    return np.r_[x1, x2]
+
+
+def make_lgvi_state_from_relative(
+    model: AcrobotSO2Model,
+    h: float,
+    q: np.ndarray,
+    qdot: np.ndarray,
+) -> AcrobotLGVIState:
+    """
+    Create an LGVI state from standard Acrobot coordinates.
+
+    q     = [theta1, theta2]
+    qdot  = [theta1dot, theta2dot]
+
+    The model uses absolute SO(2) attitudes:
+        alpha1 = theta1 - pi/2
+        alpha2 = theta1 + theta2 - pi/2
+
+    The previous F is approximated by:
+        F_{k-1} = exp(h * omega_k)
+    so that:
+        R_{k-1} = R_k F_{k-1}^T
+    """
+    q = np.asarray(q, dtype=float).reshape(2)
+    qdot = np.asarray(qdot, dtype=float).reshape(2)
+
+    alpha = model.absolute_angles_from_relative(q[0], q[1])
+    omega_abs = np.array(
+        [
+            qdot[0],
+            qdot[0] + qdot[1],
+        ],
+        dtype=float,
+    )
+
+    X, R1, R2, _ = model.positions_from_angles(alpha[0], alpha[1])
+
+    F1_prev = F_from_delta(h * omega_abs[0])
+    F2_prev = F_from_delta(h * omega_abs[1])
+
+    R1_prev = R1 @ F1_prev.T
+    R2_prev = R2 @ F2_prev.T
+    X_prev = reconstruct_X_from_R(model, R1_prev, R2_prev)
+
+    return AcrobotLGVIState(
+        X_prev=X_prev,
+        X=X,
+        R1=R1,
+        R2=R2,
+        F1_prev=F1_prev,
+        F2_prev=F2_prev,
+    )
+
+def lgvi_one_step(
+    model: AcrobotSO2Model,
+    h: float,
+    state: AcrobotLGVIState,
+    u_k: float,
+    z_guess: Optional[np.ndarray] = None,
+    root_tol: float = 1e-10,
+    maxfev: int = 100,
+    normalized: bool = True,
+) -> tuple[AcrobotLGVIState, LGVIStepInfo, np.ndarray]:
+    """
+    Propagate the acrobot by one forced LGVI step.
+
+    Input:
+        state at node k:
+            X_{k-1}, X_k, R_{1,k}, R_{2,k}, F_{1,k-1}, F_{2,k-1}
+        scalar torque:
+            u_k
+
+    Output:
+        next_state at node k+1:
+            X_k, X_{k+1}, R_{1,k+1}, R_{2,k+1}, F_{1,k}, F_{2,k}
+    """
+    if z_guess is None:
+        z_guess = initial_guess_from_previous(
+            state.X_prev,
+            state.X,
+            state.F1_prev,
+            state.F2_prev,
+        )
+
+    def fun(z: np.ndarray) -> np.ndarray:
+        return acrobot_lgvi_step_residual(
+            z=z,
+            model=model,
+            h=h,
+            X_prev=state.X_prev,
+            X_k=state.X,
+            R1_k=state.R1,
+            R2_k=state.R2,
+            F1_prev=state.F1_prev,
+            F2_prev=state.F2_prev,
+            u_k=float(u_k),
+            normalized=normalized,
+        )
+
+    sol = root(
+        fun,
+        z_guess,
+        method="hybr",
+        options={
+            "xtol": root_tol,
+            "maxfev": maxfev,
+        },
+    )
+
+    residual = fun(sol.x)
+    residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+
+    info = LGVIStepInfo(
+        success=bool(sol.success),
+        residual_inf=residual_inf,
+        nfev=int(sol.nfev),
+        message=str(sol.message),
+    )
+
+    if not sol.success and residual_inf > 1e-7:
+        raise RuntimeError(
+            f"LGVI one-step solve failed: "
+            f"success={sol.success}, "
+            f"||r||_inf={residual_inf:.3e}, "
+            f"message={sol.message}"
+        )
+
+    z = sol.x
+    X_next = z[0:4]
+    dtheta1 = float(z[4])
+    dtheta2 = float(z[5])
+
+    F1 = F_from_delta(dtheta1)
+    F2 = F_from_delta(dtheta2)
+
+    R1_next = state.R1 @ F1
+    R2_next = state.R2 @ F2
+
+    next_state = AcrobotLGVIState(
+        X_prev=state.X,
+        X=X_next,
+        R1=R1_next,
+        R2=R2_next,
+        F1_prev=F1,
+        F2_prev=F2,
+    )
+
+    return next_state, info, z
+
+def rollout_lgvi_controls(
+    model: AcrobotSO2Model,
+    h: float,
+    initial_state: AcrobotLGVIState,
+    u_sequence: np.ndarray,
+    root_tol: float = 1e-10,
+    maxfev: int = 100,
+) -> dict:
+    """
+    Open-loop rollout for a given torque sequence.
+
+    This is useful for:
+        - testing one SDP control sequence,
+        - testing one MPC step,
+        - validating extracted controls physically.
+    """
+    u_sequence = np.asarray(u_sequence, dtype=float).reshape(-1)
+    num_steps = len(u_sequence)
+
+    X = np.zeros((num_steps + 1, 4))
+    R1 = np.zeros((num_steps + 1, 2, 2))
+    R2 = np.zeros((num_steps + 1, 2, 2))
+    F1 = np.zeros((num_steps, 2, 2))
+    F2 = np.zeros((num_steps, 2, 2))
+    dtheta = np.zeros((num_steps, 2))
+    residual_inf = np.zeros(num_steps)
+    infos = []
+    z_solutions = []
+
+    state = initial_state
+
+    X[0] = state.X
+    R1[0] = state.R1
+    R2[0] = state.R2
+
+    z_guess = None
+
+    for k, u_k in enumerate(u_sequence):
+        state_next, info, z = lgvi_one_step(
+            model=model,
+            h=h,
+            state=state,
+            u_k=float(u_k),
+            z_guess=z_guess,
+            root_tol=root_tol,
+            maxfev=maxfev,
+        )
+
+        X[k + 1] = state_next.X
+        R1[k + 1] = state_next.R1
+        R2[k + 1] = state_next.R2
+        F1[k] = state_next.F1_prev
+        F2[k] = state_next.F2_prev
+        dtheta[k, 0] = angle_from_R(F1[k])
+        dtheta[k, 1] = angle_from_R(F2[k])
+        residual_inf[k] = info.residual_inf
+        infos.append(info)
+        z_solutions.append(z)
+
+        # Good predictor for next step, because root solvers are needy little creatures.
+        z_guess = np.r_[
+            state_next.X + (state_next.X - state.X),
+            dtheta[k, 0],
+            dtheta[k, 1],
+            z[6:10],
+        ]
+
+        state = state_next
+
+    return {
+        "t": np.arange(num_steps + 1) * h,
+        "X": X,
+        "R1": R1,
+        "R2": R2,
+        "F1": F1,
+        "F2": F2,
+        "dtheta": dtheta,
+        "u": u_sequence,
+        "residual_inf": residual_inf,
+        "infos": infos,
+        "z_solutions": z_solutions,
+        "final_state": state,
     }
