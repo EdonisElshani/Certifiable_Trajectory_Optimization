@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.26)  2 JUN 2026 18:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.26)  9 JUN 2026 16:18
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -934,7 +934,6 @@ Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
 Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
 ))
 Package hyperref Info: Link coloring OFF on input line 34.
- (StudentThesis_Template.out) (StudentThesis_Template.out)
 \@outlinefile=\write11
 \openout11 = `StudentThesis_Template.out'.
 
@@ -962,7 +961,7 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 67.
  (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<pics/harvard_logo.png, id=198, 246.9225pt x 284.06125pt>
+<pics/harvard_logo.png, id=6, 246.9225pt x 284.06125pt>
 File: pics/harvard_logo.png Graphic file (type png)
 <use pics/harvard_logo.png>
 Package pdftex.def Info: pics/harvard_logo.png  used on input line 67.
@@ -996,12 +995,12 @@ Non-PDF special ignored!
 {C:/Users/ASUS/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./pics/harvard_logo.png (PNG copy)>] [2
 
 ]
-<./include/Master_Thesis_Task_Description.pdf, id=210, 597.50829pt x 845.0471pt>
+<./include/Master_Thesis_Task_Description.pdf, id=18, 597.50829pt x 845.0471pt>
 File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
 <use ./include/Master_Thesis_Task_Description.pdf>
 Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf  used on input line 90.
 (pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
-<./include/Master_Thesis_Task_Description.pdf, id=212, page=1, 597.50829pt x 845.0471pt>
+<./include/Master_Thesis_Task_Description.pdf, id=20, page=1, 597.50829pt x 845.0471pt>
 File: ./include/Master_Thesis_Task_Description.pdf Graphic file (type pdf)
 <use ./include/Master_Thesis_Task_Description.pdf, page 1>
 Package pdftex.def Info: ./include/Master_Thesis_Task_Description.pdf , page1 used on input line 90.
@@ -1048,59 +1047,169 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has b
 <to be read again> 
                    \relax 
 l.127 \tableofcontents
-                       [2] (StudentThesis_Template.toc
-pdfTeX warning (ext4): destination with the same identifier (name{page.3}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.50 ...oment-SOS Hierarchy}{38}{subsection.5.2.1}
-                                                  % [3{C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
-
-])
+                       [2]
+No file StudentThesis_Template.toc.
 \tf@toc=\write12
 \openout12 = `StudentThesis_Template.toc'.
 
- (chapters/Introduction.tex [4]
-Chapter 1.
-Excluding 'comment' comment. Excluding 'comment' comment.) (chapters/Preliminaries.tex [5
+(chapters/Introduction.tex
+pdfTeX warning (ext4): destination with the same identifier (name{page.3}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.2 \chapter
+            {Introduction} [3{C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
-] [6
+] [4
+
+]
+Chapter 1.
+Excluding 'comment' comment. Excluding 'comment' comment.) (chapters/Preliminaries.tex [5] [6
 
 ]
 Chapter 2.
+
+LaTeX Warning: Citation `Hall2000LieGroups' on page 7 undefined on input line 9.
+
+
+LaTeX Warning: Citation `Hall2000LieGroups' on page 7 undefined on input line 20.
+
 
 LaTeX Warning: Citation `Lee2012ISM' on page 7 undefined on input line 21.
 
 LaTeX Font Info:    Trying to load font information for U+euf on input line 32.
 (C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
-) [7]) (chapters/Continuous_Mechanics.tex [8]
+)
+
+LaTeX Warning: Reference `eq:preliminaries_differential_left_translation' on page 7 undefined on input line 36.
+
+[7]
+
+LaTeX Warning: Reference `eq:preliminaries_differential_left_translation' on page 8 undefined on input line 47.
+
+) (chapters/Continuous_Mechanics.tex [8]
 Chapter 3.
+
+LaTeX Warning: Citation `Hall2000LieGroups' on page 9 undefined on input line 17.
+
+
+LaTeX Warning: Citation `Lee2008' on page 9 undefined on input line 27.
+
+
+LaTeX Warning: Citation `Hall2000LieGroups' on page 9 undefined on input line 41.
+
 [9
 
 ]
 
+LaTeX Warning: Citation `Lee2008' on page 10 undefined on input line 63.
+
+
+LaTeX Warning: Citation `Lee2008' on page 10 undefined on input line 69.
+
+
+LaTeX Warning: Reference `eq:delta_g_TL' on page 10 undefined on input line 76.
+
+
+LaTeX Warning: Citation `Lee2008' on page 10 undefined on input line 88.
+
+
+LaTeX Warning: Reference `section:continuous_lagrangian_mechanics' on page 10 undefined on input line 88.
+
+
 LaTeX Warning: Reference `fig:3d_pendulum' on page 10 undefined on input line 101.
 
+
+LaTeX Warning: Citation `Shen20043DPendulum' on page 10 undefined on input line 101.
+
 [10]
-Overfull \hbox (2.28084pt too wide) in paragraph at lines 148--149
- []\OT1/cmr/bx/n/12 Euler-Lagrange Equa-tions[] \OT1/cmr/m/n/12 In or-der to de-fine the Euler-Lagrange Equa-tion [],
- []
+
+LaTeX Warning: Citation `Lee2008' on page 11 undefined on input line 116.
+
+
+LaTeX Warning: Citation `Lee2008' on page 11 undefined on input line 120.
+
+
+LaTeX Warning: Citation `Lee2008' on page 11 undefined on input line 139.
+
+
+LaTeX Warning: Reference `eq:3D_pendulum_kinetic_energy' on page 11 undefined on input line 139.
+
+
+LaTeX Warning: Reference `eq:3D_pendulum_potential_energy' on page 11 undefined on input line 139.
+
+
+LaTeX Warning: Reference `eq:continuous_euler_lagrange' on page 11 undefined on input line 148.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_lagrangian' on page 11 undefined on input line 148.
+
+
+LaTeX Warning: Reference `eq:derivative_omega' on page 11 undefined on input line 148.
 
 [11]
 
 LaTeX Warning: Reference `INNER PRODUCT' on page 12 undefined on input line 189.
 
 
+LaTeX Warning: Reference `eq:nonstandard_Inertia_Relation' on page 12 undefined on input line 189.
+
+
+LaTeX Warning: Reference `eq:derivative_rotation' on page 12 undefined on input line 191.
+
+
 LaTeX Warning: Reference `eq:' on page 12 undefined on input line 209.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_derivative_omega' on page 12 undefined on input line 221.
 
 
 LaTeX Warning: Reference `eq:ad_lie_bracket' on page 12 undefined on input line 221.
 
 [12]
 
+LaTeX Warning: Reference `eq:nonstandard_Inertia_Relation' on page 13 undefined on input line 233.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_derivative_omega' on page 13 undefined on input line 239.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_derivative_rotation' on page 13 undefined on input line 239.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_adjoint_derivative_omega' on page 13 undefined on input line 239.
+
+
+LaTeX Warning: Reference `eq:continuous_euler_lagrange' on page 13 undefined on input line 239.
+
+
 LaTeX Warning: Reference `eq:continuous_legendre_transformation' on page 13 undefined on input line 252.
 
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_momentum' on page 13 undefined on input line 256.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_euler_lagrange' on page 13 undefined on input line 256.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_euler_lagrange' on page 13 undefined on input line 265.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_hamilton' on page 13 undefined on input line 265.
+
+
+LaTeX Warning: Citation `Lee2008' on page 13 undefined on input line 265.
+
+
+LaTeX Warning: Citation `Sangli2025' on page 13 undefined on input line 270.
+
+
+LaTeX Warning: Citation `Lee2008' on page 13 undefined on input line 272.
+
 [13]
+
+LaTeX Warning: Citation `Lee2008' on page 14 undefined on input line 276.
+
 
 LaTeX Warning: Reference `PROPOSITION' on page 14 undefined on input line 276.
 
@@ -1110,45 +1219,135 @@ Overfull \hbox (19.84982pt too wide) in paragraph at lines 279--281
  []
 
 
+LaTeX Warning: Citation `Lee2008' on page 14 undefined on input line 282.
+
+
+LaTeX Warning: Reference `eq:SO3_attitude_kinematics' on page 14 undefined on input line 282.
+
+
 LaTeX Warning: Reference `eq:Noether' on page 14 undefined on input line 282.
 
 
 LaTeX Warning: Reference `eq:Noether2' on page 14 undefined on input line 282.
 
 
+LaTeX Warning: Reference `eq:preliminaries_differential_left_SO' on page 14 undefined on input line 282.
+
+
+LaTeX Warning: Citation `Lee2008' on page 14 undefined on input line 282.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_momentum_conservation' on page 14 undefined on input line 320.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_derivative_rotation' on page 14 undefined on input line 320.
+
+
 LaTeX Warning: Reference `eq:' on page 14 undefined on input line 336.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_lifted_generator' on page 14 undefined on input line 336.
 
 [14]
 
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_infinitesimal_invariance_start' on page 15 undefined on input line 344.
+
+
+LaTeX Warning: Reference `eq:3D_pendulum_potential_energy' on page 15 undefined on input line 353.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_variation_eta' on page 15 undefined on input line 353.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_momentum_conservation' on page 15 undefined on input line 377.
+
+
 LaTeX Warning: Reference `PROPOSITION' on page 15 undefined on input line 377.
+
+
+LaTeX Warning: Citation `Lee2008' on page 15 undefined on input line 377.
 
 ) (chapters/Discrete_Mechanics.tex [15] [16
 
 ]
 Chapter 4.
 
+LaTeX Warning: Citation `Hall2000LieGroups' on page 17 undefined on input line 9.
+
+
 LaTeX Warning: Reference `eq:VARIATION' on page 17 undefined on input line 10.
+
+
+LaTeX Warning: Citation `Lee2008' on page 17 undefined on input line 40.
+
+
+LaTeX Warning: Citation `Lee2008' on page 17 undefined on input line 48.
 
 [17]
 
+LaTeX Warning: Reference `eq:delta_gk_TL' on page 18 undefined on input line 60.
+
+
+LaTeX Warning: Citation `Hall2000LieGroups' on page 18 undefined on input line 64.
+
+
 LaTeX Warning: Reference `eq:VARIATION' on page 18 undefined on input line 65.
+
+
+LaTeX Warning: Citation `Lee2008' on page 18 undefined on input line 95.
+
+
+LaTeX Warning: Citation `Lee2008' on page 18 undefined on input line 103.
+
+
+LaTeX Warning: Reference `eq:delta_fk_TL' on page 18 undefined on input line 114.
 
 [18]
 
 LaTeX Warning: Reference `eq:discrete_Euler_Lagrange' on page 19 undefined on input line 126.
 
 
+LaTeX Warning: Citation `Lee2008' on page 19 undefined on input line 132.
+
+
+LaTeX Warning: Citation `Marsden2001' on page 19 undefined on input line 138.
+
+
 LaTeX Warning: Reference `eq: action_sum_EL' on page 19 undefined on input line 139.
+
+
+LaTeX Warning: Citation `Lee2008' on page 19 undefined on input line 143.
+
+
+LaTeX Warning: Reference `eq:discrete_Lagrange-d_Alembert' on page 19 undefined on input line 143.
 
 
 LaTeX Warning: Reference `eq:discrete_EL' on page 19 undefined on input line 143.
 
+
+LaTeX Warning: Citation `Lee2008' on page 19 undefined on input line 165.
+
 [19]
+
+LaTeX Warning: Reference `eq:discrete_lagrangian_forced_special' on page 20 undefined on input line 175.
+
+
+LaTeX Warning: Reference `eq:discrete_moment_general' on page 20 undefined on input line 186.
+
+
+LaTeX Warning: Reference `eq:discrete_forces_special' on page 20 undefined on input line 187.
+
+
+LaTeX Warning: Reference `eq:discrete_forced_Euler_Lagrange' on page 20 undefined on input line 188.
+
 
 LaTeX Warning: Reference `eq:discrete_EL' on page 20 undefined on input line 226.
 
 
 LaTeX Warning: Reference `eq:Discrete_Legendre_Transformation' on page 20 undefined on input line 229.
+
+
+LaTeX Warning: Citation `Lee2008' on page 20 undefined on input line 280.
 
 
 LaTeX Warning: Reference `coun' on page 20 undefined on input line 288.
@@ -1159,29 +1358,136 @@ LaTeX Warning: Reference `eq:' on page 20 undefined on input line 288.
 
 LaTeX Warning: Reference `eq:' on page 20 undefined on input line 288.
 
+
+LaTeX Warning: Citation `Lee2008' on page 20 undefined on input line 288.
+
+
+LaTeX Warning: Citation `Marsden2001' on page 20 undefined on input line 288.
+
 [20]
 
-LaTeX Warning: Reference `eq:' on page 21 undefined on input line 311.
+LaTeX Warning: Citation `MarsdenRatiu1999' on page 21 undefined on input line 302.
+
+
+LaTeX Warning: Reference `eq:Rodrigues' on page 21 undefined on input line 302.
+
+
+LaTeX Warning: Citation `Arieh_Cayley_Motivation' on page 21 undefined on input line 302.
+
+
+LaTeX Warning: Citation `Barbero-Linan2023_Cayley_Formula' on page 21 undefined on input line 311.
+
+
+LaTeX Warning: Reference `eq:Cayley' on page 21 undefined on input line 311.
 
 
 LaTeX Warning: Reference `eq:' on page 21 undefined on input line 311.
 
 
-Overfull \hbox (6.4858pt too wide) in paragraph at lines 319--320
- []\OT1/cmr/bx/n/12 Newton It-er-a-tion[] \OT1/cmr/m/n/12 For solv-ing the im-plicit vec-tor equa-tion [] New-ton's method
- []
+LaTeX Warning: Reference `eq:' on page 21 undefined on input line 311.
+
+
+LaTeX Warning: Citation `ColomboJimenez2012SO3_Cayley' on page 21 undefined on input line 315.
+
+
+LaTeX Warning: Reference `eq:implicit_vector_equation' on page 21 undefined on input line 319.
+
+
+LaTeX Warning: Citation `Marsden2001' on page 21 undefined on input line 319.
+
+
+LaTeX Warning: Reference `eq:implicit_vector_equation' on page 21 undefined on input line 323.
+
+
+LaTeX Warning: Citation `Lee2008' on page 21 undefined on input line 323.
+
+
+LaTeX Warning: Reference `eq:Cayley' on page 21 undefined on input line 323.
+
+
+LaTeX Warning: Citation `Lee2008' on page 21 undefined on input line 330.
+
+
+LaTeX Warning: Reference `section:discrete_lagrangian_mechanics' on page 21 undefined on input line 330.
+
+
+LaTeX Warning: Reference `section:continuous_3D_pendulum' on page 21 undefined on input line 330.
 
 [21]
+
+LaTeX Warning: Reference `section:continuous_3D_pendulum' on page 22 undefined on input line 334.
+
+
+LaTeX Warning: Citation `Lee2008' on page 22 undefined on input line 334.
+
+
 Overfull \hbox (9.48476pt too wide) in paragraph at lines 334--335
  []\OT1/cmr/bx/n/12 Configuration Man-i-fold[] \OT1/cmr/m/n/12 The con-fig-u-ra-tion man-i-fold of the un-forced 3D-pendulum
  []
 
 
+LaTeX Warning: Citation `Lee2008' on page 22 undefined on input line 338.
+
+
 LaTeX Warning: Reference `eq:discrete_exact_lagrangian' on page 22 undefined on input line 355.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_lagrangian' on page 22 undefined on input line 355.
+
+
+LaTeX Warning: Citation `Marsden2001' on page 22 undefined on input line 360.
+
+
+LaTeX Warning: Citation `Hall2000LieGroups' on page 22 undefined on input line 364.
+
+
+LaTeX Warning: Reference `eq:first_order_expansion_exponential' on page 22 undefined on input line 368.
+
+
+LaTeX Warning: Citation `Lee2008' on page 22 undefined on input line 376.
+
+
+LaTeX Warning: Citation `Marsden2001' on page 22 undefined on input line 376.
+
+
+LaTeX Warning: Citation `Lee2008' on page 22 undefined on input line 376.
 
 [22]
 
+LaTeX Warning: Citation `butcher2016numerical' on page 23 undefined on input line 382.
+
+
+LaTeX Warning: Reference `eq:trapezodial_rule' on page 23 undefined on input line 382.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_lagrangian' on page 23 undefined on input line 382.
+
+
+LaTeX Warning: Reference `eq:discrete_attitude_kinematics_equation_SO3' on page 23 undefined on input line 397.
+
+
+LaTeX Warning: Reference `eq:discrete_velocity_approximation' on page 23 undefined on input line 397.
+
+
+LaTeX Warning: Reference `eq:discrete_potential_3D_pendulum' on page 23 undefined on input line 397.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_lagrangian' on page 23 undefined on input line 397.
+
+
+LaTeX Warning: Citation `Lee2008' on page 23 undefined on input line 420.
+
+
 LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 23 undefined on input line 424.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_lagrangian' on page 23 undefined on input line 424.
+
+
+LaTeX Warning: Reference `eq:derivative_fk' on page 23 undefined on input line 427.
+
+
+LaTeX Warning: Citation `Lee2008' on page 23 undefined on input line 456.
 
 
 LaTeX Warning: Reference `eq:inner_product' on page 23 undefined on input line 456.
@@ -1190,6 +1496,12 @@ LaTeX Warning: Reference `eq:inner_product' on page 23 undefined on input line 4
 Overfull \hbox (32.57716pt too wide) detected at line 488
 []
  []
+
+
+LaTeX Warning: Citation `Lee2008' on page 24 undefined on input line 501.
+
+
+LaTeX Warning: Reference `eq:derivative_gk' on page 24 undefined on input line 512.
 
 
 Overfull \hbox (5.51337pt too wide) in paragraph at lines 512--514
@@ -1210,133 +1522,549 @@ Overfull \hbox (52.03981pt too wide) detected at line 570
  []
 
 
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_lagrangian' on page 24 undefined on input line 572.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_derivative_fk' on page 24 undefined on input line 584.
+
+
 LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 24 undefined on input line 584.
 
 [24]
 
+LaTeX Warning: Reference `eq:discrete_coadjoint' on page 25 undefined on input line 626.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_derivative_fk' on page 25 undefined on input line 628.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_derivative_gk' on page 25 undefined on input line 628.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_coadjoint' on page 25 undefined on input line 628.
+
+
 LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 25 undefined on input line 628.
 
 
-Overfull \hbox (3.09558pt too wide) in paragraph at lines 642--645
-\OT1/cmr/m/n/12 [[]] de-scribes the pro-ce-dure of ob-tain-ing the discrete-time flow map $(\OML/cmm/b/it/12 R[]\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 !
- []
+LaTeX Warning: Citation `Lee2008' on page 25 undefined on input line 644.
 
 
-Overfull \hbox (6.58966pt too wide) in paragraph at lines 642--645
-\OT1/cmr/m/n/12 (\OML/cmm/b/it/12 R[]\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 )$, by solv-ing [] find-ing $\OML/cmm/b/it/12 F[]$ \OT1/cmr/m/n/12 for given $(\OML/cmm/b/it/12 R[]\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 R[]\OT1/cmr/m/n/12 )$ and $\OML/cmm/b/it/12 F[] \OT1/cmr/m/n/12 = \OML/cmm/b/it/12 R[]R[]$\OT1/cmr/m/n/12 .
- []
+LaTeX Warning: Reference `eq:discrete_3D_pednulum_EL_1' on page 25 undefined on input line 644.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pednulum_EL_2' on page 25 undefined on input line 644.
 
 
 LaTeX Warning: Reference `eq:discrete_legendre_transformation' on page 25 undefined on input line 648.
 
 
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_momentum' on page 25 undefined on input line 681.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_EL' on page 25 undefined on input line 681.
+
+
 LaTeX Warning: Reference `eq:discrete_hamiltion_equations' on page 25 undefined on input line 681.
 
-[25] [26]
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_hamilton_1' on page 25 undefined on input line 704.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_hamilton_2' on page 25 undefined on input line 704.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_hamilton_3' on page 25 undefined on input line 704.
+
+[25]
+
+LaTeX Warning: Citation `Lee2008' on page 26 undefined on input line 710.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_lagrangian' on page 26 undefined on input line 719.
+
+
+LaTeX Warning: Reference `eq:discrete_lagrangian_forced_special' on page 26 undefined on input line 721.
+
+
+LaTeX Warning: Reference `eq:generalized_forced_3D_pendulum' on page 26 undefined on input line 752.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_EL' on page 26 undefined on input line 754.
+
+
+LaTeX Warning: Reference `eq:discrete_forced_Euler_Lagrange' on page 26 undefined on input line 755.
+
+
+LaTeX Warning: Reference `eq:generalized_forced_3D_pendulum' on page 26 undefined on input line 756.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_hamilton' on page 26 undefined on input line 757.
+
+
+LaTeX Warning: Reference `eq:forced_discrete_momentum_system' on page 26 undefined on input line 757.
+
+
+LaTeX Warning: Reference `eq:forced_3D_pendulum_EL' on page 26 undefined on input line 781.
+
+
+LaTeX Warning: Reference `eq:forced_3D_pendulum_hamilton' on page 26 undefined on input line 781.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_EL' on page 26 undefined on input line 782.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_hamilton' on page 26 undefined on input line 782.
+
+
+LaTeX Warning: Citation `BrudigamManchester2021LQR' on page 26 undefined on input line 792.
+
+
+LaTeX Warning: Citation `Sangli2025' on page 26 undefined on input line 793.
+
+[26]
+
+LaTeX Warning: Citation `BrudigamManchester2021VariationalIntegrators' on page 27 undefined on input line 804.
+
+
 
 pdfTeX warning: pdflatex (file ./pics/Maximal_Coordinates_Joint.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<pics/Maximal_Coordinates_Joint.pdf, id=665, 845.04686pt x 478.53882pt>
+<pics/Maximal_Coordinates_Joint.pdf, id=304, 845.04686pt x 478.53882pt>
 File: pics/Maximal_Coordinates_Joint.pdf Graphic file (type pdf)
 <use pics/Maximal_Coordinates_Joint.pdf>
 Package pdftex.def Info: pics/Maximal_Coordinates_Joint.pdf  used on input line 839.
 (pdftex.def)             Requested size: 256.0774pt x 145.00853pt.
+
+LaTeX Warning: Citation `BrudigamManchester2021LQR' on page 27 undefined on input line 840.
+
+
+LaTeX Warning: Citation `BrudigamManchester2021LQR' on page 27 undefined on input line 840.
+
+
+LaTeX Warning: Reference `fig:maximal_joint_constraint' on page 27 undefined on input line 846.
+
+
+LaTeX Warning: Reference `sec:forced_discrete_euler_lagrange' on page 27 undefined on input line 881.
+
 [27]
 
-LaTeX Warning: Reference `sec:forced_discrete_euler_lagrange' on page 28 undefined on input line 881.
+LaTeX Warning: Reference `eq:forced_constrained_del_general' on page 28 undefined on input line 903.
 
 
 
 pdfTeX warning: pdflatex (file ./pics/Acrobot.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<pics/Acrobot.pdf, id=682, 845.04686pt x 633.78517pt>
+<pics/Acrobot.pdf, id=316, 845.04686pt x 633.78517pt>
 File: pics/Acrobot.pdf Graphic file (type pdf)
 <use pics/Acrobot.pdf>
 Package pdftex.def Info: pics/Acrobot.pdf  used on input line 912.
 (pdftex.def)             Requested size: 213.39566pt x 160.04158pt.
-[28 <./pics/Maximal_Coordinates_Joint.pdf>] [29 <./pics/Acrobot.pdf>] [30] [31]
+
+LaTeX Warning: Reference `fig:acrobot_maximal_coordinates' on page 28 undefined on input line 917.
+
+[28 <./pics/Maximal_Coordinates_Joint.pdf> <./pics/Acrobot.pdf>]
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 29 undefined on input line 1047.
+
+[29]
+
+LaTeX Warning: Citation `BrudigamManchester2021VariationalIntegrators' on page 30 undefined on input line 1070.
+
+
+LaTeX Warning: Citation `BrudigamManchester2021VariationalIntegrators' on page 30 undefined on input line 1114.
+
+
+LaTeX Warning: Citation `BrudigamManchester2021VariationalIntegrators' on page 30 undefined on input line 1136.
+
+
+LaTeX Warning: Reference `eq:discrete_velocity_approximation' on page 30 undefined on input line 1151.
+
+
+LaTeX Warning: Reference `eq:acrobot_kinetic_energy_split' on page 30 undefined on input line 1152.
+
+[30]
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 31 undefined on input line 1185.
+
+
+LaTeX Warning: Reference `eq:acrobot_discrete_translational_lagrangian' on page 31 undefined on input line 1204.
+
+
+LaTeX Warning: Reference `eq:acrobot_discrete_rotational_lagrangian' on page 31 undefined on input line 1204.
+
+
+LaTeX Warning: Reference `eq:acrobot_discrete_potential_lagrangian' on page 31 undefined on input line 1204.
+
+
+LaTeX Warning: Reference `eq:acrobot_constraints' on page 31 undefined on input line 1263.
+
+
+LaTeX Warning: Reference `eq:constrained_discrete_action' on page 31 undefined on input line 1277.
+
+
+LaTeX Warning: Citation `BrudigamManchester2021VariationalIntegrators' on page 31 undefined on input line 1298.
+
+[31]
+
+LaTeX Warning: Reference `eq:acrobot_discrete_translational_velocity' on page 32 undefined on input line 1318.
+
+
+LaTeX Warning: Reference `eq:acrobot_translational_constraint_force' on page 32 undefined on input line 1369.
+
+
+LaTeX Warning: Reference `eq:acrobot_translational_variation' on page 32 undefined on input line 1369.
+
 
 LaTeX Warning: Reference `eq:euler' on page 32 undefined on input line 1407.
+
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 32 undefined on input line 1407.
+
+
+LaTeX Warning: Reference `eq:derivative_fk' on page 32 undefined on input line 1408.
+
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 32 undefined on input line 1457.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_momentum_1' on page 32 undefined on input line 1473.
+
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 32 undefined on input line 1474.
+
+
+LaTeX Warning: Citation `Lee2008' on page 32 undefined on input line 1474.
 
 
 Overfull \hbox (19.78722pt too wide) in paragraph at lines 1470--1475
 \OT1/cmr/m/n/12 denotes the dis-crete an-gu-lar mo-men-tum of link $\OML/cmm/m/it/12 i$ \OT1/cmr/m/n/12 as-so-ci-ated with the rel-a-tive rotation$\OML/cmm/b/it/12 F[]$\OT1/cmr/m/n/12 .
  []
 
+
+LaTeX Warning: Citation `Lee2008' on page 32 undefined on input line 1476.
+
+
+LaTeX Warning: Reference `eq:acrobot_rotational_derivative_pairing' on page 32 undefined on input line 1477.
+
+
+LaTeX Warning: Reference `eq:acrobot_variation_constrained_discrete_action' on page 32 undefined on input line 1493.
+
 [32]
+
+LaTeX Warning: Reference `eq:derivative_gk' on page 33 undefined on input line 1499.
+
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 33 undefined on input line 1574.
+
+
+LaTeX Warning: Reference `eq:acrobot_rotational_derivative_pairing' on page 33 undefined on input line 1646.
+
+
+LaTeX Warning: Reference `eq:acrobot_Ad_variation' on page 33 undefined on input line 1646.
+
+
+LaTeX Warning: Reference `eq:acrobot_R1_constraint_derivative_kp1' on page 33 undefined on input line 1646.
+
+
+LaTeX Warning: Reference `eq:acrobot_R2_constraint_derivative_kp1' on page 33 undefined on input line 1646.
+
 
 LaTeX Warning: Reference `eq:discrete_euler_lagrange' on page 33 undefined on input line 1646.
 
 
 LaTeX Warning: Reference `eq:acrobot_translational_derivative' on page 33 undefined on input line 1646.
 
-[33] [34]) (chapters/Optimization.tex [35] [36
+[33]
+
+LaTeX Warning: Reference `eq:acrobot_constraints' on page 34 undefined on input line 1780.
+
+
+LaTeX Warning: Reference `sec:discrete_3D_pendulum' on page 34 undefined on input line 1784.
+
+
+LaTeX Warning: Reference `eq:discrete_forces_special' on page 34 undefined on input line 1786.
+
+
+LaTeX Warning: Citation `BrudigamManchester2021LQR' on page 34 undefined on input line 1790.
+
+
+LaTeX Warning: Reference `eq:forced_discrete_EL_compact' on page 34 undefined on input line 1818.
+
+
+LaTeX Warning: Reference `eq:acrobot_generalized_torque' on page 34 undefined on input line 1819.
+
+
+LaTeX Warning: Reference `eq:acrobot_full_del_shifted_rotation_1' on page 34 undefined on input line 1820.
+
+
+LaTeX Warning: Reference `eq:acrobot_full_del_shifted_rotation_2' on page 34 undefined on input line 1820.
+
+) (chapters/Optimization.tex [34]
+Chapter 5.
+[35
+
+] [36] [37]
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_dyn1' on page 38 undefined on input line 191.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_dyn3' on page 38 undefined on input line 191.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_kin' on page 38 undefined on input line 193.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_R1' on page 38 undefined on input line 195.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_R3' on page 38 undefined on input line 195.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_F1' on page 38 undefined on input line 197.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_F3' on page 38 undefined on input line 197.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_step' on page 38 undefined on input line 198.
+
+
+LaTeX Warning: Reference `eq:forced_3d_pendulum_pop_u' on page 38 undefined on input line 199.
+
+
+LaTeX Warning: Citation `GallierQuaintance2025LinearAlgebra' on page 38 undefined on input line 221.
+
+[38] [39]
+chapters/Optimization.tex:363: Missing $ inserted.
+<inserted text> 
+                $
+l.363 ..._\lambda\) denotes the parameter `lambda_
+                                                  scale`.
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+chapters/Optimization.tex:364: Missing $ inserted.
+<inserted text> 
+                $
+l.364 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (20.37543pt too wide) detected at line 589
+[]
+ []
+
+[40]
+Overfull \vbox (40.31093pt too high) has occurred while \output is active []
+
+ [41] [42]) (chapters/Evaluation.tex [43] [44
 
 ]
-Chapter 5.
-[37] [38] [39] Excluding 'comment' comment. [40]) (chapters/Evaluation.tex
 Chapter 6.
 
-LaTeX Warning: Reference `sec:' on page 41 undefined on input line 5.
+LaTeX Warning: Reference `sec:' on page 45 undefined on input line 5.
 
-[41
 
-]
+LaTeX Warning: Citation `Lee2008' on page 45 undefined on input line 5.
 
-LaTeX Warning: Reference `sec:discrete_3d_pendulum' on page 42 undefined on input line 85.
 
-[42] [43]
-<pics/Numerical_Simulation/Total_Energy.pdf, id=931, 551.47424pt x 369.65508pt>
+LaTeX Warning: Citation `Marsden2001' on page 45 undefined on input line 5.
+
+
+LaTeX Warning: Citation `CELLEDONI2003421' on page 45 undefined on input line 5.
+
+
+LaTeX Warning: Citation `Hairer2000' on page 45 undefined on input line 5.
+
+
+LaTeX Warning: Reference `tab:integrator_comparison' on page 45 undefined on input line 5.
+
+[45]
+
+LaTeX Warning: Citation `butcher2016numerical' on page 46 undefined on input line 57.
+
+
+LaTeX Warning: Citation `CELLEDONI2003421' on page 46 undefined on input line 59.
+
+
+LaTeX Warning: Citation `YanaiTakeuchiTakane2011SVD' on page 46 undefined on input line 81.
+
+
+LaTeX Warning: Citation `CELLEDONI2003421' on page 46 undefined on input line 81.
+
+
+LaTeX Warning: Reference `sec:discrete_3d_pendulum' on page 46 undefined on input line 85.
+
+[46]
+
+LaTeX Warning: Citation `RITInertiaTable216' on page 47 undefined on input line 98.
+
+
+LaTeX Warning: Citation `Lee2008' on page 47 undefined on input line 98.
+
+
+LaTeX Warning: Citation `Benacquista2018ClassicalMechanics' on page 47 undefined on input line 98.
+
+
+LaTeX Warning: Reference `eq:non-standard_inertia' on page 47 undefined on input line 121.
+
+
+LaTeX Warning: Reference `sec:discrete_computational_approach' on page 47 undefined on input line 132.
+
+
+LaTeX Warning: Reference `eq:discrete_3D_pendulum_hamilton' on page 47 undefined on input line 133.
+
+
+LaTeX Warning: Reference `eq:forced_3D_pendulum_hamilton' on page 47 undefined on input line 133.
+
+
+LaTeX Warning: Citation `ColomboJimenez2012SO3_Cayley' on page 47 undefined on input line 133.
+
+
+LaTeX Warning: Citation `ColomboJimenez2012SO3_Cayley' on page 47 undefined on input line 137.
+
+
+LaTeX Warning: Citation `Lee2008' on page 47 undefined on input line 149.
+
+
+LaTeX Warning: Reference `eq:simulation_3D_pendulum_vector_equation' on page 47 undefined on input line 158.
+
+
+LaTeX Warning: Citation `Elshani2026CTO_GitHub' on page 47 undefined on input line 158.
+
+[47]
+<pics/Numerical_Simulation/Total_Energy.pdf, id=589, 551.47424pt x 369.65508pt>
 File: pics/Numerical_Simulation/Total_Energy.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Total_Energy.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Total_Energy.pdf  used on input line 166.
 (pdftex.def)             Requested size: 204.85802pt x 137.31735pt.
-<pics/Numerical_Simulation/Delta_E.pdf, id=932, 551.47424pt x 370.03558pt>
+<pics/Numerical_Simulation/Delta_E.pdf, id=590, 551.47424pt x 370.03558pt>
 File: pics/Numerical_Simulation/Delta_E.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Delta_E.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Delta_E.pdf  used on input line 172.
 (pdftex.def)             Requested size: 204.85802pt x 137.4587pt.
-<pics/Numerical_Simulation/Momentum_error.pdf, id=933, 550.61055pt x 370.03558pt>
+<pics/Numerical_Simulation/Momentum_error.pdf, id=591, 550.61055pt x 370.03558pt>
 File: pics/Numerical_Simulation/Momentum_error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Momentum_error.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Momentum_error.pdf  used on input line 180.
 (pdftex.def)             Requested size: 204.85802pt x 137.67326pt.
-<pics/Numerical_Simulation/Orthogonality_error.pdf, id=934, 552.03708pt x 370.03558pt>
+<pics/Numerical_Simulation/Orthogonality_error.pdf, id=592, 552.03708pt x 370.03558pt>
 File: pics/Numerical_Simulation/Orthogonality_error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Orthogonality_error.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Orthogonality_error.pdf  used on input line 186.
 (pdftex.def)             Requested size: 204.85802pt x 137.31755pt.
- [44 <./pics/Numerical_Simulation/Total_Energy.pdf> <./pics/Numerical_Simulation/Delta_E.pdf> <./pics/Numerical_Simulation/Momentum_error.pdf> <./pics/Numerical_Simulation/Orthogonality_error.pdf>] [45]
-<pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf, id=1131, 578.16pt x 397.19592pt>
+
+
+LaTeX Warning: Reference `fig:simulation_results_3d_pendulum' on page 48 undefined on input line 195.
+
+
+LaTeX Warning: Reference `tab:integrator_comparison' on page 48 undefined on input line 197.
+
+[48 <./pics/Numerical_Simulation/Total_Energy.pdf> <./pics/Numerical_Simulation/Delta_E.pdf> <./pics/Numerical_Simulation/Momentum_error.pdf> <./pics/Numerical_Simulation/Orthogonality_error.pdf>]
+
+LaTeX Warning: Citation `Lee2008' on page 49 undefined on input line 209.
+
+
+LaTeX Warning: Reference `fig:simulation_results_3d_pendulum' on page 49 undefined on input line 214.
+
+
+LaTeX Warning: Reference `fig:simulation_results_3d_pendulum' on page 49 undefined on input line 214.
+
+
+LaTeX Warning: Citation `Hairer1994' on page 49 undefined on input line 214.
+
+
+LaTeX Warning: Reference `fig:simulation_results_3d_pendulum' on page 49 undefined on input line 216.
+
+
+LaTeX Warning: Reference `sec:continuous_3D_pendulum_momentum_validation' on page 49 undefined on input line 216.
+
+
+LaTeX Warning: Citation `Lee2008' on page 49 undefined on input line 216.
+
+
+LaTeX Warning: Reference `fig:simulation_results_3d_pendulum' on page 49 undefined on input line 218.
+
+
+LaTeX Warning: Reference `eq:external_control_moment_3D_pendulum' on page 49 undefined on input line 226.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_hamilton' on page 49 undefined on input line 243.
+
+
+LaTeX Warning: Reference `sec:discrete_forced_lagrangian' on page 49 undefined on input line 244.
+
+[49]
+
+LaTeX Warning: Reference `eq:forced_3D_pendulum_hamilton' on page 50 undefined on input line 277.
+
+
+LaTeX Warning: Reference `eq:simulation_3D_pendulum_vector_equation' on page 50 undefined on input line 280.
+
+
+LaTeX Warning: Reference `eq:simulation_3D_pendulum_vector_equation' on page 50 undefined on input line 296.
+
+
+LaTeX Warning: Reference `eq:Caley_Jacobian' on page 50 undefined on input line 297.
+
+
+LaTeX Warning: Citation `Elshani2026CTO_GitHub' on page 50 undefined on input line 301.
+
+
+LaTeX Warning: Reference `fig:forced_3d_pendulum_results' on page 50 undefined on input line 309.
+
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf, id=767, 578.16pt x 397.19592pt>
 File: pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf  used on input line 322.
 (pdftex.def)             Requested size: 204.85802pt x 140.73582pt.
-<pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf, id=1132, 578.16pt x 397.19592pt>
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf, id=768, 578.16pt x 397.19592pt>
 File: pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf  used on input line 328.
 (pdftex.def)             Requested size: 204.85802pt x 140.73582pt.
-<pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf, id=1133, 578.16pt x 397.19592pt>
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf, id=769, 578.16pt x 397.19592pt>
 File: pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf  used on input line 336.
 (pdftex.def)             Requested size: 204.85802pt x 140.73582pt.
-<pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf, id=1134, 650.43pt x 578.16pt>
+<pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf, id=770, 650.43pt x 578.16pt>
 File: pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf Graphic file (type pdf)
 <use pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf>
 Package pdftex.def Info: pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf  used on input line 342.
 (pdftex.def)             Requested size: 204.85802pt x 182.0949pt.
- [46] [47 <./pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf>]
-<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf, id=1309, 650.43pt x 505.89pt>
+
+LaTeX Warning: Reference `fig:forced_3d_pendulum_results' on page 50 undefined on input line 350.
+
+[50]
+
+LaTeX Warning: Reference `fig:forced_3d_pendulum_results' on page 51 undefined on input line 368.
+
+
+LaTeX Warning: Reference `fig:forced_3d_pendulum_results' on page 51 undefined on input line 375.
+
+
+LaTeX Warning: Reference `eq:rk4_update' on page 51 undefined on input line 378.
+
+[51 <./pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Ek.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Orth_Error.pdf> <./pics/Numerical_Simulation/Forced_3D_Pendulum_Omega.pdf>]
+
+LaTeX Warning: Reference `fig:forced_3d_pendulum_results' on page 52 undefined on input line 381.
+
+
+LaTeX Warning: Reference `eq:continuous_3D_pendulum_momentum' on page 52 undefined on input line 389.
+
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf, id=940, 650.43pt x 505.89pt>
 File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf Graphic file (type pdf)
 <use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf>
 Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf  used on input line 412.
 (pdftex.def)             Requested size: 204.85802pt x 159.33302pt.
-<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf, id=1310, 578.16pt x 361.35pt>
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf, id=941, 578.16pt x 361.35pt>
 File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf Graphic file (type pdf)
 <use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf>
 Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf  used on input line 418.
 (pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf, id=1311, 578.16pt x 361.35pt>
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf, id=942, 578.16pt x 361.35pt>
 File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf Graphic file (type pdf)
 <use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf>
 Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf  used on input line 426.
@@ -1346,95 +2074,65 @@ Underfull \hbox (badness 1902) in paragraph at lines 427--427
 []|\OT1/cmr/m/n/12 (c) Frobe-nius track-ing er-ror $\OMS/cmsy/m/n/12 k\OML/cmm/b/it/12 R[] \OMS/cmsy/m/n/12 ^^@
  []
 
-<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf, id=1312, 578.16pt x 361.35pt>
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf, id=943, 578.16pt x 361.35pt>
 File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf Graphic file (type pdf)
 <use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf>
 Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf  used on input line 432.
 (pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf, id=1313, 578.16pt x 361.35pt>
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf, id=944, 578.16pt x 361.35pt>
 File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf Graphic file (type pdf)
 <use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf>
 Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf  used on input line 440.
 (pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf, id=1314, 578.16pt x 361.35pt>
+<pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf, id=945, 578.16pt x 361.35pt>
 File: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf Graphic file (type pdf)
 <use pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf>
 Package pdftex.def Info: pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf  used on input line 446.
 (pdftex.def)             Requested size: 204.85802pt x 128.03477pt.
-) (chapters/Discussion.tex [48] [49 <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf>] [50
+) (chapters/Discussion.tex [52] [53 <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_trajectory.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_control_input.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_frobenius.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_F_speed.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_orthogonality.pdf> <./pics/Optimization/3D_Pendulum/MD_90_deg_Pendulum_determinant.pdf>] [54
 
 ]
 Chapter 7.
-) (chapters/Conclusion.tex [51] [52
+) (chapters/Conclusion.tex [55] [56
 
 ]
 Chapter 8.
-Excluding 'comment' comment.) (chapters/Appendix.tex) [53] [54
+Excluding 'comment' comment.) (chapters/Appendix.tex) [57] [58
 
-] (StudentThesis_Template.lof)
+]
+No file StudentThesis_Template.lof.
 \tf@lof=\write13
 \openout13 = `StudentThesis_Template.lof'.
 
- [55
-
-] [56
-
-] (StudentThesis_Template.lot)
-\tf@lot=\write14
-\openout14 = `StudentThesis_Template.lot'.
-
- [57
-
-] [58
-
-] (StudentThesis_Template.acr) [59
-
+[59
 
 ] [60
 
-] (StudentThesis_Template.not) [61
+]
+No file StudentThesis_Template.lot.
+\tf@lot=\write14
+\openout14 = `StudentThesis_Template.lot'.
 
+[61
 
 ] [62
 
-] (StudentThesis_Template.sym) [63
+] (StudentThesis_Template.acr) [63
 
 
 ] [64
 
-] (StudentThesis_Template.bbl
-Underfull \hbox (badness 1308) in paragraph at lines 42--47
-[]\OT1/cmr/m/n/12 Leonardo Colombo and Fer-nando Jim^^Senez.  Con-tin-u-ous and dis-
- []
+] (StudentThesis_Template.not) [65
 
 
-Underfull \hbox (badness 2856) in paragraph at lines 49--58
-[]\OT1/cmr/m/n/12 Elena Celle-doni and Bryn-julf Owren.  Lie group meth-ods for
- []
+] [66
+
+] (StudentThesis_Template.sym) [67
 
 
-Underfull \hbox (badness 1635) in paragraph at lines 49--58
-\OT1/cmr/m/n/12 rigid body dy-nam-ics and time in-te-gra-tion on man-i-folds.  \OT1/cmr/m/it/12 Com-
- []
+] [68
 
-
-Underfull \hbox (badness 4156) in paragraph at lines 60--66
-[]\OT1/cmr/m/n/12 Edonis Elshani.  Cer-ti-fi-able tra-jec-tory op-ti-miza-tion.  GitHub
- []
-
-
-Underfull \hbox (badness 1184) in paragraph at lines 60--66
-\OT1/cmr/m/n/12 repos-i-tory, 2026.  Nu-mer-i-cal[]Simulation di-rec-tory, ac-cessed March
- []
-
-[65
-
-]
-Underfull \hbox (badness 1484) in paragraph at lines 132--142
-[]\OT1/cmr/m/n/12 Sangli Teng, Ashkan Ja-sour, Ram Va-sude-van, and Maani Ghaf-
- []
-
-) [66] [67
+] (StudentThesis_Template.bbl) [69
 
 
 ] (StudentThesis_Template.aux)
@@ -1449,21 +2147,30 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 LaTeX Warning: There were undefined references.
 
-Package rerunfilecheck Info: File `StudentThesis_Template.out' has not changed.
-(rerunfilecheck)             Checksum: 1B08E86E0FEFB7934AEA8930BDE59661;9066.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `StudentThesis_Template.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `StudentThesis_Template.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  C20CBE4D5AEE0EC05506AA4495FDACE4;9444.
  ) 
 Here is how much of TeX's memory you used:
- 46499 strings out of 467867
- 1114919 string characters out of 5418818
- 1582365 words of memory out of 5000000
- 74261 multiletter control sequences out of 15000+600000
- 651961 words of font info for 124 fonts, out of 8000000 for 9000
+ 46489 strings out of 467867
+ 1114554 string characters out of 5418818
+ 1586365 words of memory out of 5000000
+ 74210 multiletter control sequences out of 15000+600000
+ 651792 words of font info for 123 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
  114i,17n,134p,2630b,1211s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmbsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufb10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on StudentThesis_Template.pdf (71 pages, 3067461 bytes).
+<C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmbsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufb10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/ASUS/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfding/uzdr.pfb>
+Output written on StudentThesis_Template.pdf (73 pages, 2980742 bytes).
 PDF statistics:
- 1879 PDF objects out of 2073 (max. 8388607)
- 372 named destinations out of 1000 (max. 500000)
- 497 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1478 PDF objects out of 1728 (max. 8388607)
+ 424 named destinations out of 1000 (max. 500000)
+ 113 words of extra memory for PDF output out of 10000 (max. 10000000)
 
