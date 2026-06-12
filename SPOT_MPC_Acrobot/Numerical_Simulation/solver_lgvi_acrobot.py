@@ -536,3 +536,53 @@ def rollout_lgvi_controls(
         "z_solutions": z_solutions,
         "final_state": state,
     }
+
+def simulate_one_control_interval(
+    model,
+    state,
+    u_j: float,
+    dt_control: float,
+    dt_sim: float,
+    root_tol: float = 1e-10,
+    maxfev: int = 100,
+):
+    """
+    Simulate one MPC control interval.
+
+    The SDP provides one control input u_j for the interval
+    [t_j, t_j + dt_control].
+
+    The plant / high-fidelity simulator advances with smaller
+    time step dt_sim and keeps u_j constant.
+    """
+    ratio = dt_control / dt_sim
+    n_substeps = int(round(ratio))
+
+    if abs(ratio - n_substeps) > 1e-10:
+        raise ValueError(
+            f"dt_control / dt_sim must be an integer. "
+            f"Got {dt_control} / {dt_sim} = {ratio}"
+        )
+
+    infos = []
+    z_guess = None
+    current_state = state
+
+    for _ in range(n_substeps):
+        next_state, info, z = lgvi_one_step(
+            model=model,
+            h=dt_sim,
+            state=current_state,
+            u_k=float(u_j),
+            z_guess=z_guess,
+            root_tol=root_tol,
+            maxfev=maxfev,
+        )
+
+        infos.append(info)
+
+        # Warm-start next implicit solve
+        z_guess = z
+        current_state = next_state
+
+    return current_state, infos
