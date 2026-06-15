@@ -1,42 +1,4 @@
-"""Planar Acrobot model in maximal coordinates on (R^2 x SO(2))^2.
-
-Conventions
------------
-Maximal-coordinate LGVI variables use absolute link attitudes R1, R2.  The
-body x-axis points along each link from the proximal joint to the distal joint.
-The fixed-base and elbow constraints are
-
-    phi0  = x1 + R1 rho10 - p0 = 0,
-    phi12 = x1 + R1 rho112 - x2 - R2 rho212 = 0.
-
-For the classical Acrobot continuous equations, we use the common relative
-coordinates
-
-    q = [theta1, theta2]^T,
-
-where theta1 is the shoulder angle and theta2 is the elbow relative angle.  The
-zero configuration has both links pointing directly downward.  Therefore the
-absolute SO(2) attitude angles used by the maximal-coordinate model are
-
-    alpha1 = theta1 - pi/2,
-    alpha2 = theta1 + theta2 - pi/2.
-
-The classical Acrobot actuation is a single scalar elbow torque u with
-relative-coordinate input matrix B=[0,1]^T.  In absolute-link virtual work this
-is tau=[-u,+u]^T.
-"""
-
-from __future__ import annotations
-
-from dataclasses import dataclass
-from typing import Callable, Optional, Tuple
-
-import numpy as np
-
-try:
-    from Acrobot.lie_group_so2 import R_so2, angle_from_R, cross2
-except ImportError:  # support running from inside Acrobot
-    from lie_group_so2 import R_so2, angle_from_R, cross2
+from Numerical_Simulation.lie_group_so2 import R_so2, angle_from_R, cross2
 
 
 @dataclass

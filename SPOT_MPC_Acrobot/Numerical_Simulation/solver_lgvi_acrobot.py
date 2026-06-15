@@ -305,58 +305,6 @@ def reconstruct_X_from_R(
     x2 = x1 + R1 @ model.rho112 - R2 @ model.rho212
     return np.r_[x1, x2]
 
-
-def make_lgvi_state_from_relative(
-    model: AcrobotSO2Model,
-    h: float,
-    q: np.ndarray,
-    qdot: np.ndarray,
-) -> AcrobotLGVIState:
-    """
-    Create an LGVI state from standard Acrobot coordinates.
-
-    q     = [theta1, theta2]
-    qdot  = [theta1dot, theta2dot]
-
-    The model uses absolute SO(2) attitudes:
-        alpha1 = theta1 - pi/2
-        alpha2 = theta1 + theta2 - pi/2
-
-    The previous F is approximated by:
-        F_{k-1} = exp(h * omega_k)
-    so that:
-        R_{k-1} = R_k F_{k-1}^T
-    """
-    q = np.asarray(q, dtype=float).reshape(2)
-    qdot = np.asarray(qdot, dtype=float).reshape(2)
-
-    alpha = model.absolute_angles_from_relative(q[0], q[1])
-    omega_abs = np.array(
-        [
-            qdot[0],
-            qdot[0] + qdot[1],
-        ],
-        dtype=float,
-    )
-
-    X, R1, R2, _ = model.positions_from_angles(alpha[0], alpha[1])
-
-    F1_prev = F_from_delta(h * omega_abs[0])
-    F2_prev = F_from_delta(h * omega_abs[1])
-
-    R1_prev = R1 @ F1_prev.T
-    R2_prev = R2 @ F2_prev.T
-    X_prev = reconstruct_X_from_R(model, R1_prev, R2_prev)
-
-    return AcrobotLGVIState(
-        X_prev=X_prev,
-        X=X,
-        R1=R1,
-        R2=R2,
-        F1_prev=F1_prev,
-        F2_prev=F2_prev,
-    )
-
 def lgvi_one_step(
     model: AcrobotSO2Model,
     h: float,
