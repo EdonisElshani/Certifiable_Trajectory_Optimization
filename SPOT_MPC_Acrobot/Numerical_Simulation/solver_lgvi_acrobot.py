@@ -37,18 +37,13 @@ class AcrobotReducedState:
     """
     Reduced Option-B state for the SDP-matching SO(2) acrobot simulator.
 
-    This state matches the reduced SDP logic:
+    R1, R2:
+        Absolute rotations at node k.
 
-        R1_k, R2_k:
-            absolute rotations at node k
+    F1_prev, F2_prev:
+        Previous step rotations F_{i,k-1}.
 
-        F1_prev, F2_prev:
-            previous step rotations F_{i,k-1}
-
-    No independent x or v variables are stored.
-
-    COM positions X can always be reconstructed from R1, R2 and the geometry
-    in model_acrobot_so2.py.
+    No independent x, v, or angular-rate state is stored.
     """
 
     R1: np.ndarray
@@ -64,7 +59,6 @@ class AcrobotReducedState:
 
 
 # Backward-compatible name.
-# The state is now reduced, but this alias prevents older imports from exploding.
 AcrobotLGVIState = AcrobotReducedState
 
 
@@ -83,9 +77,6 @@ class LGVIStepInfo:
 def _require_option_b_model(model: AcrobotSO2Model) -> None:
     """
     Check that the model file contains the Option-B reduced dynamics methods.
-
-    If this fails, your model_acrobot_so2.py is still the old geometry-only file
-    or an older maximal-coordinate version.
     """
     required = [
         "reduced_step_residual",
@@ -93,6 +84,7 @@ def _require_option_b_model(model: AcrobotSO2Model) -> None:
         "advance_reduced_state",
         "reconstruct_positions_from_rotations",
         "scalars_from_step_rotation",
+        "scalars_from_rotation",
         "angles_from_rotations",
     ]
 
@@ -109,39 +101,26 @@ def _require_option_b_model(model: AcrobotSO2Model) -> None:
 def make_model_from_params(params: Mapping[str, Any]) -> AcrobotSO2Model:
     """
     Build numerical simulation model from the shared YAML-derived params dict.
-
-    This is the bridge:
-
-        YAML -> config_loader.py -> params -> AcrobotSO2Model
-
-    So the physical parameters are changed only in the YAML file.
     """
     return AcrobotSO2Model.from_params_dict(params)
 
 
-def _get_nested_or_flat(
-    params: Mapping[str, Any],
-    flat_key: str,
-    block_key: str,
-    nested_key: str,
-    default: Optional[float] = None,
-) -> float:
+def _get_time_step(params: Mapping[str, Any], h_key: str) -> float:
     """
-    Helper for supporting both flattened config_loader params and raw YAML.
+    Support flattened params and, as fallback, raw YAML-style params.
     """
-    if flat_key in params:
-        return float(params[flat_key])
+    if h_key in params:
+        return float(params[h_key])
 
-    block = params.get(block_key, {})
-    if isinstance(block, Mapping) and nested_key in block:
-        return float(block[nested_key])
+    if "time" in params and isinstance(params["time"], Mapping):
+        if h_key in params["time"]:
+            return float(params["time"][h_key])
 
-    if default is not None:
-        return float(default)
+    if "dt" in params:
+        return float(params["dt"])
 
     raise KeyError(
-        f"Could not find '{flat_key}' in flattened params or "
-        f"'{block_key}.{nested_key}' in raw YAML."
+        f"Could not find time step '{h_key}', 'time.{h_key}', or fallback key 'dt'."
     )
 
 
@@ -149,28 +128,29 @@ def make_reduced_state_from_absolute(
     model: AcrobotSO2Model,
     h: float,
     thetaR: np.ndarray,
-    thetaRdot: np.ndarray,
+    thetaF: np.ndarray,
 ) -> AcrobotReducedState:
     """
-    Create reduced state from absolute body-frame angles.
+    Create reduced state from absolute R angles and previous F step angles.
 
     thetaR:
         [thetaR1, thetaR2]
 
-    thetaRdot:
-        [thetaR1dot, thetaR2dot]
+    thetaF:
+        [thetaF1, thetaF2]
 
-    Important:
-        No relative acrobot angles are used.
-        There is no thetaR2 = theta1 + theta2 conversion here.
+    The argument h is kept for call compatibility; thetaF already represents the
+    step angle of F for the chosen time step.
     """
+    _require_option_b_model(model)
+
     thetaR = np.asarray(thetaR, dtype=float).reshape(2)
-    thetaRdot = np.asarray(thetaRdot, dtype=float).reshape(2)
+    thetaF = np.asarray(thetaF, dtype=float).reshape(2)
 
     R1, R2 = model.rotations_from_angles(thetaR[0], thetaR[1])
 
-    F1_prev = F_from_delta(float(h) * thetaRdot[0])
-    F2_prev = F_from_delta(float(h) * thetaRdot[1])
+    F1_prev = F_from_delta(thetaF[0])
+    F2_prev = F_from_delta(thetaF[1])
 
     return AcrobotReducedState(
         R1=R1,
@@ -186,73 +166,47 @@ def make_initial_state_from_params(
     h_key: str = "dt_sim",
 ) -> Tuple[AcrobotSO2Model, AcrobotReducedState]:
     """
-    Build initial model and reduced state from the YAML-derived params.
+    Build initial model and reduced state from params.
 
-    Expected flattened keys from config_loader.py:
+    Uses the old thesis convention:
+        thetaR1_0, thetaR2_0
+        thetaF1_0, thetaF2_0
 
-        thetaR1_0
-        thetaR2_0
-        thetaR1dot_0
-        thetaR2dot_0
-        dt_sim
-
-    Also supports raw YAML style:
-
-        initial:
-          thetaR1_deg: ...
-          thetaR2_deg: ...
-          thetaR1dot: ...
-          thetaR2dot: ...
-
-        time:
-          dt_sim: ...
+    thetaF_i,0 is the step angle of F_i,0 from the YAML-derived params.
     """
     if model is None:
         model = make_model_from_params(params)
 
     _require_option_b_model(model)
 
-    if h_key in params:
-        h = float(params[h_key])
-    elif "time" in params and isinstance(params["time"], Mapping) and h_key in params["time"]:
-        h = float(params["time"][h_key])
-    elif "dt" in params:
-        h = float(params["dt"])
-    else:
-        raise KeyError(
-            f"Could not find time step '{h_key}' or fallback key 'dt' in params."
-        )
+    h = _get_time_step(params, h_key)
 
-    if "thetaR1_0" in params and "thetaR2_0" in params:
-        thetaR = np.array(
-            [
-                float(params["thetaR1_0"]),
-                float(params["thetaR2_0"]),
-            ],
-            dtype=float,
-        )
-    else:
-        thetaR = np.array(
-            [
-                np.deg2rad(_get_nested_or_flat(params, "thetaR1_deg", "initial", "thetaR1_deg")),
-                np.deg2rad(_get_nested_or_flat(params, "thetaR2_deg", "initial", "thetaR2_deg")),
-            ],
-            dtype=float,
-        )
-
-    thetaRdot = np.array(
+    thetaR = np.array(
         [
-            _get_nested_or_flat(params, "thetaR1dot_0", "initial", "thetaR1dot", default=0.0),
-            _get_nested_or_flat(params, "thetaR2dot_0", "initial", "thetaR2dot", default=0.0),
+            float(params["thetaR1_0"]),
+            float(params["thetaR2_0"]),
         ],
         dtype=float,
     )
+
+    thetaF_sdp = np.array(
+        [
+            float(params["thetaF1_0"]),
+            float(params["thetaF2_0"]),
+        ],
+        dtype=float,
+    )
+
+    # thetaF_i,0 is defined for dt_sdp. If we initialize a fine simulator with
+    # dt_sim, rescale the step angle so the physical motion is consistent.
+    h_ref = float(params.get("dt_sdp", h))
+    thetaF_for_h = thetaF_sdp * (h / h_ref)
 
     state = make_reduced_state_from_absolute(
         model=model,
         h=h,
         thetaR=thetaR,
-        thetaRdot=thetaRdot,
+        thetaF=thetaF_for_h,
     )
 
     return model, state
@@ -292,8 +246,8 @@ def _normalize_reduced_residual(
 
     rot_scale = max(
         1.0,
-        abs(model.J1),
-        abs(model.J2),
+        abs(model.rot_inertia_1),
+        abs(model.rot_inertia_2),
     )
 
     scale = np.array(
@@ -328,7 +282,6 @@ def acrobot_reduced_step_residual(
     Reduced one-step residual matching the SDP dynamics.
 
     Unknown vector:
-
         z = [
             a1_k,
             b1_k,
@@ -344,8 +297,6 @@ def acrobot_reduced_step_residual(
         4 reduced translational dynamics
         2 reduced rotational dynamics
         2 SO(2) step constraints
-
-    No X_next is solved.
     """
     _require_option_b_model(model)
 
@@ -401,18 +352,13 @@ def lgvi_one_step(
     Propagate the reduced acrobot by one SDP-matching implicit step.
 
     Input state at node k:
-
         R1_k, R2_k, F1_{k-1}, F2_{k-1}
 
     Unknown solved by scipy.root:
-
         z = [a1_k, b1_k, a2_k, b2_k, lam0x, lam0y, lam12x, lam12y]
 
     Output state at node k+1:
-
         R1_{k+1}, R2_{k+1}, F1_k, F2_k
-
-    This is the correct Option-B replacement for the old X_next-based solver.
     """
     _require_option_b_model(model)
 
@@ -498,16 +444,8 @@ def rollout_lgvi_controls(
     """
     Roll out reduced SDP-matching dynamics for a given torque sequence.
 
-    This keeps the old function name `rollout_lgvi_controls` so your surrounding
-    code does not need to change immediately.
-
-    Internally, this is now Option B:
-
-        state = (R1, R2, F1_prev, F2_prev)
-
-    not:
-
-        state = (X_prev, X, R1, R2, F1_prev, F2_prev)
+    State:
+        (R1, R2, F1_prev, F2_prev)
     """
     _require_option_b_model(model)
 
@@ -523,7 +461,7 @@ def rollout_lgvi_controls(
     X = np.zeros((num_steps + 1, 4), dtype=float)
 
     thetaR = np.zeros((num_steps + 1, 2), dtype=float)
-    dtheta = np.zeros((num_steps, 2), dtype=float)
+    thetaF = np.zeros((num_steps, 2), dtype=float)
 
     lam0 = np.zeros((num_steps, 2), dtype=float)
     lam12 = np.zeros((num_steps, 2), dtype=float)
@@ -570,8 +508,8 @@ def rollout_lgvi_controls(
             state_next.R2,
         )
 
-        dtheta[k, 0] = angle_from_R(F1_k)
-        dtheta[k, 1] = angle_from_R(F2_k)
+        thetaF[k, 0] = angle_from_R(F1_k)
+        thetaF[k, 1] = angle_from_R(F2_k)
 
         lam0[k] = lam0_k
         lam12[k] = lam12_k
@@ -593,7 +531,7 @@ def rollout_lgvi_controls(
         "F1": F1,
         "F2": F2,
         "thetaR": thetaR,
-        "dtheta": dtheta,
+        "thetaF": thetaF,
         "lambda0": lam0,
         "lambda12": lam12,
         "u": u_sequence,
@@ -619,21 +557,9 @@ def simulate_one_control_interval(
     Simulate one MPC control interval.
 
     The SDP provides one control input u_j for:
-
         [t_j, t_j + dt_control]
 
     The simulator applies this constant torque over many small dt_sim steps.
-
-    Example:
-        dt_control = 0.1
-        dt_sim     = 0.001
-
-    Then:
-        n_substeps = 100
-
-    Important:
-        Do not scale u_j by 100.
-        The smaller h = dt_sim is already used inside the reduced dynamics.
     """
     _require_option_b_model(model)
 
@@ -677,15 +603,6 @@ def simulate_one_control_interval_from_params(
 ) -> Tuple[AcrobotReducedState, Dict[str, Any]]:
     """
     Convenience wrapper using YAML-derived params.
-
-    Expected keys:
-        dt_sim
-        control_interval
-
-    Raw YAML fallback:
-        time:
-          dt_sim
-          control_interval
     """
     if "dt_sim" in params:
         dt_sim = float(params["dt_sim"])
@@ -715,7 +632,7 @@ def simulate_lgvi_acrobot(
     h: float,
     steps: int,
     alpha0: np.ndarray,
-    omega0: np.ndarray,
+    thetaF0: Optional[np.ndarray] = None,
     u_fun: Optional[Any] = None,
     first_step: str = "reduced",
     root_tol: float = 1e-10,
@@ -725,24 +642,15 @@ def simulate_lgvi_acrobot(
     """
     Backward-compatible rollout interface.
 
-    This no longer uses RK4 or minimal-coordinate dynamics.
+    Initializes the reduced state from:
+        alpha0  = absolute R angles [thetaR1, thetaR2]
+        thetaF0 = initial F step angles [thetaF1, thetaF2]
 
-    It initializes the reduced state from absolute angles and absolute angular
-    velocities, then rolls out the Option-B reduced SDP-matching dynamics.
+    If thetaF0 is omitted, rest start is used:
+        F1_prev = I
+        F2_prev = I
 
-    Parameters
-    ----------
-    alpha0:
-        Absolute initial angles [thetaR1, thetaR2].
-
-    omega0:
-        Absolute angular velocities [thetaR1dot, thetaR2dot].
-
-    u_fun:
-        Optional function u_fun(t).
-
-    first_step:
-        Kept only for backward compatibility. Ignored.
+    first_step is kept only for compatibility and is ignored.
     """
     if steps < 1:
         raise ValueError("steps must be at least 1")
@@ -753,11 +661,14 @@ def simulate_lgvi_acrobot(
             "Using reduced Option-B initialization."
         )
 
+    if thetaF0 is None:
+        thetaF0 = np.zeros(2, dtype=float)
+
     initial_state = make_reduced_state_from_absolute(
         model=model,
         h=h,
         thetaR=np.asarray(alpha0, dtype=float).reshape(2),
-        thetaRdot=np.asarray(omega0, dtype=float).reshape(2),
+        thetaF=np.asarray(thetaF0, dtype=float).reshape(2),
     )
 
     if u_fun is None:
@@ -786,33 +697,23 @@ def simulate_lgvi_acrobot(
     return sim
 
 
-def get_absolute_angles_and_rates(
+def get_absolute_angles_and_step_angles(
     state: AcrobotReducedState,
-    h: float,
 ) -> Dict[str, float]:
     """
-    Extract absolute angles and approximate angular rates from reduced state.
-
-    thetaR_i:
-        angle from R_i
-
-    thetaRdot_i:
-        approximated from previous step:
-            thetaRdot_i ~= angle(F_i_prev) / h
+    Extract absolute R angles and previous F step angles from reduced state.
     """
-    h = float(h)
-
     thetaR1 = float(angle_from_R(state.R1))
     thetaR2 = float(angle_from_R(state.R2))
 
-    thetaR1dot = float(angle_from_R(state.F1_prev)) / h
-    thetaR2dot = float(angle_from_R(state.F2_prev)) / h
+    thetaF1_prev = float(angle_from_R(state.F1_prev))
+    thetaF2_prev = float(angle_from_R(state.F2_prev))
 
     return {
         "thetaR1": thetaR1,
         "thetaR2": thetaR2,
-        "thetaR1dot": thetaR1dot,
-        "thetaR2dot": thetaR2dot,
+        "thetaF1_prev": thetaF1_prev,
+        "thetaF2_prev": thetaF2_prev,
     }
 
 
@@ -824,33 +725,39 @@ def convert_state_to_sdp_initial(
     """
     Convert a fine simulation state into an SDP-compatible initial state.
 
-    Why:
-        The physical MPC rollout may use dt_sim = 0.001.
-        The SDP prediction may use dt_sdp = 0.1.
+    The rotations R1, R2 are unchanged.
 
-    The rotations R1, R2 are unchanged, but the previous F must encode the
-    same angular velocity over the larger SDP step:
-
-        omega_i ~= angle(F_i_prev_sim) / dt_sim
-        F_i_prev_sdp = exp(dt_sdp * omega_i)
+    The previous F values are rescaled from the fine simulation step to the SDP
+    step. This keeps the same physical incremental motion over the larger SDP
+    step.
     """
-    rates = get_absolute_angles_and_rates(
-        state=state,
-        h=dt_physical,
-    )
+    dt_physical = float(dt_physical)
+    dt_sdp = float(dt_sdp)
 
-    F1_prev_sdp = F_from_delta(float(dt_sdp) * rates["thetaR1dot"])
-    F2_prev_sdp = F_from_delta(float(dt_sdp) * rates["thetaR2dot"])
+    values = get_absolute_angles_and_step_angles(state)
+
+    thetaF1_physical = values["thetaF1_prev"]
+    thetaF2_physical = values["thetaF2_prev"]
+
+    scale = dt_sdp / dt_physical
+
+    thetaF1_sdp = thetaF1_physical * scale
+    thetaF2_sdp = thetaF2_physical * scale
+
+    F1_prev_sdp = F_from_delta(thetaF1_sdp)
+    F2_prev_sdp = F_from_delta(thetaF2_sdp)
 
     return {
         "R1": state.R1.copy(),
         "R2": state.R2.copy(),
         "F1_prev": F1_prev_sdp,
         "F2_prev": F2_prev_sdp,
-        "thetaR1": rates["thetaR1"],
-        "thetaR2": rates["thetaR2"],
-        "thetaR1dot": rates["thetaR1dot"],
-        "thetaR2dot": rates["thetaR2dot"],
+        "thetaR1": values["thetaR1"],
+        "thetaR2": values["thetaR2"],
+        "thetaF1_prev": thetaF1_sdp,
+        "thetaF2_prev": thetaF2_sdp,
+        "thetaF1_physical": thetaF1_physical,
+        "thetaF2_physical": thetaF2_physical,
     }
 
 
@@ -888,18 +795,26 @@ def convert_state_to_sdp_initial_scalars(
     a2_prev, b2_prev = model.scalars_from_step_rotation(F2_prev)
 
     return {
-        "c1_0": c1_0,
-        "s1_0": s1_0,
-        "c2_0": c2_0,
-        "s2_0": s2_0,
-        "a1_prev": a1_prev,
-        "b1_prev": b1_prev,
-        "a2_prev": a2_prev,
-        "b2_prev": b2_prev,
+        # These names are kept for compatibility with solve.py.
+        # They mean current physical state, later placed at SDP node 1.
+        "c1_0": float(c1_0),
+        "s1_0": float(s1_0),
+        "c2_0": float(c2_0),
+        "s2_0": float(s2_0),
+
+        # Previous step F for the next SDP.
+        "a1_prev": float(a1_prev),
+        "b1_prev": float(b1_prev),
+        "a2_prev": float(a2_prev),
+        "b2_prev": float(b2_prev),
+
+        # Diagnostics only.
         "thetaR1": float(converted["thetaR1"]),
         "thetaR2": float(converted["thetaR2"]),
-        "thetaR1dot": float(converted["thetaR1dot"]),
-        "thetaR2dot": float(converted["thetaR2dot"]),
+        "thetaF1_prev": float(converted["thetaF1_prev"]),
+        "thetaF2_prev": float(converted["thetaF2_prev"]),
+        "thetaF1_physical": float(converted["thetaF1_physical"]),
+        "thetaF2_physical": float(converted["thetaF2_physical"]),
     }
 
 
@@ -914,7 +829,7 @@ def diagnostics_lgvi(
         holonomic constraint norms from reconstructed X,
         SO(2) orthogonality/determinant errors,
         absolute angles,
-        approximate angular rates,
+        previous-step angles,
         approximate energy if model provides energy_from_reduced_state.
     """
     R1 = np.asarray(sim["R1"], dtype=float)
@@ -922,12 +837,9 @@ def diagnostics_lgvi(
     F1 = np.asarray(sim["F1"], dtype=float)
     F2 = np.asarray(sim["F2"], dtype=float)
     X = np.asarray(sim["X"], dtype=float)
-    t = np.asarray(sim["t"], dtype=float)
 
     num_nodes = R1.shape[0]
     num_steps = max(0, num_nodes - 1)
-
-    h = float(t[1] - t[0]) if len(t) > 1 else 1.0
 
     phi_norm = np.zeros(num_nodes, dtype=float)
     phi0_norm = np.zeros(num_nodes, dtype=float)
@@ -956,12 +868,12 @@ def diagnostics_lgvi(
 
         thetaR[k] = model.angles_from_rotations(R1[k], R2[k])
 
-    omega = np.zeros((num_steps, 2), dtype=float)
+    thetaF = np.zeros((num_steps, 2), dtype=float)
     energy = np.full(num_steps, np.nan, dtype=float)
 
     for k in range(num_steps):
-        omega[k, 0] = float(angle_from_R(F1[k])) / h
-        omega[k, 1] = float(angle_from_R(F2[k])) / h
+        thetaF[k, 0] = float(angle_from_R(F1[k]))
+        thetaF[k, 1] = float(angle_from_R(F2[k]))
 
         if hasattr(model, "energy_from_reduced_state"):
             energy[k] = model.energy_from_reduced_state(
@@ -969,7 +881,7 @@ def diagnostics_lgvi(
                 R2=R2[k],
                 F1_prev=F1[k],
                 F2_prev=F2[k],
-                h=h,
+                h=float(sim["t"][1] - sim["t"][0]) if len(sim.get("t", [])) > 1 else 1.0,
             )
 
     if num_steps > 0 and np.isfinite(energy[0]):
@@ -986,7 +898,7 @@ def diagnostics_lgvi(
         "det_R1": det_R1,
         "det_R2": det_R2,
         "thetaR": thetaR,
-        "omega": omega,
+        "thetaF": thetaF,
         "energy": energy,
         "energy_error": energy_error,
     }
@@ -1003,12 +915,12 @@ def print_step_summary(
     """
     X = reconstruct_X_from_R(model, state.R1, state.R2)
     theta = model.angles_from_rotations(state.R1, state.R2)
-    rates = get_absolute_angles_and_rates(state, h=h)
+    step = get_absolute_angles_and_step_angles(state)
 
     print(f"[{label}]")
     print(f"  thetaR1 = {theta[0]: .6f} rad, {np.rad2deg(theta[0]): .3f} deg")
     print(f"  thetaR2 = {theta[1]: .6f} rad, {np.rad2deg(theta[1]): .3f} deg")
-    print(f"  thetaR1dot ~= {rates['thetaR1dot']: .6f} rad/s")
-    print(f"  thetaR2dot ~= {rates['thetaR2dot']: .6f} rad/s")
+    print(f"  thetaF1_prev = {step['thetaF1_prev']: .6f} rad")
+    print(f"  thetaF2_prev = {step['thetaF2_prev']: .6f} rad")
     print(f"  X = {X}")
     print(f"  constraint norm = {model.constraint_norm(X, state.R1, state.R2):.3e}")

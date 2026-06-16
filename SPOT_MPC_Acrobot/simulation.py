@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 import numpy as np
 
+from config.config_loader import build_common_params, load_yaml_config
 from Numerical_Simulation.Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import (
     AcrobotSO2Model,
-    AcrobotSO2Params,
 )
 from Numerical_Simulation.solver_lgvi_acrobot import (
     make_lgvi_state_from_relative,
@@ -19,22 +19,11 @@ def main() -> None:
     # ------------------------------------------------------------
     # Parameters
     # ------------------------------------------------------------
-    h = 0.05
+    yaml_path = Path(__file__).resolve().parent / "config" / "acrobot_physical.yaml"
+    shared_params = build_common_params(load_yaml_config(yaml_path))
+    h = float(shared_params["dt_sdp"])
 
-    params = AcrobotSO2Params(
-        m1=1.0,
-        m2=1.0,
-        l1=0.5,
-        l2=0.5,
-        lc1=0.25,
-        lc2=0.25,
-        J1=(1.0 / 12.0) * 1.0 * 0.5**2,
-        J2=(1.0 / 12.0) * 1.0 * 0.5**2,
-        g=9.81,
-        p0=(0.0, 0.0),
-    )
-
-    model = AcrobotSO2Model(params)
+    model = AcrobotSO2Model.from_params_dict(shared_params)
 
     # ------------------------------------------------------------
     # Initial condition in relative Acrobot coordinates

@@ -1,70 +1,114 @@
-def get_cliques_for_cstss(N, params):
+# SDP/cliques.py
+
+from __future__ import annotations
+
+import numpy as np
+
+
+def _dedupe_keep_order(items):
+    out = []
+    seen = set()
+
+    for item in items:
+        if item not in seen:
+            out.append(item)
+            seen.add(item)
+
+    return out
+
+
+def get_cliques_for_cstss(N: int, params: dict):
     """
-    Conservative 21-variable SELF cliques for the reduced x-free/v-free Acrobot.
+    Conservative SELF cliques for the reduced Acrobot.
 
-    Interior clique I_k, k=1,...,N-1:
-        {R_{1,k-1}, R_{2,k-1}, R_{1,k}, R_{2,k},
-         F_{1,k-1}, F_{2,k-1}, F_{1,k}, F_{2,k},
-         lambda_{0,k}, lambda_{12,k}, u_k}
+    Interior dynamics at k = 1,...,N-1 depend on:
 
-    with R_i=(c_i,s_i), F_i=(a_i,b_i), lambda_0,lambda_12 in R^2.
-    Size: 4 + 4 + 4 + 4 + 4 + 1 = 21.
+        R_{k-1}, R_k,
+        F_{k-1}, F_k,
+        lambda_k,
+        u_k.
 
-    A small terminal clique is added to cover R_N, F_{N-1}, terminal objective,
-    and the final kinematics R_N = R_{N-1}F_{N-1}. The largest clique stays 21.
+    We also add small kinematic endpoint cliques.
     """
-    id_func = params['id']
+    idf = params["id"]
     cliques = []
 
     def vid(prefix, k):
-        return id_func(prefix, k)
+        return idf(prefix, k)
 
-    def dedupe_keep_order(items):
-        out, seen = [], set()
-        for item in items:
-            if item not in seen:
-                out.append(item)
-                seen.add(item)
-        return out
+    # Initial/MPC boundary clique: R0, F0, R1.
+    init_clique = [
+        vid("c1", 0),
+        vid("s1", 0),
+        vid("c2", 0),
+        vid("s2", 0),
+        vid("a1", 0),
+        vid("b1", 0),
+        vid("a2", 0),
+        vid("b2", 0),
+        vid("c1", 1),
+        vid("s1", 1),
+        vid("c2", 1),
+        vid("s2", 1),
+    ]
+    cliques.append(_dedupe_keep_order(init_clique))
 
+    # Interior dynamics cliques.
     for k in range(1, N):
         clique = [
-            # R_{1,k-1}, R_{2,k-1}
-            vid("c1", k - 1), vid("s1", k - 1),
-            vid("c2", k - 1), vid("s2", k - 1),
+            # R_{k-1}
+            vid("c1", k - 1),
+            vid("s1", k - 1),
+            vid("c2", k - 1),
+            vid("s2", k - 1),
 
-            # R_{1,k}, R_{2,k}
-            vid("c1", k), vid("s1", k),
-            vid("c2", k), vid("s2", k),
+            # R_k
+            vid("c1", k),
+            vid("s1", k),
+            vid("c2", k),
+            vid("s2", k),
 
-            # F_{1,k-1}, F_{2,k-1}
-            vid("a1", k - 1), vid("b1", k - 1),
-            vid("a2", k - 1), vid("b2", k - 1),
+            # F_{k-1}
+            vid("a1", k - 1),
+            vid("b1", k - 1),
+            vid("a2", k - 1),
+            vid("b2", k - 1),
 
-            # F_{1,k}, F_{2,k}
-            vid("a1", k), vid("b1", k),
-            vid("a2", k), vid("b2", k),
+            # F_k
+            vid("a1", k),
+            vid("b1", k),
+            vid("a2", k),
+            vid("b2", k),
 
-            # multipliers and control at k
-            vid("lam0x", k), vid("lam0y", k),
-            vid("lam12x", k), vid("lam12y", k),
+            # lambda_k and u_k
+            vid("lam0x", k),
+            vid("lam0y", k),
+            vid("lam12x", k),
+            vid("lam12y", k),
             vid("u", k),
         ]
-        cliques.append(dedupe_keep_order(clique))
+        cliques.append(_dedupe_keep_order(clique))
 
-    # terminal / kinematics endpoint clique for R_N and F_{N-1}
-    if N >= 1:
-        terminal = [
-            vid("c1", N - 1), vid("s1", N - 1),
-            vid("c2", N - 1), vid("s2", N - 1),
-            vid("c1", N), vid("s1", N),
-            vid("c2", N), vid("s2", N),
-            vid("a1", N - 1), vid("b1", N - 1),
-            vid("a2", N - 1), vid("b2", N - 1),
-        ]
-        cliques.append(dedupe_keep_order(terminal))
+    # Terminal kinematics / terminal objective clique.
+    terminal_clique = [
+        vid("c1", N - 1),
+        vid("s1", N - 1),
+        vid("c2", N - 1),
+        vid("s2", N - 1),
+        vid("a1", N - 1),
+        vid("b1", N - 1),
+        vid("a2", N - 1),
+        vid("b2", N - 1),
+        vid("c1", N),
+        vid("s1", N),
+        vid("c2", N),
+        vid("s2", N),
+    ]
+    cliques.append(_dedupe_keep_order(terminal_clique))
 
-    unique_cliques, seen = [], set()
+    unique_cliques = []
+    seen = set()
+
     for clique in cliques:
         key = tuple(clique)
         if key not in seen:
@@ -72,17 +116,20 @@ def get_cliques_for_cstss(N, params):
             seen.add(key)
 
     sizes = [len(c) for c in unique_cliques]
+
     print("\n" + "=" * 80)
-    print("SELF CLIQUE DEBUG: reduced conservative 21-variable cliques")
+    print("SELF CLIQUE DEBUG: reduced Acrobot cliques")
     print("=" * 80)
     print(f"number of SELF cliques: {len(unique_cliques)}")
+
     if sizes:
-        print(f"min clique size:        {min(sizes)}")
-        print(f"max clique size:        {max(sizes)}")
-        print(f"mean clique size:       {np.mean(sizes):.2f}")
-        print(f"largest clique sizes:   {sorted(sizes)[-20:]}")
+        print(f"min clique size:      {min(sizes)}")
+        print(f"max clique size:      {max(sizes)}")
+        print(f"mean clique size:     {np.mean(sizes):.2f}")
+        print(f"largest clique sizes: {sorted(sizes)[-20:]}")
     else:
-        print("No SELF cliques created. This happens if N < 1.")
+        print("No cliques created.")
+
     print("=" * 80 + "\n")
 
     return unique_cliques

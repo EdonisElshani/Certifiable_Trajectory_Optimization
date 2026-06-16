@@ -12,11 +12,8 @@ physical:
   l1: 0.5
   l2: 0.5
 
-  lc1: 0.25
-  lc2: 0.25
-
-  J1: 0.020833333333333332
-  J2: 0.020833333333333332
+  deltaJ1: 0.02
+  deltaJ2: 0.02
 
   g: 9.81
 
@@ -26,28 +23,30 @@ physical:
 
 time:
   dt_sdp: 0.1
-  dt_sim: 0.001
+  dt_sim: 0.1
   control_interval: 0.1
 
 initial:
   thetaR1_deg: 5.0
   thetaR2_deg: 5.0
-  thetaR1dot: 0.0
-  thetaR2dot: 0.0
+  thetaF1_deg: 0.0
+  thetaF2_deg: 0.0
 
 target:
   thetaR1_deg: 180.0
   thetaR2_deg: 180.0
+  thetaF1_deg: 0.0
+  thetaF2_deg: 0.0
 
 bounds:
   u_max: 15.0
-  lambda_max: 100.0
-  max_step_angle_deg: 20.0
+  lambda_max: 10.0
+  max_step_angle_deg: 23.0
 
 sdp:
-  horizon_N: 5
+  horizon_N: 3
   relaxation_order: 2
-  clique_mode: "self"
+  clique_mode: "SELF"
   extraction: "ordered"
 
 cost:
@@ -58,4 +57,4 @@ cost:
   gamma: 50.0
 
 scaling:
-  lambda_scale: 1.0
+  lambda_scale: 4.0

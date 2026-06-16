@@ -1,6 +1,23 @@
-def extract_solution_variables(v_opt, var_start_dict, N, id_func, params=None):
-    """Extract reduced variables and reconstruct x1/x2 from c,s."""
-    solution_dict = {
+from __future__ import annotations
+
+from typing import Any, Dict
+
+import numpy as np
+
+from SDP.constraints import reconstruct_positions_from_cs
+from SDP.objective import evaluate_objective_from_vector
+
+
+def extract_solution_variables(v_opt, params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract reduced SDP variables into structured dictionaries.
+
+    lambda and u exist only for k = 1,...,N-1.
+    """
+    N = int(params["N"])
+    idf = params["id"]
+
+    sol = {
         "x1": {},
         "x2": {},
         "R1": {},
@@ -10,184 +27,154 @@ def extract_solution_variables(v_opt, var_start_dict, N, id_func, params=None):
         "lambda0": {},
         "lambda12": {},
         "u": {},
-        "theta1": {},
-        "theta2": {},
+        "thetaR1": {},
+        "thetaR2": {},
         "step_theta1": {},
         "step_theta2": {},
     }
 
     for k in range(N + 1):
-        c1 = v_opt[id_func("c1", k) - 1]
-        s1 = v_opt[id_func("s1", k) - 1]
-        c2 = v_opt[id_func("c2", k) - 1]
-        s2 = v_opt[id_func("s2", k) - 1]
+        c1 = float(v_opt[idf("c1", k) - 1])
+        s1 = float(v_opt[idf("s1", k) - 1])
+        c2 = float(v_opt[idf("c2", k) - 1])
+        s2 = float(v_opt[idf("s2", k) - 1])
 
-        if params is not None:
-            x1_obj, x2_obj = reconstruct_positions_from_cs(c1, s1, c2, s2, params)
-            x1 = np.array(x1_obj, dtype=float)
-            x2 = np.array(x2_obj, dtype=float)
-        else:
-            x1 = np.array([np.nan, np.nan])
-            x2 = np.array([np.nan, np.nan])
+        x1_obj, x2_obj = reconstruct_positions_from_cs(c1, s1, c2, s2, params)
 
-        solution_dict["x1"][k] = x1
-        solution_dict["x2"][k] = x2
-        solution_dict["R1"][k] = np.array([[c1, -s1], [s1, c1]])
-        solution_dict["R2"][k] = np.array([[c2, -s2], [s2, c2]])
-        solution_dict["theta1"][k] = np.arctan2(s1, c1)
-        solution_dict["theta2"][k] = np.arctan2(s2, c2)
+        sol["x1"][k] = np.array(x1_obj, dtype=float)
+        sol["x2"][k] = np.array(x2_obj, dtype=float)
+
+        sol["R1"][k] = np.array([[c1, -s1], [s1, c1]], dtype=float)
+        sol["R2"][k] = np.array([[c2, -s2], [s2, c2]], dtype=float)
+
+        sol["thetaR1"][k] = float(np.arctan2(s1, c1))
+        sol["thetaR2"][k] = float(np.arctan2(s2, c2))
 
         if k < N:
-            a1 = v_opt[id_func("a1", k) - 1]
-            b1 = v_opt[id_func("b1", k) - 1]
-            a2 = v_opt[id_func("a2", k) - 1]
-            b2 = v_opt[id_func("b2", k) - 1]
+            a1 = float(v_opt[idf("a1", k) - 1])
+            b1 = float(v_opt[idf("b1", k) - 1])
+            a2 = float(v_opt[idf("a2", k) - 1])
+            b2 = float(v_opt[idf("b2", k) - 1])
 
-            solution_dict["F1"][k] = np.array([[a1, -b1], [b1, a1]])
-            solution_dict["F2"][k] = np.array([[a2, -b2], [b2, a2]])
-            solution_dict["step_theta1"][k] = np.arctan2(b1, a1)
-            solution_dict["step_theta2"][k] = np.arctan2(b2, a2)
+            sol["F1"][k] = np.array([[a1, -b1], [b1, a1]], dtype=float)
+            sol["F2"][k] = np.array([[a2, -b2], [b2, a2]], dtype=float)
+
+            sol["step_theta1"][k] = float(np.arctan2(b1, a1))
+            sol["step_theta2"][k] = float(np.arctan2(b2, a2))
 
         if 1 <= k < N:
-            solution_dict["lambda0"][k] = np.array([
-                v_opt[id_func("lam0x", k) - 1],
-                v_opt[id_func("lam0y", k) - 1],
-            ])
-            solution_dict["lambda12"][k] = np.array([
-                v_opt[id_func("lam12x", k) - 1],
-                v_opt[id_func("lam12y", k) - 1],
-            ])
-            solution_dict["u"][k] = v_opt[id_func("u", k) - 1]
+            sol["lambda0"][k] = np.array(
+                [
+                    float(v_opt[idf("lam0x", k) - 1]),
+                    float(v_opt[idf("lam0y", k) - 1]),
+                ],
+                dtype=float,
+            )
 
-    return solution_dict
+            sol["lambda12"][k] = np.array(
+                [
+                    float(v_opt[idf("lam12x", k) - 1]),
+                    float(v_opt[idf("lam12y", k) - 1]),
+                ],
+                dtype=float,
+            )
 
-def _fmt_array(arr, precision=8):
-    """Compact formatter for numpy arrays in the log file."""
-    if arr is None:
-        return "None"
-    return np.array2string(
-        np.asarray(arr, dtype=float),
-        precision=precision,
-        suppress_small=False,
-        separator=", ",
-        max_line_width=10_000,
-    )
+            sol["u"][k] = float(v_opt[idf("u", k) - 1])
+
+    return sol
 
 
-def write_extraction_trajectory_to_log(log_path, solutions, gap_info, errors_by_method, N, rank_info=None):
+def get_first_mpc_control(solution: Dict[str, Any]) -> float:
     """
-    Append detailed per-timestep trajectory values to log.txt for the relevant
-    extraction methods. This is mainly for thesis/debug analysis.
+    In thesis indexing, the first meaningful MPC control is u_1.
 
-    Logged for each available method in ['ordered', 'robust']:
-      - R1_k, R2_k for k = 0..N
-      - F1_k, F2_k for k = 0..N-1
-      - x1_k, x2_k for k = 0..N
-      - lambda0_k, lambda12_k for k = 1..N-1
-      - u_k for k = 1..N-1
+    This is the value applied in the numerical simulator over the next
+    control interval.
     """
-    methods_to_log = [m for m in ["ordered", "robust"] if m in solutions]
+    if 1 not in solution["u"]:
+        raise KeyError("Solution has no u[1]. Check that N >= 2 and extraction succeeded.")
 
-    with open(log_path, "a") as log_file:
-        log_file.write("\n" + "=" * 100 + "\n")
-        log_file.write("DETAILED EXTRACTED ACROBOT TRAJECTORIES\n")
-        log_file.write("=" * 100 + "\n")
+    return float(solution["u"][1])
 
-        if rank_info is not None:
-            summary = rank_info.get("summary", {})
-            blocks = rank_info.get("blocks", [])
-            log_file.write("\n" + "#" * 100 + "\n")
-            log_file.write("MOMENT MATRIX RANK / TIGHTNESS ANALYSIS\n")
-            log_file.write("#" * 100 + "\n")
-            log_file.write("Teng-style diagnostic: delta_21 = |lambda_2| / |lambda_1| per moment block.\n")
-            log_file.write("Small max delta_21 suggests rank-one/tight moment blocks.\n")
-            log_file.write(f"number of analyzed blocks:       {summary.get('num_blocks')}\n")
-            log_file.write(f"number of skipped blocks:        {summary.get('num_skipped_blocks')}\n")
-            log_file.write(f"max block dimension:             {summary.get('max_block_dim')}\n")
-            log_file.write(f"max numerical rank:              {summary.get('max_numerical_rank')}\n")
-            log_file.write(f"rank-one blocks:                 {summary.get('num_rank_one_blocks')} / {summary.get('num_blocks')}\n")
-            log_file.write(f"rank-one tolerance on delta_21:  {summary.get('rank_one_tol'):.12e}\n")
-            if summary.get("max_delta_21") is not None:
-                log_file.write(f"max delta_21:                    {summary.get('max_delta_21'):.12e}\n")
-                log_file.write(f"mean delta_21:                   {summary.get('mean_delta_21'):.12e}\n")
-                log_file.write(f"median delta_21:                 {summary.get('median_delta_21'):.12e}\n")
-                log_file.write(f"min eigenvalue over all blocks:  {summary.get('min_eig_over_all_blocks'):.12e}\n")
-                log_file.write(f"blocks with negative eig:        {summary.get('num_blocks_with_negative_eig')}\n")
 
-            if blocks:
-                log_file.write("\nWorst 20 blocks by delta_21:\n")
-                worst = sorted(blocks, key=lambda b: b["delta_21"], reverse=True)[:20]
-                for b in worst:
-                    log_file.write(
-                        f"  block {b['block_index']:4d}: dim={b['dim']:4d}, "
-                        f"rank={b['numerical_rank']:3d}, "
-                        f"delta_21={b['delta_21']:.12e}, "
-                        f"lambda1={b['lambda1_abs']:.12e}, "
-                        f"lambda2={b['lambda2_abs']:.12e}, "
-                        f"min_eig={b['min_eig']:.12e}\n"
-                    )
+def extract_sdp_initial_for_next_mpc(solution: Dict[str, Any]) -> Dict[str, float]:
+    """
+    If you want to use the SDP-predicted next state directly, this prepares
+    the next MPC boundary data.
 
-        if not methods_to_log:
-            log_file.write("No ordered or robust extraction available. Nothing to log here.\n")
-            return
+    Usually, for closed-loop MPC, prefer the numerical simulation output instead.
+    Humanity already suffers enough without feeding relaxed predictions as reality.
+    """
+    R1_cur = solution["R1"][2]
+    R2_cur = solution["R2"][2]
 
-        for method in methods_to_log:
-            sol = solutions[method]
-            log_file.write("\n" + "#" * 100 + "\n")
-            log_file.write(f"{method.upper()} EXTRACTION\n")
-            log_file.write("#" * 100 + "\n")
+    F1_prev = solution["F1"][1]
+    F2_prev = solution["F2"][1]
 
-            if method in gap_info:
-                gi = gap_info[method]
-                log_file.write("\nCandidate suboptimality gap:\n")
-                log_file.write(f"  SDP lower bound:     {gi['sdp_lower_bound']:.12e}\n")
-                log_file.write(f"  extracted objective: {gi['extracted_objective']:.12e}\n")
-                log_file.write(f"  absolute gap:        {gi['absolute_gap']:.12e}\n")
-                log_file.write(f"  relative gap:        {gi['relative_gap']:.12e}\n")
+    c1_current = float(R1_cur[0, 0])
+    s1_current = float(R1_cur[1, 0])
+    c2_current = float(R2_cur[0, 0])
+    s2_current = float(R2_cur[1, 0])
 
-            if method in errors_by_method:
-                err = errors_by_method[method]
-                log_file.write("\nSO(2) orthogonality errors, max over horizon:\n")
-                for key in ["R1", "R2", "F1", "F2"]:
-                    vals = err.get(key, [])
-                    if len(vals) > 0:
-                        log_file.write(f"  max {key}: {max(vals):.12e}\n")
+    a1_prev = float(F1_prev[0, 0])
+    b1_prev = float(F1_prev[1, 0])
+    a2_prev = float(F2_prev[0, 0])
+    b2_prev = float(F2_prev[1, 0])
 
-            log_file.write("\nPer-timestep values:\n")
-            log_file.write("- R1, R2 are 2x2 SO(2) matrices.\n")
-            log_file.write("- F1, F2 are relative step rotations and exist only for k = 0..N-1.\n")
-            log_file.write("- lambda0, lambda12 and u exist only for k = 1..N-1.\n")
+    return {
+        "c1_current": c1_current,
+        "s1_current": s1_current,
+        "c2_current": c2_current,
+        "s2_current": s2_current,
+        "a1_prev": a1_prev,
+        "b1_prev": b1_prev,
+        "a2_prev": a2_prev,
+        "b2_prev": b2_prev,
+    }
 
-            for k in range(N + 1):
-                log_file.write("\n" + "-" * 100 + "\n")
-                log_file.write(f"k = {k}\n")
-                log_file.write(f"theta1 = {sol['theta1'][k]:+.12e}\n")
-                log_file.write(f"theta2 = {sol['theta2'][k]:+.12e}\n")
-                log_file.write(f"x1     = {_fmt_array(sol['x1'][k])}\n")
-                log_file.write(f"x2     = {_fmt_array(sol['x2'][k])}\n")
-                log_file.write(f"R1     = {_fmt_array(sol['R1'][k])}\n")
-                log_file.write(f"R2     = {_fmt_array(sol['R2'][k])}\n")
 
-                if k < N:
-                    log_file.write(f"step_theta1 = {sol['step_theta1'][k]:+.12e}\n")
-                    log_file.write(f"step_theta2 = {sol['step_theta2'][k]:+.12e}\n")
-                    log_file.write(f"F1          = {_fmt_array(sol['F1'][k])}\n")
-                    log_file.write(f"F2          = {_fmt_array(sol['F2'][k])}\n")
-                else:
-                    log_file.write("step_theta1 = None\n")
-                    log_file.write("step_theta2 = None\n")
-                    log_file.write("F1          = None\n")
-                    log_file.write("F2          = None\n")
+def compute_SO2_errors(solution: Dict[str, Any], N: int) -> Dict[str, list]:
+    errors = {
+        "R1": [],
+        "R2": [],
+        "F1": [],
+        "F2": [],
+    }
 
-                if 1 <= k < N:
-                    log_file.write(f"lambda0     = {_fmt_array(sol['lambda0'][k])}\n")
-                    log_file.write(f"lambda12    = {_fmt_array(sol['lambda12'][k])}\n")
-                    log_file.write(f"u           = {float(sol['u'][k]):+.12e}\n")
-                else:
-                    log_file.write("lambda0     = None\n")
-                    log_file.write("lambda12    = None\n")
-                    log_file.write("u           = None\n")
+    I = np.eye(2)
 
-        log_file.write("\n" + "=" * 100 + "\n")
-        log_file.write("END DETAILED EXTRACTED ACROBOT TRAJECTORIES\n")
-        log_file.write("=" * 100 + "\n")
+    for k in range(N + 1):
+        R1 = solution["R1"][k]
+        R2 = solution["R2"][k]
+
+        errors["R1"].append(float(np.linalg.norm(R1.T @ R1 - I, ord="fro")))
+        errors["R2"].append(float(np.linalg.norm(R2.T @ R2 - I, ord="fro")))
+
+        if k < N:
+            F1 = solution["F1"][k]
+            F2 = solution["F2"][k]
+
+            errors["F1"].append(float(np.linalg.norm(F1.T @ F1 - I, ord="fro")))
+            errors["F2"].append(float(np.linalg.norm(F2.T @ F2 - I, ord="fro")))
+
+    return errors
+
+
+def build_gap_info(result, extracted_vectors: Dict[str, np.ndarray], params: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
+    sdp_lower_bound = float(np.asarray(result).squeeze())
+    gap_info = {}
+
+    for name, v_extracted in extracted_vectors.items():
+        extracted_obj = evaluate_objective_from_vector(v_extracted, params)
+
+        absolute_gap = extracted_obj - sdp_lower_bound
+        relative_gap = absolute_gap / max(1.0, abs(extracted_obj))
+
+        gap_info[name] = {
+            "sdp_lower_bound": sdp_lower_bound,
+            "extracted_objective": extracted_obj,
+            "absolute_gap": absolute_gap,
+            "relative_gap": relative_gap,
+        }
+
+    return gap_info

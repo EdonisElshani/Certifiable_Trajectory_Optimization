@@ -46,11 +46,8 @@ class AcrobotSO2Params:
     l1: float
     l2: float
 
-    lc1: float
-    lc2: float
-
-    J1: float
-    J2: float
+    deltaJ1: float
+    deltaJ2: float
 
     g: float
     p0: Tuple[float, float]
@@ -75,12 +72,6 @@ class AcrobotSO2Params:
         If rho vectors are not explicitly given, they are generated from
         the thesis convention:
 
-            rho_10  = [0,  lc1]
-            rho_112 = [0, -(l1 - lc1)]
-            rho_212 = [0,  lc2]
-
-        For uniform rods with lc1=l1/2 and lc2=l2/2 this is exactly:
-
             rho_10  = [0,  l1/2]
             rho_112 = [0, -l1/2]
             rho_212 = [0,  l2/2]
@@ -92,10 +83,8 @@ class AcrobotSO2Params:
             "m2",
             "l1",
             "l2",
-            "lc1",
-            "lc2",
-            "J1",
-            "J2",
+            "deltaJ1",
+            "deltaJ2",
             "g",
         ]
 
@@ -113,11 +102,8 @@ class AcrobotSO2Params:
         l1 = float(physical["l1"])
         l2 = float(physical["l2"])
 
-        lc1 = float(physical["lc1"])
-        lc2 = float(physical["lc2"])
-
-        J1 = float(physical["J1"])
-        J2 = float(physical["J2"])
+        deltaJ1 = float(physical["deltaJ1"])
+        deltaJ2 = float(physical["deltaJ2"])
 
         g = float(physical["g"])
 
@@ -132,17 +118,17 @@ class AcrobotSO2Params:
 
         rho10_value = physical.get(
             "rho_10",
-            physical.get("rho10", np.array([0.0, lc1], dtype=float)),
+            physical.get("rho10", np.array([0.0, 0.5 * l1], dtype=float)),
         )
 
         rho112_value = physical.get(
             "rho_112",
-            physical.get("rho112", np.array([0.0, -(l1 - lc1)], dtype=float)),
+            physical.get("rho112", np.array([0.0, -0.5 * l1], dtype=float)),
         )
 
         rho212_value = physical.get(
             "rho_212",
-            physical.get("rho212", np.array([0.0, lc2], dtype=float)),
+            physical.get("rho212", np.array([0.0, 0.5 * l2], dtype=float)),
         )
 
         rho10 = tuple(np.asarray(rho10_value, dtype=float).reshape(2))
@@ -154,10 +140,8 @@ class AcrobotSO2Params:
             m2=m2,
             l1=l1,
             l2=l2,
-            lc1=lc1,
-            lc2=lc2,
-            J1=J1,
-            J2=J2,
+            deltaJ1=deltaJ1,
+            deltaJ2=deltaJ2,
             g=g,
             p0=p0,
             rho10=rho10,
@@ -200,11 +184,8 @@ class AcrobotSO2Model:
         self.l1 = float(p.l1)
         self.l2 = float(p.l2)
 
-        self.lc1 = float(p.lc1)
-        self.lc2 = float(p.lc2)
-
-        self.J1 = float(p.J1)
-        self.J2 = float(p.J2)
+        self.deltaJ1 = float(p.deltaJ1)
+        self.deltaJ2 = float(p.deltaJ2)
 
         self.g = float(p.g)
 
@@ -236,9 +217,10 @@ class AcrobotSO2Model:
         self.d1_elbow = float(self.rho10[1] - self.rho112[1])
         self.d2_com = float(self.rho212[1])
 
-        # Lee-style nonstandard inertia matrices, only kept for diagnostics.
-        self.Jd1 = 0.5 * self.J1 * np.eye(2)
-        self.Jd2 = 0.5 * self.J2 * np.eye(2)
+        self.Jd1 = np.diag([self.deltaJ1, self.deltaJ1])
+        self.Jd2 = np.diag([self.deltaJ2, self.deltaJ2])
+        self.rot_inertia_1 = float(np.trace(self.Jd1))
+        self.rot_inertia_2 = float(np.trace(self.Jd2))
 
     @classmethod
     def from_params_dict(cls, params: Mapping[str, Any]) -> "AcrobotSO2Model":
@@ -686,16 +668,16 @@ class AcrobotSO2Model:
 
         Approximate discrete momentum:
 
-            Pi_i * h = J_i * b_i
+            Pi_i * h = trace(Jd_i) * b_i
 
         Dynamics:
 
             link 1:
-                J1*(b1_prev - b1_k)
+                trace(Jd1)*(b1_prev - b1_k)
                 + h^2*(mu1 - u_k) = 0
 
             link 2:
-                J2*(b2_prev - b2_k)
+                trace(Jd2)*(b2_prev - b2_k)
                 + h^2*(mu2 + u_k) = 0
 
         where:
@@ -718,8 +700,8 @@ class AcrobotSO2Model:
             lam12=lam12,
         )
 
-        res_rot1 = self.J1 * (b1_prev - b1_k) + h**2 * (mu1 - u_k)
-        res_rot2 = self.J2 * (b2_prev - b2_k) + h**2 * (mu2 + u_k)
+        res_rot1 = self.rot_inertia_1 * (b1_prev - b1_k) + h**2 * (mu1 - u_k)
+        res_rot2 = self.rot_inertia_2 * (b2_prev - b2_k) + h**2 * (mu2 + u_k)
 
         return np.array([res_rot1, res_rot2], dtype=float)
 
@@ -955,7 +937,10 @@ class AcrobotSO2Model:
         omega1 = float(np.arcsin(np.clip(b1, -1.0, 1.0))) / h
         omega2 = float(np.arcsin(np.clip(b2, -1.0, 1.0))) / h
 
-        return float(0.5 * self.J1 * omega1**2 + 0.5 * self.J2 * omega2**2)
+        return float(
+            0.5 * self.rot_inertia_1 * omega1**2
+            + 0.5 * self.rot_inertia_2 * omega2**2
+        )
 
     def energy_from_reduced_state(
         self,
