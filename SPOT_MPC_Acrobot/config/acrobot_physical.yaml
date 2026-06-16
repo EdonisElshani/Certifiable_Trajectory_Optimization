@@ -26,6 +26,12 @@ time:
   dt_sim: 0.1
   control_interval: 0.1
 
+mpc:
+  max_iterations: 30
+  stop_angle_tol_deg: 2.0
+  stop_step_angle_tol_deg: 2.0
+  cleanup_solver_artifacts: True
+
 initial:
   thetaR1_deg: 5.0
   thetaR2_deg: 5.0

@@ -96,6 +96,7 @@ def build_common_params(cfg: Mapping[str, Any]) -> Dict[str, Any]:
     sdp = _get_block(cfg, "sdp")
     cost = _get_block(cfg, "cost")
     scaling = _get_block(cfg, "scaling")
+    mpc = _get_block(cfg, "mpc")
 
     # ------------------------------------------------------------------
     # System metadata
@@ -276,6 +277,14 @@ def build_common_params(cfg: Mapping[str, Any]) -> Dict[str, Any]:
 
     # Optional lambda regularization.
     params["alpha_lam"] = _as_float(cost, "alpha_lam", 0.0)
+
+    # ------------------------------------------------------------------
+    # MPC settings
+    # ------------------------------------------------------------------
+    params["mpc_max_iterations"] = _as_int(mpc, "max_iterations", 20)
+    params["mpc_stop_angle_tol_deg"] = _as_float(mpc, "stop_angle_tol_deg", 2.0)
+    params["mpc_stop_step_angle_tol_deg"] = _as_float(mpc, "stop_step_angle_tol_deg", 2.0)
+    params["cleanup_solver_artifacts"] = bool(mpc.get("cleanup_solver_artifacts", True))
 
     # ------------------------------------------------------------------
     # Scaling
