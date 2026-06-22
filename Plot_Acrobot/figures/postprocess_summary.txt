@@ -1,0 +1,14 @@
+Postprocessing summary
+================================================================================
+Run folder: C:\Users\ASUS\Desktop\Masterarbeit\Certifiable_Trajectory_Optimization\Plot_Acrobot
+Figures folder: C:\Users\ASUS\Desktop\Masterarbeit\Certifiable_Trajectory_Optimization\Plot_Acrobot\figures
+Trajectory rows: 201
+GIF stride: 11
+GIF frames: 21
+GIF fps: 50
+thetaR1_des [deg]: 180.0
+thetaR2_des [deg]: 180.0
+thetaF1_des [deg]: 0.0
+thetaF2_des [deg]: 0.0
+Stopped: False
+Stop reason: running
