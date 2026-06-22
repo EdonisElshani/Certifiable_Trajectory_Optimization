@@ -11,4 +11,4 @@ thetaR2_des [deg]: 180.0
 thetaF1_des [deg]: 0.0
 thetaF2_des [deg]: 0.0
 Stopped: False
-Stop reason: running
+Stop reason: max_iterations reached

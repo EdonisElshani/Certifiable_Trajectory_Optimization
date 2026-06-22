@@ -1,60 +1,60 @@
 MPC-SDP FINAL RESULT
 ================================================================================
 Stopped: False
-Termination: running
-Reason: running
+Termination: max_iterations
+Reason: max_iterations reached
 Iterations: 2
 Stable counter: 0
 Stable steps required: 3
-Final target angle error norm: 163.2836641471396 deg
-Final target step error norm: 11.453946834047326 deg
+Final target angle error norm: 169.4881378815926 deg
+Final target step error norm: 0.13689029225637298 deg
 
 MPC settings:
-  mpc_max_iterations: 3
+  mpc_max_iterations: 2
   mpc_stop_angle_tol_deg: 2.0
   mpc_stop_step_angle_tol_deg: 2.0
   mpc_stable_steps_required: 3
   cleanup_solver_artifacts: True
 
 Applied controls:
-  j=0: t=0.100000, u_1=+3.686979972854e+00, thetaR1=-7.292191 deg, thetaR2=+31.663180 deg, target_norm=227.665982 deg
-  j=1: t=0.200000, u_1=-2.543395834724e+00, thetaR1=-20.201077 deg, thetaR2=+146.446177 deg, target_norm=163.283664 deg
+  j=0: t=0.100000, u_1=+3.686979568816e+00, thetaR1=-7.292189 deg, thetaR2=+31.663176 deg, target_norm=227.665986 deg
+  j=1: t=0.200000, u_1=-2.640952860785e+00, thetaR1=-22.463428 deg, thetaR2=+117.482343 deg, target_norm=169.488138 deg
 
 Final state:
   k: 2.0
   t: 0.2
-  u: -2.5433958347244765
-  thetaR1_rad: -0.35257529979906826
-  thetaR2_rad: 2.555967957264902
-  thetaR1_deg: -20.201076639046313
-  thetaR2_deg: 146.44617652195325
-  thetaF1_rad: 0.037044476693803584
-  thetaF2_rad: 0.19644680922095487
-  thetaF1_deg: 2.122492168825687
-  thetaF2_deg: 11.255573067172378
-  R1_orth_error: 8.424040407041246e-14
-  R2_orth_error: 1.3714814073349818e-13
-  F1_orth_error: 9.420554754517889e-14
-  F2_orth_error: 1.4366346026990584e-13
-  R1_det_error: 5.96189764223709e-14
-  R2_det_error: 9.692247004977617e-14
-  F1_det_error: 6.661338147750939e-14
-  F2_det_error: 1.0147438445073931e-13
+  u: -2.640952860784828
+  thetaR1_rad: -0.39206078364792674
+  thetaR2_rad: 2.0504536988343487
+  thetaR1_deg: -22.46342821561788
+  thetaR2_deg: 117.48234303019694
+  thetaF1_rad: 0.0022536369722617406
+  thetaF2_rad: 0.000793304254204784
+  thetaF1_deg: 0.1291238870652391
+  thetaF2_deg: 0.04545298563570751
+  R1_orth_error: 1.3081692493125307e-14
+  R2_orth_error: 8.768428891301531e-15
+  F1_orth_error: 2.220446545662895e-16
+  F2_orth_error: 1.5700925491151372e-16
+  R1_det_error: 9.325873406851315e-15
+  R2_det_error: 6.217248937900877e-15
+  F1_det_error: 2.220446049250313e-16
+  F2_det_error: 0.0
   base_x: 0.0
   base_y: 0.0
-  elbow_x: -0.17265791703127978
-  elbow_y: -0.46924326706562314
-  tip_x: 0.10370212868160336
-  tip_y: -0.05255978391135513
-  target_angle_error_norm_rad: 2.8498375540882046
-  target_angle_error_norm_deg: 163.2836641471396
-  target_step_error_norm_rad: 0.19990908460250637
-  target_step_error_norm_deg: 11.453946834047326
-  target_error_R1_deg: 159.7989233609537
-  target_error_R2_deg: -33.55382347804676
-  target_error_F1_deg: 2.1224921688256764
-  target_error_F2_deg: 11.255573067172387
+  elbow_x: -0.19104682197153916
+  elbow_y: -0.46206180518906237
+  tip_x: 0.2525297226131724
+  tip_y: -0.23132418559856863
+  target_angle_error_norm_rad: 2.9581260491079178
+  target_angle_error_norm_deg: 169.4881378815926
+  target_step_error_norm_rad: 0.002389186313891006
+  target_step_error_norm_deg: 0.13689029225637298
+  target_error_R1_deg: 157.53657178438212
+  target_error_R2_deg: -62.51765696980305
+  target_error_F1_deg: 0.1291238870652347
+  target_error_F2_deg: 0.045452985635706315
   mpc_iteration: 1.0
   angle_ok: False
-  step_ok: False
+  step_ok: True
   stable_counter: 0
