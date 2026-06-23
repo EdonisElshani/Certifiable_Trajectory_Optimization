@@ -27,9 +27,9 @@ time:
   control_interval: 0.1
 
 simulation:
-  lgvi_maxfev: 2000
+  lgvi_maxfev: 5000
   accept_residual: true
-  accept_residual_tol: 1.0e-3
+  accept_residual_tol: 2.0e-3
   plot_results: false
 
 mpc:

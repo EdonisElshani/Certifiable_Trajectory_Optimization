@@ -110,9 +110,14 @@ def write_mpc_summary(
     stable_counter = int(final_state.get("stable_counter", 0))
     final_angle_error = final_state.get("target_angle_error_norm_deg")
     final_step_error = final_state.get("target_step_error_norm_deg")
-    termination = "stabilization" if stopped else (
-        "max_iterations" if stop_reason == "max_iterations reached" else "running"
-    )
+    if "MOSEK status rejected" in stop_reason:
+        termination = "sdp_failure"
+    elif stopped:
+        termination = "stabilization"
+    elif stop_reason == "max_iterations reached":
+        termination = "max_iterations"
+    else:
+        termination = "running"
 
     compact = {
         "stopped": stopped,
@@ -170,6 +175,35 @@ def write_mpc_summary(
                 f"thetaR2={row['thetaR2_deg']:+.6f} deg, "
                 f"target_norm={row['target_angle_error_norm_deg']:.6f} deg\n"
             )
+        f.write("\nPer-iteration diagnostics:\n")
+        for idx, sdp_summary in enumerate(sdp_summaries):
+            f.write(f"  MPC iteration {idx}:\n")
+            f.write(f"    problem_status: {sdp_summary.get('problem_status', 'UNKNOWN')}\n")
+            f.write(f"    solution_status: {sdp_summary.get('solution_status', 'UNKNOWN')}\n")
+            f.write(f"    control applied: {sdp_summary.get('control_applied', False)}\n")
+            if idx < len(sim_summaries):
+                sim_summary = sim_summaries[idx]
+                nxt = sim_summary.get("next_sdp_initial", {})
+                f.write(
+                    "    thetaF_prev computed from coarse interval: "
+                    f"[{nxt.get('thetaF1_prev')}, {nxt.get('thetaF2_prev')}] rad\n"
+                )
+                f.write(
+                    "    thetaF_last_fine (comparison only): "
+                    f"[{nxt.get('thetaF1_last_fine')}, {nxt.get('thetaF2_last_fine')}] rad\n"
+                )
+                f.write(
+                    "    next SDP initial F satisfies max-step bound: "
+                    f"{sim_summary.get('next_sdp_initial_f_within_max_step')}\n"
+                )
+                for accepted in sim_summary.get("accepted_residuals", []):
+                    f.write(
+                        "    accepted LGVI residual: "
+                        f"local_step={accepted['local_step']}, "
+                        f"residual_inf={accepted['residual_inf']:.12e}\n"
+                    )
+            elif sdp_summary.get("failure_reason"):
+                f.write(f"    rejection reason: {sdp_summary['failure_reason']}\n")
         f.write("\nFinal state:\n")
         if history_rows:
             for key, val in history_rows[-1].items():
@@ -235,7 +269,6 @@ def run_mpc_sdp(
         # Solve SDP. solve_sdp writes temporary old artifacts; write_sdp_run_logs
         # copies compact information into Results and then deletes old artifacts.
         out = solve_sdp(params_sdp)
-        u_apply = float(out["first_control"])
 
         sdp_run_dir = sdp_parent / f"mpc_{j:04d}"
         sdp_summary = write_sdp_run_logs(
@@ -245,6 +278,32 @@ def run_mpc_sdp(
             cleanup_solver_artifacts_enabled=bool(settings["cleanup_solver_artifacts"]),
         )
         sdp_summaries.append(sdp_summary)
+
+        problem_status = str(out.get("problem_status", "UNKNOWN"))
+        solution_status = str(out.get("solution_status", "UNKNOWN"))
+        valid_sdp = (
+            problem_status == "PRIMAL_AND_DUAL_FEASIBLE"
+            and solution_status == "OPTIMAL"
+        )
+        if not valid_sdp:
+            stopped = True
+            stop_reason = (
+                f"MOSEK status rejected at MPC iteration {j}: "
+                f"problem_status={problem_status}, solution_status={solution_status}; "
+                "control was not applied and the next interval was not simulated"
+            )
+            write_mpc_summary(
+                out_dir=mpc_dir, params=params, settings=settings,
+                history_rows=history_rows, sdp_summaries=sdp_summaries,
+                sim_summaries=sim_summaries, stopped=stopped,
+                stop_reason=stop_reason,
+            )
+            del out
+            gc.collect()
+            print(stop_reason)
+            break
+
+        u_apply = float(out["first_control"])
 
         # Delete bulky solver output before simulating the next step. Keep only compact logs.
         del out

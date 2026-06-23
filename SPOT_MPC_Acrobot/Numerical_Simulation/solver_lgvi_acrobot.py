@@ -772,31 +772,31 @@ def convert_state_to_sdp_initial(
     state: AcrobotReducedState,
     dt_physical: float,
     dt_sdp: float,
+    interval_start_state: Optional[AcrobotReducedState] = None,
 ) -> Dict[str, np.ndarray | float]:
     """
     Convert a fine simulation state into an SDP-compatible initial state.
 
     The rotations R1, R2 are unchanged.
 
-    The previous F values are rescaled from the fine simulation step to the SDP
-    step. This keeps the same physical incremental motion over the larger SDP
-    step.
+    For MPC, the previous SDP step is the rotation accumulated over the entire
+    control interval: R_start.T @ R_end.  The last fine-step F is retained only
+    as a comparison diagnostic and is never rescaled.
     """
     dt_physical = float(dt_physical)
     dt_sdp = float(dt_sdp)
 
     values = get_absolute_angles_and_step_angles(state)
 
-    thetaF1_physical = values["thetaF1_prev"]
-    thetaF2_physical = values["thetaF2_prev"]
+    thetaF1_last_fine = values["thetaF1_prev"]
+    thetaF2_last_fine = values["thetaF2_prev"]
+    if interval_start_state is None:
+        raise ValueError("interval_start_state is required for MPC SDP conversion")
 
-    scale = dt_sdp / dt_physical
-
-    thetaF1_sdp = thetaF1_physical * scale
-    thetaF2_sdp = thetaF2_physical * scale
-
-    F1_prev_sdp = F_from_delta(thetaF1_sdp)
-    F2_prev_sdp = F_from_delta(thetaF2_sdp)
+    F1_prev_sdp = interval_start_state.R1.T @ state.R1
+    F2_prev_sdp = interval_start_state.R2.T @ state.R2
+    thetaF1_sdp = float(angle_from_R(F1_prev_sdp))
+    thetaF2_sdp = float(angle_from_R(F2_prev_sdp))
 
     return {
         "R1": state.R1.copy(),
@@ -807,8 +807,8 @@ def convert_state_to_sdp_initial(
         "thetaR2": values["thetaR2"],
         "thetaF1_prev": thetaF1_sdp,
         "thetaF2_prev": thetaF2_sdp,
-        "thetaF1_physical": thetaF1_physical,
-        "thetaF2_physical": thetaF2_physical,
+        "thetaF1_last_fine": thetaF1_last_fine,
+        "thetaF2_last_fine": thetaF2_last_fine,
     }
 
 
@@ -817,6 +817,7 @@ def convert_state_to_sdp_initial_scalars(
     model: AcrobotSO2Model,
     dt_physical: float,
     dt_sdp: float,
+    interval_start_state: Optional[AcrobotReducedState] = None,
 ) -> Dict[str, float]:
     """
     Convert reduced state to scalar values useful for fixing SDP initial data.
@@ -825,12 +826,14 @@ def convert_state_to_sdp_initial_scalars(
         c1_0, s1_0, c2_0, s2_0
         a1_prev, b1_prev, a2_prev, b2_prev
 
-    The previous F values are rescaled from dt_physical to dt_sdp.
+    The previous F values are computed over the full MPC interval from
+    interval_start_state to state.
     """
     converted = convert_state_to_sdp_initial(
         state=state,
         dt_physical=dt_physical,
         dt_sdp=dt_sdp,
+        interval_start_state=interval_start_state,
     )
 
     R1 = np.asarray(converted["R1"], dtype=float).reshape(2, 2)
@@ -864,8 +867,8 @@ def convert_state_to_sdp_initial_scalars(
         "thetaR2": float(converted["thetaR2"]),
         "thetaF1_prev": float(converted["thetaF1_prev"]),
         "thetaF2_prev": float(converted["thetaF2_prev"]),
-        "thetaF1_physical": float(converted["thetaF1_physical"]),
-        "thetaF2_physical": float(converted["thetaF2_physical"]),
+        "thetaF1_last_fine": float(converted["thetaF1_last_fine"]),
+        "thetaF2_last_fine": float(converted["thetaF2_last_fine"]),
     }
 
 

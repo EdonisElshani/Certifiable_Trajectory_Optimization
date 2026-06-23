@@ -425,6 +425,36 @@ def write_sdp_run_logs(
     """Write compact SDP logs inside Results/Results-Open_Loop-SDP."""
     run_dir.mkdir(parents=True, exist_ok=True)
 
+    problem_status = str(out.get("problem_status", "UNKNOWN"))
+    solution_status = str(out.get("solution_status", "UNKNOWN"))
+    valid_solution = (
+        problem_status == "PRIMAL_AND_DUAL_FEASIBLE"
+        and solution_status == "OPTIMAL"
+    )
+    if not valid_solution:
+        metrics = {
+            "mpc_iteration": mpc_iteration,
+            "problem_status": problem_status,
+            "solution_status": solution_status,
+            "control_applied": False,
+            "failure_reason": (
+                "MOSEK status rejected: "
+                f"problem_status={problem_status}, solution_status={solution_status}"
+            ),
+        }
+        with open(run_dir / "sdp_metrics.json", "w", encoding="utf-8") as f:
+            json.dump(metrics, f, indent=2)
+        with open(run_dir / "sdp_readable_log.txt", "w", encoding="utf-8") as f:
+            f.write("SDP solve rejected\n" + "=" * 80 + "\n")
+            if mpc_iteration is not None:
+                f.write(f"MPC iteration: {mpc_iteration}\n")
+            f.write(f"problem_status: {problem_status}\n")
+            f.write(f"solution_status: {solution_status}\n")
+            f.write("control applied: False\n")
+            f.write("No SDP solution variables or u_1 were extracted.\n")
+        cleanup_old_solver_artifacts(out, enabled=cleanup_solver_artifacts_enabled)
+        return metrics
+
     preferred, sol = _get_preferred_solution(out)
     params = out["params"]
     solve_metrics = compute_suboptimality_and_tightness(out, preferred)
@@ -467,6 +497,9 @@ def write_sdp_run_logs(
         "mpc_iteration": mpc_iteration,
         "N": int(params["N"]),
         "dt_sdp": float(params["dt"]),
+        "problem_status": problem_status,
+        "solution_status": solution_status,
+        "control_applied": True,
         "lower_bound_sdp": solve_metrics["lower_bound_sdp"],
         "extracted_cost": solve_metrics["extracted_cost"],
         "absolute_suboptimality_gap": solve_metrics["absolute_suboptimality_gap"],
@@ -495,6 +528,9 @@ def write_sdp_run_logs(
             f.write(f"MPC iteration: {mpc_iteration}\n")
         f.write(f"N: {int(params['N'])}\n")
         f.write(f"dt_sdp: {float(params['dt'])}\n\n")
+        f.write(f"problem_status: {problem_status}\n")
+        f.write(f"solution_status: {solution_status}\n")
+        f.write("control applied: True\n\n")
         f.write(f"Lower bound SDP: {solve_metrics['lower_bound_sdp']:+.12e}\n")
         f.write(f"Extracted cost: {solve_metrics['extracted_cost']:+.12e}\n")
         f.write(
@@ -563,6 +599,14 @@ def run_open_loop_sdp(
         run_name = datetime.now().strftime("open_loop_%Y-%m-%d_%H-%M-%S")
 
     out = solve_sdp(params)
+    # Keep the statuses as top-level result fields for MPC callers and logs.
+    aux_info = out.get("aux_info", {})
+    out["problem_status"] = str(
+        out.get("problem_status", aux_info.get("problem_status", "UNKNOWN"))
+    )
+    out["solution_status"] = str(
+        out.get("solution_status", aux_info.get("solution_status", "UNKNOWN"))
+    )
     run_dir = SDP_RESULTS_DIR / run_name
     summary = write_sdp_run_logs(
         out,

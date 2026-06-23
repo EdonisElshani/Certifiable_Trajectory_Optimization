@@ -262,6 +262,10 @@ def write_simulation_log(
     accepted_mask = np.asarray(sim.get("accepted_by_residual", []), dtype=bool)
     residuals = np.asarray(sim.get("residual_inf", []), dtype=float)
     accepted_steps = np.flatnonzero(accepted_mask)
+    accepted_residuals_log = [
+        {"local_step": int(k), "residual_inf": float(residuals[k])}
+        for k in accepted_steps
+    ]
     if accepted_steps.size:
         accepted_residuals = residuals[accepted_steps]
         max_accepted_offset = int(np.argmax(accepted_residuals))
@@ -281,10 +285,20 @@ def write_simulation_log(
         "lgvi_accepted_failure_count": int(accepted_steps.size),
         "max_accepted_residual": max_accepted_residual,
         "max_accepted_residual_local_step": max_accepted_residual_step,
+        "accepted_residuals": accepted_residuals_log,
         "hard_failure_occurred": False,
         "final_state": final_row,
         "next_sdp_initial": sdp_initial_next or {},
     }
+
+    if sdp_initial_next:
+        max_step = float(params["max_step_angle"])
+        theta1 = float(sdp_initial_next["thetaF1_prev"])
+        theta2 = float(sdp_initial_next["thetaF2_prev"])
+        summary["next_sdp_initial_f_within_max_step"] = bool(
+            abs(theta1) <= max_step + 1.0e-12
+            and abs(theta2) <= max_step + 1.0e-12
+        )
 
     try:
         diag = diagnostics_lgvi(model=make_model_from_params(params), sim=dict(sim))
@@ -349,6 +363,10 @@ def write_simulation_hard_failure_log(
     summary = {
         "mpc_iteration": mpc_iteration,
         "lgvi_accepted_failure_count": len(accepted),
+        "accepted_residuals": [
+            {"local_step": int(step), "residual_inf": float(residual)}
+            for step, residual in accepted
+        ],
         "max_accepted_residual": float(max_residual),
         "max_accepted_residual_local_step": max_step,
         "hard_failure_occurred": True,
@@ -376,6 +394,13 @@ def write_simulation_hard_failure_log(
         f.write(f"hard failure residual_inf: {exc.residual_inf:.12e}\n")
         f.write(f"hard failure nfev: {exc.nfev}\n")
         f.write(f"hard failure message: {exc.solver_message}\n")
+        if accepted:
+            f.write("\nWARNING: accepted near-converged LGVI solves before failure:\n")
+            for local_step, residual in accepted:
+                f.write(
+                    f"  local step {int(local_step)}: solver success=False, "
+                    f"residual_inf={float(residual):.12e}\n"
+                )
 
 
 def simulate_and_log_control(
@@ -390,6 +415,10 @@ def simulate_and_log_control(
     Apply one MPC control input, log the simulation, and return the next SDP initial data.
     """
     try:
+        interval_start_state = AcrobotReducedState(
+            R1=state.R1.copy(), R2=state.R2.copy(),
+            F1_prev=state.F1_prev.copy(), F2_prev=state.F2_prev.copy(),
+        )
         final_state, sim = simulate_one_control_interval_from_params(
             params=params,
             model=model,
@@ -410,6 +439,7 @@ def simulate_and_log_control(
         model=model,
         dt_physical=float(params["dt_sim"]),
         dt_sdp=float(params["dt_sdp"]),
+        interval_start_state=interval_start_state,
     )
 
     summary = write_simulation_log(

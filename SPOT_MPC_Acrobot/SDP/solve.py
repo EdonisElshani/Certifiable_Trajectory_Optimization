@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import datetime
+import io
 import os
 import pickle
+import re
 import sys
 import time
+from contextlib import redirect_stdout
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -71,6 +74,38 @@ from SDP.extraction import (
     build_gap_info,
     get_first_mpc_control,
 )
+
+
+class _TeeTextStream:
+    """Mirror solver output to the terminal while retaining a local copy."""
+
+    def __init__(self, terminal, capture: io.StringIO):
+        self.terminal = terminal
+        self.capture = capture
+
+    def write(self, text: str) -> int:
+        self.terminal.write(text)
+        self.capture.write(text)
+        return len(text)
+
+    def flush(self) -> None:
+        self.terminal.flush()
+
+
+def _parse_mosek_statuses(solver_output: str) -> tuple[str, str]:
+    """Parse the final MOSEK solution summary emitted by the backend."""
+
+    def last_status(label: str) -> str:
+        matches = re.findall(
+            rf"{label}\s*status\s*:\s*([A-Za-z0-9_-]+)",
+            solver_output,
+            flags=re.IGNORECASE,
+        )
+        if not matches:
+            return "UNKNOWN"
+        return matches[-1].replace("-", "_").upper()
+
+    return last_status("Problem"), last_status("Solution")
 
 
 def complete_sdp_params(params: Dict[str, Any], mpc_initial: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
@@ -526,14 +561,35 @@ def solve_sdp(
 
     start_time = time.time()
 
-    result, res, coeff_info, aux_info = CSTSS_pybind(
-        poly_data,
-        kappa,
-        total_var_num,
-        params,
-    )
+    solver_output_buffer = io.StringIO()
+    solver_exception: Optional[Exception] = None
+    try:
+        with redirect_stdout(_TeeTextStream(sys.stdout, solver_output_buffer)):
+            result, res, coeff_info, aux_info = CSTSS_pybind(
+                poly_data,
+                kappa,
+                total_var_num,
+                params,
+            )
+    except Exception as exc:
+        solver_exception = exc
+        result, res, coeff_info, aux_info = float("nan"), {}, {}, {}
 
     elapsed = time.time() - start_time
+    problem_status, solution_status = _parse_mosek_statuses(
+        solver_output_buffer.getvalue()
+    )
+    aux_info["problem_status"] = problem_status
+    aux_info["solution_status"] = solution_status
+    if solver_exception is not None:
+        aux_info["solver_exception"] = str(solver_exception)
+
+    valid_solution = (
+        problem_status == "PRIMAL_AND_DUAL_FEASIBLE"
+        and solution_status == "OPTIMAL"
+    )
+    if solver_exception is not None and valid_solution:
+        raise solver_exception
 
     aux_info["result"] = result
     params["aux_info"] = aux_info
@@ -623,11 +679,36 @@ def solve_sdp(
             "extracted_vectors": {},
             "gap_info": {},
             "first_control": None,
+            "problem_status": problem_status,
+            "solution_status": solution_status,
             "prefix": prefix,
             "Xs": [],
         }
 
-    # Extraction.
+    if not valid_solution:
+        total_time = time.time() - total_start
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write("\nMOSEK solution rejected; no SDP variables or control extracted.\n")
+            f.write(f"problem_status: {problem_status}\n")
+            f.write(f"solution_status: {solution_status}\n")
+            if solver_exception is not None:
+                f.write(f"backend exception after solve: {solver_exception}\n")
+        print(
+            "MOSEK solution rejected; no control extracted: "
+            f"problem_status={problem_status}, solution_status={solution_status}"
+        )
+        return {
+            "params": params, "result": result, "res": res,
+            "coeff_info": coeff_info, "aux_info": aux_info,
+            "solutions": {}, "extracted_vectors": {}, "extraction_info": {},
+            "gap_info": {}, "errors_by_method": {}, "first_control": None,
+            "preferred_extraction": None, "prefix": prefix, "Xs": [],
+            "problem_status": problem_status,
+            "solution_status": solution_status,
+            "total_time": total_time,
+        }
+
+    # Extraction is permitted only for a valid optimal solution.
     if params["relax_mode"] == "MOMENT":
         Xs = res["Xopt"]
     elif params["relax_mode"] == "SOS":
@@ -752,6 +833,8 @@ def solve_sdp(
         "gap_info": gap_info,
         "errors_by_method": errors_by_method,
         "first_control": first_control,
+        "problem_status": problem_status,
+        "solution_status": solution_status,
         "preferred_extraction": preferred,
         "prefix": prefix,
         # These are the actual clique moment matrices used by the extraction
