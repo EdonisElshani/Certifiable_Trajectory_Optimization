@@ -1,48 +1,58 @@
 This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: StudentThesis_Template.aux
-I found no \citation commands---while reading file StudentThesis_Template.aux
-I found no \bibdata command---while reading file StudentThesis_Template.aux
-I found no \bibstyle command---while reading file StudentThesis_Template.aux
-You've used 0 entries,
-            0 wiz_defined-function locations,
-            83 strings with 518 characters,
-and the built_in function-call counts, 0 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 0
-:= -- 0
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
-chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 0
-format.name$ -- 0
-if$ -- 0
-int.to.chr$ -- 0
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: alphaurl.bst
+Reallocating 'glb_str_end' (item size: 4) to 20 items.
+Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
+Reallocating 'global_strs' (item size: 1) to 4000000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: refs/mybib.bib
+Warning--entry type for "ColomboJimenez2012SO3_Cayley" isn't style-file defined
+--line 88 of file refs/mybib.bib
+Warning--I didn't find a database entry for "Lee2012ISM"
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+You've used 20 entries,
+            3368 wiz_defined-function locations,
+            858 strings with 10132 characters,
+and the built_in function-call counts, 10673 in all, are:
+= -- 1168
+> -- 353
+< -- 14
++ -- 108
+- -- 104
+* -- 630
+:= -- 1504
+add.period$ -- 79
+call.type$ -- 20
+change.case$ -- 115
+chr.to.int$ -- 19
+cite$ -- 20
+duplicate$ -- 320
+empty$ -- 961
+format.name$ -- 131
+if$ -- 2703
+int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 0
-num.names$ -- 0
-pop$ -- 0
-preamble$ -- 0
-purify$ -- 0
+missing$ -- 18
+newline$ -- 120
+num.names$ -- 60
+pop$ -- 230
+preamble$ -- 1
+purify$ -- 138
 quote$ -- 0
-skip$ -- 0
+skip$ -- 752
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
-text.length$ -- 0
-text.prefix$ -- 0
+substring$ -- 437
+swap$ -- 83
+text.length$ -- 40
+text.prefix$ -- 8
 top$ -- 0
-type$ -- 0
+type$ -- 144
 warning$ -- 0
-while$ -- 0
-width$ -- 0
-write$ -- 0
-(There were 3 error messages)
+while$ -- 68
+width$ -- 22
+write$ -- 301
+(There were 2 warnings)

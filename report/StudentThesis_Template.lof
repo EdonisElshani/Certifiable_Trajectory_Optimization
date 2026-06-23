@@ -1,0 +1,15 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Two rigid bodies connected by a holonomic joint in maximal coordinates. Adapted from \cite {BrudigamManchester2021LQR}.}}{28}{figure.caption.15}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Acrobot configuration manifold in maximal coordinates.}}{29}{figure.caption.17}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Comparison of the numerical preservation properties for the unforced $3$D pendulum.}}{50}{figure.caption.29}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Comparison of the forced LGVI and RK4 simulation for the controlled $3$D pendulum.}}{53}{figure.caption.31}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Comparison of the numerical preservation properties for the unforced Acrobot.}}{55}{figure.caption.33}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Comparison of the numerical preservation properties for the controlled Acrobot.}}{56}{figure.caption.35}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces SPOT optimization results for the controlled $3$D pendulum performing a $90^\circ $ rotation about the $x$-axis using the MD sparsity setting.}}{57}{figure.caption.37}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }

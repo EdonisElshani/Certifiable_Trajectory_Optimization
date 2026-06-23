@@ -320,7 +320,7 @@ progresses, however, the trajectories begin to separate.
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Forced_3D_Pendulum_Trajectory.pdf}
-        \caption*{(a) Position error norm $\Delta \bm{x}_k$.}
+        \caption*{(a) Position error norm $\|\Delta \bm{x}_k \||$.}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\textwidth}
@@ -393,6 +393,80 @@ same behaviour observed in the position error $\Delta \bm{x}_k$ and the ploted E
 The 3D-Pendulum numerical simulation using external control inputs produces
 consistent short-time dynamics of LGVI and RK4, while the numerical trajectories between both methods separate as the
 simulation continues.
+
+\subsection{Acrobot}
+\label{sec:numercial_simulation_acrobot}
+
+\subsubsection{Unforced Acrobot}
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/acrobot_unforced_total_energy.pdf}
+        \caption*{(a) Total energy $E_k$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/acrobot_unforced_position_error_norm.pdf}
+        \caption*{(b) Position error norm $\|\Delta \bm{x}_k \||$.}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/acrobot_unforced_holonomic_constraint_residuals.pdf}
+        \caption*{(c) Holonomic constraint residual $\phi$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/acrobot_unforced_orthogonality_error.pdf}
+        \caption*{(d) Orthogonality error $e_{orth}$.}
+    \end{minipage}
+
+    \caption{Comparison of the numerical preservation properties for the unforced Acrobot.}
+    \label{fig:simulation_results_acrobot_unforced}
+\end{figure}
+
+\subsubsection{Controlled Acrobot}
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/forced_sine_total_energy.pdf}
+        \caption*{(a) Total energy $E_k$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/forced_sine_position_error.pdf}
+        \caption*{(b) Position error norm $\|\Delta \bm{x}_k \||$.}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/forced_sine_constraint_residuals.pdf}
+        \caption*{(c) Holonomic constraint residual $\phi$.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pics/Numerical_Simulation/Acrobot/forced_sine_orthogonality_error.pdf}
+        \caption*{(d) Orthogonality error $e_{orth}$.}
+    \end{minipage}
+
+    \caption{Comparison of the numerical preservation properties for the controlled Acrobot.}
+    \label{fig:simulation_results_acrobot_forced}
+\end{figure}
+
+
+
 
 \section{Optimization Results}
 \label{sec:optimization_results}
