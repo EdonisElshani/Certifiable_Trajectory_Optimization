@@ -14,7 +14,7 @@ from solver_rk4 import simulate_rk4
 # ============================================================
 # User choices
 # ============================================================
-INCLUDE_RK4_PROJ = False
+INCLUDE_RK4_PROJ = True
 
 
 def set_axes_equal(ax):
@@ -42,6 +42,7 @@ def set_axes_equal(ax):
 
 def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     t = lgvi["t"]
+    k_axis = np.arange(1, len(t) + 1)
 
     # -------------------------------
     # Global plot styling
@@ -57,7 +58,7 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
         "ytick.major.width": 1.8,
         "xtick.major.size": 7,
         "ytick.major.size": 7,
-        "lines.linewidth": 1.5,
+        "lines.linewidth": 2.0,
         "lines.markersize": 7,
         "legend.frameon": True,
     })
@@ -75,9 +76,8 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     fig_traj = plt.figure(figsize=(7, 6))
     ax_traj = fig_traj.add_subplot(111, projection="3d")
 
-    # thinner lines in this figure
-    traj_lw = 1.0
-    rod_lw = 0.7
+    traj_lw = 2.0
+    rod_lw = 2.0
     sample_step = max(1, len(lgvi["x_hist"]) // 40)   # draw only some rods
 
     # trajectories
@@ -97,17 +97,17 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
         )
 
     # pendulum rods from origin to selected positions
-    for k in range(0, len(lgvi["x_hist"]), sample_step):
-        x = lgvi["x_hist"][k]
+    for sample_idx in range(0, len(lgvi["x_hist"]), sample_step):
+        x = lgvi["x_hist"][sample_idx]
         ax_traj.plot([0, x[0]], [0, x[1]], [0, x[2]], color="C0", alpha=0.35, linewidth=rod_lw)
 
-    for k in range(0, len(rk4["x_hist"]), sample_step):
-        x = rk4["x_hist"][k]
+    for sample_idx in range(0, len(rk4["x_hist"]), sample_step):
+        x = rk4["x_hist"][sample_idx]
         ax_traj.plot([0, x[0]], [0, x[1]], [0, x[2]], color="C1", alpha=0.25, linewidth=rod_lw)
 
     if rk4_proj is not None:
-        for k in range(0, len(rk4_proj["x_hist"]), sample_step):
-            x = rk4_proj["x_hist"][k]
+        for sample_idx in range(0, len(rk4_proj["x_hist"]), sample_step):
+            x = rk4_proj["x_hist"][sample_idx]
             ax_traj.plot([0, x[0]], [0, x[1]], [0, x[2]], color="C2", alpha=0.25, linewidth=rod_lw)
 
     # pivot point
@@ -119,10 +119,9 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     ax_traj.scatter(x0[0], x0[1], x0[2], marker="o", s=25, color="black", label="start")
     ax_traj.scatter(xN[0], xN[1], xN[2], marker="x", s=35, color="black", label="end")
 
-    ax_traj.set_title("Pendulum Position Trajectory", fontsize=14)
-    ax_traj.set_xlabel(r"$x_1$", fontsize=12)
-    ax_traj.set_ylabel(r"$x_2$", fontsize=12)
-    ax_traj.set_zlabel(r"$x_3$", fontsize=12)
+    ax_traj.set_xlabel(r"$x_1\;[\mathrm{m}]$", fontsize=12)
+    ax_traj.set_ylabel(r"$x_2\;[\mathrm{m}]$", fontsize=12)
+    ax_traj.set_zlabel(r"$x_3\;[\mathrm{m}]$", fontsize=12)
     set_axes_equal(ax_traj)
     ax_traj.legend(fontsize=10)
 
@@ -135,13 +134,13 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
 
     for j in range(3):
         for label, data in zip(labels, datas):
-            axes_pos[j].plot(data["t"], data["x_hist"][:, j], linewidth=1.8, label=label)
+            k_data = np.arange(1, len(data["t"]) + 1)
+            axes_pos[j].plot(k_data, data["x_hist"][:, j], linewidth=2.0, label=label)
 
-        axes_pos[j].set_ylabel(rf"$x_{j+1}$", fontsize=12)
+        axes_pos[j].set_ylabel(rf"$x_{j+1}\;[\mathrm{{m}}]$", fontsize=12)
         axes_pos[j].grid(True, alpha=0.3)
 
-    axes_pos[0].set_title("Pendulum Position Components", fontsize=14)
-    axes_pos[-1].set_xlabel(r"discrete time-steps $k$", fontsize=20)
+    axes_pos[-1].set_xlabel(r"discrete-time steps $k$", fontsize=20)
     axes_pos[0].legend(fontsize=10)
 
     plt.tight_layout()
@@ -153,13 +152,13 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
 
     for j in range(3):
         for label, data in zip(labels, datas):
-            axes_u[j].plot(data["t"], data["u_hist"][:, j], linewidth=1.8, label=label)
+            k_data = np.arange(1, len(data["t"]) + 1)
+            axes_u[j].plot(k_data, data["u_hist"][:, j], linewidth=2.0, label=label)
 
-        axes_u[j].set_ylabel(rf"$u_{j+1}$", fontsize=12)
+        axes_u[j].set_ylabel(rf"$u_{j+1}\;[\mathrm{{Nm}}]$", fontsize=12)
         axes_u[j].grid(True, alpha=0.3)
 
-    axes_u[0].set_title("Applied Body Torque Components", fontsize=14)
-    axes_u[-1].set_xlabel(r"discrete time-steps $k$", fontsize=20)
+    axes_u[-1].set_xlabel(r"discrete-time steps $k$", fontsize=20)
     axes_u[0].legend(fontsize=10)
 
     plt.tight_layout()
@@ -171,12 +170,13 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
 
     for j in range(3):
         for label, data in zip(labels, datas):
-            axes_omega[j].plot(data["t"], data["Omega_hist"][:, j], linewidth=1.8, label=label)
+            k_data = np.arange(1, len(data["t"]) + 1)
+            axes_omega[j].plot(k_data, data["Omega_hist"][:, j], linewidth=2.0, label=label)
 
-        axes_omega[j].set_ylabel(rf"$\Omega_{j+1}$", fontsize=20, fontweight="bold")
+        axes_omega[j].set_ylabel(rf"$\Omega_{j+1}\;[\mathrm{{rad/s}}]$", fontsize=20, fontweight="bold")
         axes_omega[j].grid(True, alpha=0.3)
 
-    axes_omega[-1].set_xlabel(r"discrete time-steps $k$", fontsize=20)
+    axes_omega[-1].set_xlabel(r"discrete-time steps $k$", fontsize=20)
     axes_omega[0].legend(fontsize=16)
 
     plt.tight_layout()
@@ -188,19 +188,19 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
 
     err_rk4 = np.linalg.norm(rk4["x_hist"] - lgvi["x_hist"], axis=1)
     ax_err.plot(
-        lgvi["t"], err_rk4, "--", linewidth=2.0,
+        k_axis, err_rk4, "--", linewidth=2.0,
         label=r"$\|x_{\mathrm{RK4}} - x_{\mathrm{LGVI}}\|$"
     )
 
     if rk4_proj is not None:
         err_rk4_proj = np.linalg.norm(rk4_proj["x_hist"] - lgvi["x_hist"], axis=1)
         ax_err.plot(
-            lgvi["t"], err_rk4_proj, ":", linewidth=2.0,
+            k_axis, err_rk4_proj, ":", linewidth=2.0,
             label=r"$\|x_{\mathrm{RK4proj}} - x_{\mathrm{LGVI}}\|$"
         )
 
-    ax_err.set_xlabel(r"discrete time-steps $k$")
-    ax_err.set_ylabel(r"$\Delta x_k$")
+    ax_err.set_xlabel(r"discrete-time steps $k$")
+    ax_err.set_ylabel(r"$\|\Delta x_k\|\;[\mathrm{m}]$")
     ax_err.grid(True, alpha=0.3)
     ax_err.legend(fontsize=16)
 
@@ -211,67 +211,67 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
     # ============================================================
     # Angular velocity (old style)
     plt.figure(figsize=(8, 5.5))
-    line1, = plt.plot(t, lgvi["Omega_hist"][:, 0], "-", label=r"$\Omega_1$ LGVI")
-    plt.plot(t, rk4["Omega_hist"][:, 0], "--", color=line1.get_color(), label=r"$\Omega_1$ RK4")
+    line1, = plt.plot(k_axis, lgvi["Omega_hist"][:, 0], "-", label=r"$\Omega_1$ LGVI")
+    plt.plot(k_axis, rk4["Omega_hist"][:, 0], "--", color=line1.get_color(), label=r"$\Omega_1$ RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["Omega_hist"][:, 0], ":", color=line1.get_color(), label=r"$\Omega_1$ RK4-proj")
+        plt.plot(k_axis, rk4_proj["Omega_hist"][:, 0], ":", color=line1.get_color(), label=r"$\Omega_1$ RK4-proj")
 
-    line2, = plt.plot(t, lgvi["Omega_hist"][:, 1], "-", label=r"$\Omega_2$ LGVI")
-    plt.plot(t, rk4["Omega_hist"][:, 1], "--", color=line2.get_color(), label=r"$\Omega_2$ RK4")
+    line2, = plt.plot(k_axis, lgvi["Omega_hist"][:, 1], "-", label=r"$\Omega_2$ LGVI")
+    plt.plot(k_axis, rk4["Omega_hist"][:, 1], "--", color=line2.get_color(), label=r"$\Omega_2$ RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["Omega_hist"][:, 1], ":", color=line2.get_color(), label=r"$\Omega_2$ RK4-proj")
+        plt.plot(k_axis, rk4_proj["Omega_hist"][:, 1], ":", color=line2.get_color(), label=r"$\Omega_2$ RK4-proj")
 
-    line3, = plt.plot(t, lgvi["Omega_hist"][:, 2], "-", label=r"$\Omega_3$ LGVI")
-    plt.plot(t, rk4["Omega_hist"][:, 2], "--", color=line3.get_color(), label=r"$\Omega_3$ RK4")
+    line3, = plt.plot(k_axis, lgvi["Omega_hist"][:, 2], "-", label=r"$\Omega_3$ LGVI")
+    plt.plot(k_axis, rk4["Omega_hist"][:, 2], "--", color=line3.get_color(), label=r"$\Omega_3$ RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["Omega_hist"][:, 2], ":", color=line3.get_color(), label=r"$\Omega_3$ RK4-proj")
+        plt.plot(k_axis, rk4_proj["Omega_hist"][:, 2], ":", color=line3.get_color(), label=r"$\Omega_3$ RK4-proj")
 
-    plt.xlabel(r"discrete time-steps $k$")
-    plt.ylabel(r"$\Omega$")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\Omega\;[\mathrm{rad/s}]$")
     plt.legend(ncol=3, loc="best")
     plt.tight_layout()
 
     # Total energy
     plt.figure(figsize=(8, 5.5))
-    plt.plot(t, lgvi["E_hist"], label="LGVI")
-    plt.plot(t, rk4["E_hist"], "--", label="RK4")
+    plt.plot(k_axis, lgvi["E_hist"], label="LGVI")
+    plt.plot(k_axis, rk4["E_hist"], "--", label="RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["E_hist"], ":", label="RK4-proj")
-    plt.xlabel(r"discrete time-steps $k$")
-    plt.ylabel(r"$E_k$")
+        plt.plot(k_axis, rk4_proj["E_hist"], ":", label="RK4-proj")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$E_k\;[\mathrm{J}]$")
     plt.legend(loc="best")
     plt.tight_layout()
 
     # Orthogonality error
     plt.figure(figsize=(8, 5.5))
-    plt.plot(t, lgvi["orth_hist"], label="LGVI")
-    plt.plot(t, rk4["orth_hist"], "--", label="RK4")
+    plt.plot(k_axis, lgvi["orth_hist"], label="LGVI")
+    plt.plot(k_axis, rk4["orth_hist"], "--", label="RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["orth_hist"], ":", label="RK4-proj")
-    plt.xlabel(r"discrete time-steps $k$")
+        plt.plot(k_axis, rk4_proj["orth_hist"], ":", label="RK4-proj")
+    plt.xlabel(r"discrete-time steps $k$")
     plt.ylabel(r"$e_{\mathrm{orth}}$")
     plt.legend(loc="best")
     plt.tight_layout()
 
     # Momentum error
     plt.figure(figsize=(8, 5.5))
-    plt.plot(t, lgvi["DeltaMu"], label="LGVI")
-    plt.plot(t, rk4["DeltaMu"], "--", label="RK4")
+    plt.plot(k_axis, lgvi["DeltaMu"], label="LGVI")
+    plt.plot(k_axis, rk4["DeltaMu"], "--", label="RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["DeltaMu"], ":", label="RK4-proj")
-    plt.xlabel(r"discrete time-steps $k$")
-    plt.ylabel(r"$\Delta \mu_k$")
+        plt.plot(k_axis, rk4_proj["DeltaMu"], ":", label="RK4-proj")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\Delta \mu_k\;[\mathrm{kg\,m^2/s}]$")
     plt.legend(loc="best")
     plt.tight_layout()
 
     # Energy deviation
     plt.figure(figsize=(8, 5.5))
-    plt.plot(t, lgvi["DeltaE"], label="LGVI")
-    plt.plot(t, rk4["DeltaE"], "--", label="RK4")
+    plt.plot(k_axis, lgvi["DeltaE"], label="LGVI")
+    plt.plot(k_axis, rk4["DeltaE"], "--", label="RK4")
     if rk4_proj is not None:
-        plt.plot(t, rk4_proj["DeltaE"], ":", label="RK4-proj")
-    plt.xlabel(r"discrete time-steps $k$")
-    plt.ylabel(r"$\Delta E_k$")
+        plt.plot(k_axis, rk4_proj["DeltaE"], ":", label="RK4-proj")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\Delta E_k\;[\mathrm{J}]$")
     plt.legend(loc="best")
     plt.tight_layout()
 
@@ -279,12 +279,12 @@ def make_plots(lgvi: dict, rk4: dict, rk4_proj: dict | None = None):
 if __name__ == "__main__":
 
     # Choose the model to simulate:
-    model = ForcedPendulum3DModel()
-    # model = Pendulum3DModel()
+    #model = ForcedPendulum3DModel()
+    model = Pendulum3DModel()
 
     # Simulation parameters
-    h = 0.001
-    tf = 100.0
+    h = 0.05
+    tf = 1000.0
 
     R0 = np.eye(3)
     Omega0 = np.array([4.14, 4.14, 4.14])

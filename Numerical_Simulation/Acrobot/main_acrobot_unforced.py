@@ -50,7 +50,7 @@ from Acrobot.solver_lgvi_acrobot import (  # noqa: E402
 # ---------------------------------------------------------------------------
 # h=0.15 may be too large for the implicit LGVI solve. For reliable validation,
 # start with H=0.05, then try H=0.1. Yes, numerical solvers have trust issues.
-H = 0.10
+H = 0.1
 TF = 10000.0
 
 RUN_LGVI = True
@@ -64,6 +64,25 @@ def make_output_dir() -> Path:
     out = THIS_DIR / "output" / "acrobot_so2_unforced"
     out.mkdir(parents=True, exist_ok=True)
     return out
+
+
+def set_plot_style() -> None:
+    """Match the visual style used in the 3D pendulum plotting code."""
+    plt.rcParams.update({
+        "font.size": 18,
+        "axes.labelsize": 20,
+        "xtick.labelsize": 17,
+        "ytick.labelsize": 17,
+        "legend.fontsize": 16,
+        "axes.linewidth": 2.0,
+        "xtick.major.width": 1.8,
+        "ytick.major.width": 1.8,
+        "xtick.major.size": 7,
+        "ytick.major.size": 7,
+        "lines.linewidth": 2.0,
+        "lines.markersize": 7,
+        "legend.frameon": True,
+    })
 
 
 def save_current_figure(outpath_pdf: Path) -> None:
@@ -111,106 +130,107 @@ def print_constraint_summary(name: str, sim: Dict[str, np.ndarray]) -> None:
     print(f"{name:38s} max ||phi12||: {np.nanmax(sim['phi12_norm']):.3e}")
 
 
-def plot_constraint_drift(
+def plot_position_error_norm(
     out: Path,
     rk4_relative: Dict[str, np.ndarray],
-    rk4_maximal_accel: Dict[str, np.ndarray],
-    lgvi_diag: Optional[Dict[str, np.ndarray]] = None,
-    t_lgvi: Optional[np.ndarray] = None,
+    lgvi: Dict[str, np.ndarray],
 ) -> None:
-    """One combined constraint-drift plot."""
-    plt.figure(figsize=(8.8, 4.8))
+    """Plot the norm of the LGVI-vs-RK4 maximal-coordinate position error."""
+    n_common = min(len(lgvi["X"]), len(rk4_relative["X"]))
+    k_nodes = np.arange(n_common)
 
-    if lgvi_diag is not None and t_lgvi is not None:
-        plt.semilogy(
-            t_lgvi,
-            np.maximum(lgvi_diag["phi_norm"], EPS),
-            label="LGVI maximal",
-        )
-
-    plt.semilogy(
-        rk4_relative["t"],
-        np.maximum(rk4_relative["phi_norm"], EPS),
-        label="relative RK4",
-    )
-    plt.semilogy(
-        rk4_maximal_accel["t"],
-        np.maximum(rk4_maximal_accel["phi_norm"], EPS),
-        label="maximal RK4 (accel-level)",
+    x_diff = lgvi["X"][:n_common] - rk4_relative["X"][:n_common]
+    pos_err = np.sqrt(
+        np.sum(x_diff[:, :2] ** 2, axis=1) +
+        np.sum(x_diff[:, 2:] ** 2, axis=1)
     )
 
-    plt.xlabel("time [s]")
-    plt.ylabel(r"$\|\phi_k\|$")
-    plt.title("Constraint drift: LGVI vs relative RK4 vs maximal RK4")
-    plt.grid(True, which="both", alpha=0.3)
-    plt.legend()
-    save_current_figure(out / "constraint_drift_comparison.pdf")
-
-
-def plot_constraint_drift_split(
-    out: Path,
-    rk4_relative: Dict[str, np.ndarray],
-    rk4_maximal_accel: Dict[str, np.ndarray],
-    lgvi_diag: Optional[Dict[str, np.ndarray]] = None,
-    t_lgvi: Optional[np.ndarray] = None,
-) -> None:
-    """Split base and elbow constraint drift. Useful if the elbow starts escaping."""
-    plt.figure(figsize=(8.8, 4.8))
-
-    if lgvi_diag is not None and t_lgvi is not None:
-        plt.semilogy(t_lgvi, np.maximum(lgvi_diag["phi0_norm"], EPS), label=r"LGVI $\phi_0$")
-        plt.semilogy(t_lgvi, np.maximum(lgvi_diag["phi12_norm"], EPS), label=r"LGVI $\phi_{12}$")
-
-    plt.semilogy(
-        rk4_relative["t"],
-        np.maximum(rk4_relative["phi_norm"], EPS),
+    plt.figure(figsize=(8.0, 5.5))
+    plt.plot(
+        k_nodes,
+        pos_err,
         "--",
-        label="relative RK4 total",
+        linewidth=2.0,
+        label=r"$\|x_{\mathrm{RK4}} - x_{\mathrm{LGVI}}\|$",
     )
-    plt.semilogy(
-        rk4_maximal_accel["t"],
-        np.maximum(rk4_maximal_accel["phi0_norm"], EPS),
-        label=r"maximal RK4 $\phi_0$",
-    )
-    plt.semilogy(
-        rk4_maximal_accel["t"],
-        np.maximum(rk4_maximal_accel["phi12_norm"], EPS),
-        label=r"maximal RK4 $\phi_{12}$",
-    )
-
-    plt.xlabel("time [s]")
-    plt.ylabel("constraint norm")
-    plt.title("Constraint drift by constraint")
-    plt.grid(True, which="both", alpha=0.3)
-    plt.legend()
-    save_current_figure(out / "constraint_drift_split.pdf")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\|\Delta x_k\|\;[\mathrm{m}]$")
+    plt.grid(True, alpha=0.3)
+    plt.legend(fontsize=16)
+    save_current_figure(out / "acrobot_position_error_norm.pdf")
 
 
-def plot_energy_error(
+def plot_total_energy(
     out: Path,
     rk4_relative: Dict[str, np.ndarray],
-    rk4_maximal_accel: Dict[str, np.ndarray],
-    lgvi_diag: Optional[Dict[str, np.ndarray]] = None,
-    t_lgvi: Optional[np.ndarray] = None,
+    lgvi_diag: Dict[str, np.ndarray],
 ) -> None:
-    plt.figure(figsize=(8.8, 4.8))
+    """Plot total mechanical energy for LGVI and RK4 over discrete steps."""
+    k_lgvi = np.arange(len(lgvi_diag["energy"]))
+    k_rk4 = np.arange(min(len(rk4_relative["energy"]) - 1, len(lgvi_diag["energy"])))
 
-    if lgvi_diag is not None and t_lgvi is not None:
-        # LGVI diagnostic energy is interval-based, so it has one value less than nodes.
-        plt.plot(t_lgvi[:-1], lgvi_diag["energy_error"], label="LGVI interval energy proxy")
-
-    plt.plot(rk4_relative["t"], rk4_relative["energy_error"], label="relative RK4")
-    # plt.plot(rk4_maximal_accel["t"], rk4_maximal_accel["energy_error"], label="maximal RK4 (accel-level)")
-
-    plt.xlabel("time [s]")
-    plt.ylabel(r"$E - E_0$")
-    plt.title("Unforced Acrobot energy error")
+    plt.figure(figsize=(8.0, 5.5))
+    plt.plot(k_lgvi, lgvi_diag["energy"], linewidth=2.0, label="LGVI")
+    plt.plot(k_rk4, rk4_relative["energy"][:len(k_rk4)], "--", linewidth=2.0, label="RK4")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$E_k\;[\mathrm{J}]$")
     plt.grid(True, alpha=0.3)
-    plt.legend()
-    save_current_figure(out / "energy_error_comparison.pdf")
+    plt.legend(loc="best")
+    save_current_figure(out / "acrobot_total_energy.pdf")
+
+
+def plot_orthogonality_error(
+    out: Path,
+    rk4_relative: Dict[str, np.ndarray],
+    lgvi_diag: Dict[str, np.ndarray],
+) -> None:
+    """Plot SO(2) orthogonality errors for both LGVI link rotations."""
+    n_common = min(
+        len(lgvi_diag["orth_R1"]),
+        len(rk4_relative["orth_R1"]),
+        len(rk4_relative["orth_R2"]),
+    )
+    k_nodes = np.arange(n_common)
+    rk4_orth = np.maximum(
+        rk4_relative["orth_R1"][:n_common],
+        rk4_relative["orth_R2"][:n_common],
+    )
+
+    plt.figure(figsize=(8.0, 5.5))
+    plt.semilogy(k_nodes, np.maximum(lgvi_diag["orth_R1"][:n_common], EPS), linewidth=2.0, label="LGVI link 1")
+    plt.semilogy(k_nodes, np.maximum(lgvi_diag["orth_R2"][:n_common], EPS), "--", linewidth=2.0, label="LGVI link 2")
+    plt.semilogy(k_nodes, np.maximum(rk4_orth, EPS), ":", linewidth=2.0, label="RK4")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$e_{\mathrm{orth}}$")
+    plt.grid(True, which="both", alpha=0.3)
+    plt.legend(loc="best")
+    save_current_figure(out / "acrobot_orthogonality_error.pdf")
+
+
+def plot_holonomic_constraint_residuals(
+    out: Path,
+    lgvi_diag: Dict[str, np.ndarray],
+) -> None:
+    """Plot the LGVI holonomic constraint residuals only.
+
+    RK4 in minimal relative coordinates satisfies the holonomic constraints by
+    construction through the angle parametrization, so including it here would
+    not be a meaningful apples-to-apples comparison.
+    """
+    k_nodes = np.arange(len(lgvi_diag["phi0_norm"]))
+
+    plt.figure(figsize=(8.0, 5.5))
+    plt.semilogy(k_nodes, np.maximum(lgvi_diag["phi0_norm"], EPS), linewidth=2.0, label=r"$\|\phi_0\|$ base constraint")
+    plt.semilogy(k_nodes, np.maximum(lgvi_diag["phi12_norm"], EPS), "--", linewidth=2.0, label=r"$\|\phi_{12}\|$ elbow constraint")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\|\phi\|\;[\mathrm{m}]$")
+    plt.grid(True, which="both", alpha=0.3)
+    plt.legend(loc="lower right")
+    save_current_figure(out / "acrobot_holonomic_constraint_residuals.pdf")
 
 
 def main() -> None:
+    set_plot_style()
     out = make_output_dir()
 
     params = AcrobotSO2Params(
@@ -300,13 +320,16 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Plots
     # ------------------------------------------------------------------
-    plot_constraint_drift(out, rk4_relative, rk4_maximal_accel, diag, t_lgvi)
-    plot_constraint_drift_split(out, rk4_relative, rk4_maximal_accel, diag, t_lgvi)
-    plot_energy_error(out, rk4_relative, rk4_maximal_accel, diag, t_lgvi)
+    if lgvi is not None and diag is not None:
+        plot_position_error_norm(out, rk4_relative, lgvi)
+        plot_total_energy(out, rk4_relative, diag)
+        plot_orthogonality_error(out, rk4_relative, diag)
+        plot_holonomic_constraint_residuals(out, diag)
 
-    print(f"Saved: {out / 'constraint_drift_comparison.pdf'}")
-    print(f"Saved: {out / 'constraint_drift_split.pdf'}")
-    print(f"Saved: {out / 'energy_error_comparison.pdf'}")
+        print(f"Saved: {out / 'acrobot_position_error_norm.pdf'}")
+        print(f"Saved: {out / 'acrobot_total_energy.pdf'}")
+        print(f"Saved: {out / 'acrobot_orthogonality_error.pdf'}")
+        print(f"Saved: {out / 'acrobot_holonomic_constraint_residuals.pdf'}")
 
     # ------------------------------------------------------------------
     # Save numeric results

@@ -44,13 +44,13 @@ class AcrobotSO2Params:
     # Geometry and mass. Defaults: two uniform rods of length 1 and mass 1.
     m1: float = 1.0
     m2: float = 1.0
-    l1: float = 1.0
-    l2: float = 1.0
+    l1: float = 0.5
+    l2: float = 0.5
     lc1: float = 0.5
     lc2: float = 0.5
     # Moments of inertia about each link center of mass.
-    J1: float = 1.0 / 12.0
-    J2: float = 1.0 / 12.0
+    J1: float = 1.0 / 12.0 * m1 * l1**2
+    J2: float = 1.0 / 12.0 * m2 * l2**2
     g: float = 9.81
     p0: Tuple[float, float] = (0.0, 0.0)
 

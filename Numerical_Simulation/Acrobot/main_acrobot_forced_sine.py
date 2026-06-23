@@ -42,7 +42,7 @@ from Acrobot.solver_lgvi_acrobot import simulate_lgvi_acrobot, diagnostics_lgvi
 # ---------------------------------------------------------------------------
 # User choices
 # ---------------------------------------------------------------------------
-H = 0.005
+H = 0.001
 TF = 100.0
 
 # Sinusoidal elbow torque input u(t) = U0 sin(omega_u t).
@@ -58,6 +58,11 @@ QDOT0 = np.array([0.0, 0.0], dtype=float)
 ROOT_TOL = 1e-10
 MAXFEV = 150
 VERBOSE_LGVI = True
+SAVE_PNG_ALSO = True
+
+TRAJ_FIGSIZE = (7.0, 6.0)
+STACK_FIGSIZE = (9.0, 8.0)
+BENCHMARK_FIGSIZE = (8.0, 5.5)
 
 
 # ---------------------------------------------------------------------------
@@ -65,7 +70,7 @@ VERBOSE_LGVI = True
 # ---------------------------------------------------------------------------
 def u_fun(t: float) -> float:
     """Classical Acrobot scalar elbow torque."""
-    return float(U0 * np.sin(OMEGA_U * t))
+    return float (U0 * np.sin(OMEGA_U * t))
 
 
 def make_output_dir() -> Path:
@@ -76,20 +81,27 @@ def make_output_dir() -> Path:
 
 def set_plot_style() -> None:
     plt.rcParams.update({
-        "font.size": 14,
-        "axes.labelsize": 15,
-        "xtick.labelsize": 13,
-        "ytick.labelsize": 13,
-        "legend.fontsize": 12,
-        "axes.linewidth": 1.5,
-        "lines.linewidth": 1.6,
+        "font.size": 18,
+        "axes.labelsize": 20,
+        "xtick.labelsize": 17,
+        "ytick.labelsize": 17,
+        "legend.fontsize": 16,
+        "axes.linewidth": 2.0,
+        "xtick.major.width": 1.8,
+        "ytick.major.width": 1.8,
+        "xtick.major.size": 7,
+        "ytick.major.size": 7,
+        "lines.linewidth": 2.0,
+        "lines.markersize": 7,
         "legend.frameon": True,
     })
 
 
 def savefig(out: Path, name: str) -> None:
     plt.tight_layout()
-    plt.savefig(out / name, dpi=200)
+    plt.savefig(out / name)
+    if SAVE_PNG_ALSO:
+        plt.savefig((out / name).with_suffix(".png"), dpi=200)
     plt.close()
 
 
@@ -156,12 +168,25 @@ def compute_forced_power_reference(rk4: dict, t: np.ndarray) -> np.ndarray:
     return u * theta2dot
 
 
+def compute_position_error_norm(X_ref: np.ndarray, X_cmp: np.ndarray) -> np.ndarray:
+    """Return the combined COM-position error norm used in the unforced case."""
+    X_ref = np.asarray(X_ref, dtype=float)
+    X_cmp = np.asarray(X_cmp, dtype=float)
+    x_diff = X_ref - X_cmp
+    return np.sqrt(
+        np.sum(x_diff[:, :2] ** 2, axis=1) +
+        np.sum(x_diff[:, 2:] ** 2, axis=1)
+    )
+
+
 # ---------------------------------------------------------------------------
 # Plotting
 # ---------------------------------------------------------------------------
 def make_plots(model: AcrobotSO2Model, lgvi: dict, diag: dict, rk4: dict, out: Path, h: float) -> None:
     t_nodes = lgvi["t"]
     t_int = t_nodes[:-1]
+    k_nodes = np.arange(len(t_nodes))
+    k_int = np.arange(len(t_int))
     lgvi_rel = compute_lgvi_relative_quantities(model, lgvi, diag, h)
 
     q_lgvi = lgvi_rel["q"]
@@ -178,60 +203,56 @@ def make_plots(model: AcrobotSO2Model, lgvi: dict, diag: dict, rk4: dict, out: P
     X_lgvi = lgvi["X"]
     X_rk4 = rk4["X"]
 
-    plt.figure(figsize=(7.2, 6.2))
+    plt.figure(figsize=TRAJ_FIGSIZE)
     plt.plot(X_lgvi[:, 0], X_lgvi[:, 1], label=r"LGVI $x_1$")
     plt.plot(X_rk4[:, 0], X_rk4[:, 1], "--", label=r"RK4 $x_1$")
     plt.plot(X_lgvi[:, 2], X_lgvi[:, 3], label=r"LGVI $x_2$")
     plt.plot(X_rk4[:, 2], X_rk4[:, 3], "--", label=r"RK4 $x_2$")
     plt.scatter(model.p0[0], model.p0[1], c="k", s=35, label="base")
-    plt.xlabel(r"$x$")
-    plt.ylabel(r"$y$")
-    plt.title("Forced Acrobot COM trajectories")
+    plt.xlabel(r"$x\;[\mathrm{m}]$")
+    plt.ylabel(r"$y\;[\mathrm{m}]$")
     plt.axis("equal")
     plt.grid(True, alpha=0.3)
-    plt.legend()
+    plt.legend(loc="lower right", fontsize=16)
     savefig(out, "forced_sine_com_trajectory.pdf")
 
     # ============================================================
     # 2) Relative angle components
     # ============================================================
-    fig, axes = plt.subplots(2, 1, figsize=(9.0, 6.5), sharex=True)
-    names = [r"$\theta_1$", r"$\theta_2$"]
+    fig, axes = plt.subplots(2, 1, figsize=STACK_FIGSIZE, sharex=True)
+    names = [r"$\theta_1\;[\mathrm{rad}]$", r"$\theta_2\;[\mathrm{rad}]$"]
     for j, ax in enumerate(axes):
-        ax.plot(t_nodes, q_lgvi[:, j], label="LGVI")
-        ax.plot(t_nodes, q_rk4[:, j], "--", label="RK4-relative")
-        ax.set_ylabel(names[j] + " [rad]")
+        ax.plot(k_nodes, q_lgvi[:, j], label="LGVI")
+        ax.plot(k_nodes, q_rk4[:, j], "--", label="RK4")
+        ax.set_ylabel(names[j])
         ax.grid(True, alpha=0.3)
-    axes[0].set_title("Forced Acrobot relative angles")
-    axes[-1].set_xlabel("time [s]")
-    axes[0].legend()
+    axes[-1].set_xlabel(r"discrete-time steps $k$")
+    axes[0].legend(fontsize=16)
     savefig(out, "forced_sine_angles.pdf")
 
     # ============================================================
     # 3) Input torque
     # ============================================================
-    plt.figure(figsize=(8.8, 4.6))
-    plt.plot(t_nodes, u_nodes, label=rf"$u(t)={U0}\sin({OMEGA_U}t)$")
-    plt.xlabel("time [s]")
-    plt.ylabel(r"$u$ [Nm]")
-    plt.title("Applied elbow torque")
+    plt.figure(figsize=BENCHMARK_FIGSIZE)
+    plt.plot(k_nodes, u_nodes, label=rf"$u(t)={U0}\sin({OMEGA_U}t)$")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$u\;[\mathrm{Nm}]$")
     plt.grid(True, alpha=0.3)
-    plt.legend()
+    plt.legend(loc="lower right", fontsize=16)
     savefig(out, "forced_sine_input.pdf")
 
     # ============================================================
     # 4) Relative angular velocities
     # ============================================================
-    fig, axes = plt.subplots(2, 1, figsize=(9.0, 6.5), sharex=True)
-    names = [r"$\dot\theta_1$", r"$\dot\theta_2$"]
+    fig, axes = plt.subplots(2, 1, figsize=STACK_FIGSIZE, sharex=True)
+    names = [r"$\Omega_1\;[\mathrm{rad/s}]$", r"$\Omega_2\;[\mathrm{rad/s}]$"]
     for j, ax in enumerate(axes):
-        ax.plot(t_int, qdot_lgvi[:, j], label="LGVI")
-        ax.plot(t_int, qdot_rk4_int[:, j], "--", label="RK4-relative")
-        ax.set_ylabel(names[j] + " [rad/s]")
+        ax.plot(k_int, qdot_lgvi[:, j], label="LGVI")
+        ax.plot(k_int, qdot_rk4_int[:, j], "--", label="RK4")
+        ax.set_ylabel(names[j])
         ax.grid(True, alpha=0.3)
-    axes[0].set_title("Forced Acrobot relative angular velocities")
-    axes[-1].set_xlabel("time [s]")
-    axes[0].legend()
+    axes[-1].set_xlabel(r"discrete-time steps $k$")
+    axes[0].legend(fontsize=16)
     savefig(out, "forced_sine_angular_velocities.pdf")
 
     # ============================================================
@@ -245,58 +266,77 @@ def make_plots(model: AcrobotSO2Model, lgvi: dict, diag: dict, rk4: dict, out: P
     theta1_err_deg = np.abs(q_err_deg_components[:, 0])
     theta2_err_deg = np.abs(q_err_deg_components[:, 1])
 
-    X_err = np.linalg.norm(X_lgvi - X_rk4, axis=1)
+    X_err = compute_position_error_norm(X_lgvi, X_rk4)
 
-    plt.figure(figsize=(8.8, 4.8))
-    plt.plot(t_nodes, q_err_norm_deg, label=r"$\|q_{LGVI}-q_{RK4}\|$ [deg]")
-    plt.plot(t_nodes, theta1_err_deg, "--", label=r"$|\theta_{1,LGVI}-\theta_{1,RK4}|$ [deg]")
-    plt.plot(t_nodes, theta2_err_deg, "--", label=r"$|\theta_{2,LGVI}-\theta_{2,RK4}|$ [deg]")
-    plt.xlabel("time [s]")
-    plt.ylabel("angle error [deg]")
-    plt.title("Forced Acrobot angle trajectory error")
+    plt.figure(figsize=BENCHMARK_FIGSIZE)
+    plt.plot(k_nodes, q_err_norm_deg, linewidth=2.0, label=r"$\|q_{LGVI}-q_{RK4}\|$ [deg]")
+    plt.plot(k_nodes, theta1_err_deg, "--", linewidth=2.0, label=r"$|\theta_{1,LGVI}-\theta_{1,RK4}|$ [deg]")
+    plt.plot(k_nodes, theta2_err_deg, "--", linewidth=2.0, label=r"$|\theta_{2,LGVI}-\theta_{2,RK4}|$ [deg]")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\mathrm{angle\ error}\;[\mathrm{deg}]$")
     plt.grid(True, alpha=0.3)
-    plt.legend()
+    plt.legend(loc="lower right", fontsize=16)
     savefig(out, "forced_sine_angle_error_degrees.pdf")
 
-    plt.figure(figsize=(8.8, 4.8))
-    plt.plot(t_nodes, X_err, label=r"$\|X_{LGVI}-X_{RK4}\|$")
-    plt.xlabel("time [s]")
-    plt.ylabel("position error [m]")
-    plt.title("Forced Acrobot maximal position trajectory error")
+    plt.figure(figsize=BENCHMARK_FIGSIZE)
+    plt.plot(
+        k_nodes,
+        X_err,
+        "--",
+        linewidth=2.0,
+        label=r"$\|x_{\mathrm{RK4}} - x_{\mathrm{LGVI}}\|$",
+    )
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\|\Delta x_k\|\;[\mathrm{m}]$")
     plt.grid(True, alpha=0.3)
-    plt.legend()
+    plt.legend(fontsize=16)
     savefig(out, "forced_sine_position_error.pdf")
 
     # ============================================================
-    # 6) Constraint residuals
+    # 6) SO(2) orthogonality errors
     # ============================================================
     eps = 1e-16
-    rk4_phi = np.maximum(rk4.get("phi_norm", np.zeros_like(t_nodes)), eps)
-    plt.figure(figsize=(8.8, 4.8))
-    plt.semilogy(t_nodes, np.maximum(diag["phi_norm"], eps), label="LGVI maximal")
-    plt.semilogy(t_nodes, rk4_phi, "--", label="RK4-relative reconstructed")
-    plt.xlabel("time [s]")
-    plt.ylabel(r"$\|\phi_k\|$")
-    plt.title("Forced Acrobot constraint residuals")
+    n_common_orth = min(len(diag["orth_R1"]), len(rk4["orth_R1"]), len(rk4["orth_R2"]))
+    k_orth = np.arange(n_common_orth)
+    rk4_orth = np.maximum(rk4["orth_R1"][:n_common_orth], rk4["orth_R2"][:n_common_orth])
+
+    plt.figure(figsize=BENCHMARK_FIGSIZE)
+    plt.semilogy(k_orth, np.maximum(diag["orth_R1"][:n_common_orth], eps), linewidth=2.0, label="LGVI link 1")
+    plt.semilogy(k_orth, np.maximum(diag["orth_R2"][:n_common_orth], eps), "--", linewidth=2.0, label="LGVI link 2")
+    plt.semilogy(k_orth, np.maximum(rk4_orth, eps), ":", linewidth=2.0, label="RK4")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$e_{\mathrm{orth}}$")
     plt.grid(True, which="both", alpha=0.3)
-    plt.legend()
+    plt.legend(fontsize=16)
+    savefig(out, "forced_sine_orthogonality_error.pdf")
+
+    # ============================================================
+    # 7) Holonomic constraint residuals
+    # ============================================================
+    plt.figure(figsize=BENCHMARK_FIGSIZE)
+    plt.semilogy(k_nodes, np.maximum(diag["phi0_norm"], eps), linewidth=2.0, label=r"$\|\phi_0\|$ base constraint")
+    plt.semilogy(k_nodes, np.maximum(diag["phi12_norm"], eps), "--", linewidth=2.0, label=r"$\|\phi_{12}\|$ elbow constraint")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$\|\phi\|\;[\mathrm{m}]$")
+    plt.grid(True, which="both", alpha=0.3)
+    plt.legend(loc="lower right", fontsize=16)
     savefig(out, "forced_sine_constraint_residuals.pdf")
 
     # ============================================================
-    # 7) Energy evolution under forcing
+    # 8) Total energy under forcing
     # ============================================================
-    plt.figure(figsize=(8.8, 4.8))
-    plt.plot(t_int, diag["energy_error"], label="LGVI interval energy proxy")
-    plt.plot(t_nodes, rk4["energy_error"], "--", label="RK4-relative continuous energy")
-    plt.xlabel("time [s]")
-    plt.ylabel(r"$E-E_0$")
-    plt.title("Forced Acrobot energy change")
+    n_energy = min(len(diag["energy"]), len(rk4["energy"]) - 1)
+    plt.figure(figsize=BENCHMARK_FIGSIZE)
+    plt.plot(k_int[:n_energy], diag["energy"][:n_energy], linewidth=2.0, label="LGVI")
+    plt.plot(k_int[:n_energy], rk4["energy"][:n_energy], "--", linewidth=2.0, label="RK4")
+    plt.xlabel(r"discrete-time steps $k$")
+    plt.ylabel(r"$E_k\;[\mathrm{J}]$")
     plt.grid(True, alpha=0.3)
-    plt.legend()
-    savefig(out, "forced_sine_energy_change.pdf")
+    plt.legend(fontsize=16)
+    savefig(out, "forced_sine_total_energy.pdf")
 
     # ============================================================
-    # 8) Applied power for RK4 reference
+    # 9) Applied power for RK4 reference
     # ============================================================
     #power = compute_forced_power_reference(rk4, t_nodes)
     #plt.figure(figsize=(8.8, 4.8))
