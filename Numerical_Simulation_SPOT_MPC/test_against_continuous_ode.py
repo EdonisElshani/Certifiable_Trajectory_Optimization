@@ -131,6 +131,8 @@ def run_lgvi_case(model: Any, method: str, u_const: float, h: float, tf: float) 
         lgvi_maxfev=5000,
         accept_residual=True,
         accept_residual_tol=1e-10,
+        use_multistart=True,
+        multistart_select="local",
     )
     return np.asarray(sim["thetaR"][-1], dtype=float)
 

@@ -478,20 +478,29 @@ def evaluate_step(
 ) -> Dict[str, Any]:
     F1_k, F2_k, lam0, lam12 = model.unpack_reduced_solution(z)
 
-    residual_parts = evaluate_raw_residual_parts(
-        model=model,
-        state_k=state_k,
-        z=z,
-        u_k=u_k,
-        h=h,
-    )
     if bool(getattr(info, "substepping_performed", False)):
-        residual_parts["residual_inf_raw"] = float(getattr(info, "residual_inf", math.nan))
-        residual_parts["residual_trans_inf"] = float(getattr(info, "residual_inf", math.nan))
-        residual_parts["residual_rot_inf"] = float(getattr(info, "residual_inf", math.nan))
+        info_residual = float(getattr(info, "residual_inf", math.nan))
+        residual_parts = {
+            "residual_inf_raw": info_residual,
+            "residual_trans_inf": info_residual,
+            "residual_rot_inf": info_residual,
+            "residual_so2_inf": max(abs(det_error_so2(F1_k)), abs(det_error_so2(F2_k))),
+        }
+        F1_kinematic = state_k.R1.T @ state_next.R1
+        F2_kinematic = state_k.R2.T @ state_next.R2
+    else:
+        residual_parts = evaluate_raw_residual_parts(
+            model=model,
+            state_k=state_k,
+            z=z,
+            u_k=u_k,
+            h=h,
+        )
+        F1_kinematic = F1_k
+        F2_kinematic = F2_k
 
-    kin_R1_error = fro_norm(state_next.R1 - state_k.R1 @ F1_k)
-    kin_R2_error = fro_norm(state_next.R2 - state_k.R2 @ F2_k)
+    kin_R1_error = fro_norm(state_next.R1 - state_k.R1 @ F1_kinematic)
+    kin_R2_error = fro_norm(state_next.R2 - state_k.R2 @ F2_kinematic)
 
     thetaR = model.angles_from_rotations(state_next.R1, state_next.R2)
     info_q1 = float(getattr(info, "q1", math.nan))
@@ -507,6 +516,10 @@ def evaluate_step(
     thetaF1_abs_deg = abs(thetaF1_deg)
     thetaF2_abs_deg = abs(thetaF2_deg)
     thetaF_max_abs_deg = max(thetaF1_abs_deg, thetaF2_abs_deg)
+    thetaF1_net_deg = float(getattr(info, "thetaF1_net_deg", math.nan))
+    thetaF2_net_deg = float(getattr(info, "thetaF2_net_deg", math.nan))
+    q1_net = float(getattr(info, "q1_net", math.nan))
+    q2_net = float(getattr(info, "q2_net", math.nan))
 
     selected_guess = multistart_meta.get("selected_guess")
     thetaF1_guess, thetaF2_guess = theta_guess_from_candidate(method, model, selected_guess)
@@ -576,6 +589,10 @@ def evaluate_step(
         "thetaF1_abs_deg": thetaF1_abs_deg,
         "thetaF2_abs_deg": thetaF2_abs_deg,
         "thetaF_max_abs_deg": thetaF_max_abs_deg,
+        "thetaF1_net_deg": thetaF1_net_deg,
+        "thetaF2_net_deg": thetaF2_net_deg,
+        "q1_net": q1_net,
+        "q2_net": q2_net,
         "thetaF1_guess_deg": thetaF1_guess_deg,
         "thetaF2_guess_deg": thetaF2_guess_deg,
         "delta_thetaF1_from_guess_deg": delta_thetaF1_from_guess_deg,

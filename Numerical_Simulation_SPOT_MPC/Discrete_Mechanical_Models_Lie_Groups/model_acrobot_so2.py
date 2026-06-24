@@ -8,7 +8,7 @@ from typing import Any, Mapping, Optional, Tuple
 import numpy as np
 
 try:
-    from Numerical_Simulation.lie_group_so2 import R_so2, angle_from_R, cross2
+    from ..lie_group_so2 import R_so2, angle_from_R, cross2
 except ImportError:
     from lie_group_so2 import R_so2, angle_from_R, cross2
 

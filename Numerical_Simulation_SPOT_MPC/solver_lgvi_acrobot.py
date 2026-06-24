@@ -7,7 +7,7 @@ import numpy as np
 from scipy.optimize import root
 
 try:
-    from Numerical_Simulation.lie_group_so2 import (
+    from .lie_group_so2 import (
         F_from_delta,
         F_from_cayley,
         angle_from_R,
@@ -18,12 +18,12 @@ try:
         det_error_so2,
     )
 
-    from Numerical_Simulation.Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import (
+    from .Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import (
         AcrobotSO2Model,
     )
 
 except ImportError:
-    # Allows running this file from inside Numerical_Simulation.
+    # Allows running this file directly from inside Numerical_Simulation_SPOT_MPC.
     from lie_group_so2 import (
         F_from_delta,
         F_from_cayley,
@@ -84,8 +84,14 @@ class LGVIStepInfo:
     method: str = "ab"
     thetaF1_deg: float = np.nan
     thetaF2_deg: float = np.nan
+    thetaF_max_abs_deg: float = np.nan
+    delta_thetaF_max_from_guess_deg: float = np.nan
     q1: float = np.nan
     q2: float = np.nan
+    thetaF1_net_deg: float = np.nan
+    thetaF2_net_deg: float = np.nan
+    q1_net: float = np.nan
+    q2_net: float = np.nan
     cayley_near_singularity: bool = False
     singularity_margin_deg: float = np.nan
     substepping_performed: bool = False
@@ -94,6 +100,14 @@ class LGVIStepInfo:
     h_original: float = np.nan
     h_min_used: float = np.nan
     near_singularity_count: int = 0
+    lambda0_norm: float = np.nan
+    lambda12_norm: float = np.nan
+    lambda_total_norm: float = np.nan
+    multistart_used: bool = False
+    multistart_num_candidates: int = 1
+    multistart_num_converged: int = 0
+    multistart_selected_index: int = 0
+    multistart_selected_score: float = np.nan
 
 
 class LGVISolveError(RuntimeError):
@@ -375,6 +389,83 @@ def initial_guess_from_previous(
     )
 
 
+def _lambda_norms(lambda0: np.ndarray, lambda12: np.ndarray) -> Tuple[float, float, float]:
+    lambda0_norm = float(np.linalg.norm(np.asarray(lambda0, dtype=float).reshape(2)))
+    lambda12_norm = float(np.linalg.norm(np.asarray(lambda12, dtype=float).reshape(2)))
+    return lambda0_norm, lambda12_norm, float(np.hypot(lambda0_norm, lambda12_norm))
+
+
+def _ab_theta_pair_from_z(model: AcrobotSO2Model, z: np.ndarray) -> Tuple[float, float]:
+    F1, F2, _, _ = model.unpack_reduced_solution(np.asarray(z, dtype=float).reshape(8))
+    return angle_from_R(F1), angle_from_R(F2)
+
+
+def _cayley_theta_pair_from_y(y: np.ndarray) -> Tuple[float, float]:
+    y = np.asarray(y, dtype=float).reshape(6)
+    return angle_from_cayley(float(y[0])), angle_from_cayley(float(y[1]))
+
+
+def _ab_multistart_guesses(
+    model: AcrobotSO2Model,
+    state: AcrobotReducedState,
+    z_guess: Optional[np.ndarray],
+) -> List[np.ndarray]:
+    previous_f_guess = model.initial_step_guess(
+        F1_prev=state.F1_prev,
+        F2_prev=state.F2_prev,
+    )
+    primary = (
+        np.asarray(z_guess, dtype=float).reshape(8).copy()
+        if z_guess is not None
+        else previous_f_guess.copy()
+    )
+    prev_lambda = primary[4:8].copy()
+    identity_prev_lambda = np.array([1.0, 0.0, 1.0, 0.0, *prev_lambda], dtype=float)
+    identity_zero_lambda = np.array([1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+    previous_f_zero_lambda = previous_f_guess.copy()
+    previous_f_zero_lambda[4:8] = 0.0
+    return [primary, identity_prev_lambda, identity_zero_lambda, previous_f_zero_lambda]
+
+
+def _cayley_multistart_guesses(
+    state: AcrobotReducedState,
+    y_guess: Optional[np.ndarray],
+) -> List[np.ndarray]:
+    previous_q = np.array(
+        [cayley_from_R(state.F1_prev), cayley_from_R(state.F2_prev)],
+        dtype=float,
+    )
+    primary = (
+        np.asarray(y_guess, dtype=float).reshape(6).copy()
+        if y_guess is not None
+        else np.r_[previous_q, 0.0, 0.0, 0.0, 0.0].astype(float)
+    )
+    previous_lambda = primary[2:6].copy()
+    zero_q_prev_lambda = np.r_[0.0, 0.0, previous_lambda].astype(float)
+    zero_q_zero_lambda = np.zeros(6, dtype=float)
+    previous_q_zero_lambda = np.r_[previous_q, 0.0, 0.0, 0.0, 0.0].astype(float)
+    return [primary, zero_q_prev_lambda, zero_q_zero_lambda, previous_q_zero_lambda]
+
+
+def _multistart_score(
+    multistart_select: str,
+    residual_inf: float,
+    theta1: float,
+    theta2: float,
+    guess_theta1: float,
+    guess_theta2: float,
+    lambda_total_norm: float,
+) -> float:
+    if str(multistart_select).lower() == "residual":
+        return float(residual_inf)
+    theta_max_abs_deg = max(abs(float(np.rad2deg(theta1))), abs(float(np.rad2deg(theta2))))
+    delta_max_deg = max(
+        abs(float(np.rad2deg(theta1 - guess_theta1))),
+        abs(float(np.rad2deg(theta2 - guess_theta2))),
+    )
+    return float(theta_max_abs_deg + 0.1 * delta_max_deg + 1.0e-6 * lambda_total_norm)
+
+
 def lgvi_one_step(
     model: AcrobotSO2Model,
     h: float,
@@ -386,6 +477,8 @@ def lgvi_one_step(
     normalized: bool = False,
     accept_residual: bool = True,
     accept_residual_tol: float = 1e-3,
+    use_multistart: bool = False,
+    multistart_select: str = "local",
 ) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
     """
     Propagate the reduced acrobot by one SDP-matching implicit step.
@@ -404,13 +497,6 @@ def lgvi_one_step(
     h = float(h)
     u_k = float(u_k)
 
-    if z_guess is None:
-        z_guess = initial_guess_from_previous(
-            model=model,
-            state=state,
-            previous_z=None,
-        )
-
     def fun(z: np.ndarray) -> np.ndarray:
         return acrobot_reduced_step_residual(
             z=z,
@@ -424,63 +510,141 @@ def lgvi_one_step(
             normalized=normalized,
         )
 
-    sol = root(
-        fun,
-        np.asarray(z_guess, dtype=float).reshape(8),
-        method="hybr",
-        options={
-            "xtol": root_tol,
-            "maxfev": int(lgvi_maxfev),
-        },
-    )
-
-    residual = fun(sol.x)
-    residual_inf = float(np.linalg.norm(residual, ord=np.inf))
-
-    accepted_by_residual = bool(
-        not sol.success
-        and accept_residual
-        and np.isfinite(residual_inf)
-        and residual_inf <= float(accept_residual_tol)
-    )
-
-    info = LGVIStepInfo(
-        success=bool(sol.success),
-        residual_inf=residual_inf,
-        nfev=int(sol.nfev),
-        message=str(sol.message),
-        accepted_by_residual=accepted_by_residual,
-        method="ab",
-    )
-
-    if not sol.success and not accepted_by_residual:
-        raise LGVISolveError(
-            residual_inf=residual_inf,
-            message=str(sol.message),
-            nfev=int(sol.nfev),
+    def solve_from_guess(guess: np.ndarray) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
+        sol = root(
+            fun,
+            np.asarray(guess, dtype=float).reshape(8),
+            method="hybr",
+            options={
+                "xtol": root_tol,
+                "maxfev": int(lgvi_maxfev),
+            },
         )
 
-    z = np.asarray(sol.x, dtype=float).reshape(8)
+        residual = fun(sol.x)
+        residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+        accepted_by_residual = bool(
+            not sol.success
+            and accept_residual
+            and np.isfinite(residual_inf)
+            and residual_inf <= float(accept_residual_tol)
+        )
 
-    R1_next, R2_next, F1_k, F2_k, _, _ = model.advance_reduced_state(
-        R1_k=state.R1,
-        R2_k=state.R2,
-        z=z,
-    )
+        info = LGVIStepInfo(
+            success=bool(sol.success),
+            residual_inf=residual_inf,
+            nfev=int(sol.nfev),
+            message=str(sol.message),
+            accepted_by_residual=accepted_by_residual,
+            method="ab",
+        )
 
-    info.thetaF1_deg = float(np.rad2deg(angle_from_R(F1_k)))
-    info.thetaF2_deg = float(np.rad2deg(angle_from_R(F2_k)))
-    info.h_original = h
-    info.h_min_used = h
+        if not sol.success and not accepted_by_residual:
+            raise LGVISolveError(
+                residual_inf=residual_inf,
+                message=str(sol.message),
+                nfev=int(sol.nfev),
+            )
 
-    next_state = AcrobotReducedState(
-        R1=R1_next,
-        R2=R2_next,
-        F1_prev=F1_k,
-        F2_prev=F2_k,
-    )
+        z = np.asarray(sol.x, dtype=float).reshape(8)
+        R1_next, R2_next, F1_k, F2_k, _, _ = model.advance_reduced_state(
+            R1_k=state.R1,
+            R2_k=state.R2,
+            z=z,
+        )
+        thetaF1 = angle_from_R(F1_k)
+        thetaF2 = angle_from_R(F2_k)
+        guess_thetaF1, guess_thetaF2 = _ab_theta_pair_from_z(model, guess)
+        _, _, lam0, lam12 = model.unpack_reduced_solution(z)
+        lambda0_norm, lambda12_norm, lambda_total_norm = _lambda_norms(lam0, lam12)
 
-    return next_state, info, z
+        info.thetaF1_deg = float(np.rad2deg(thetaF1))
+        info.thetaF2_deg = float(np.rad2deg(thetaF2))
+        info.thetaF_max_abs_deg = max(abs(info.thetaF1_deg), abs(info.thetaF2_deg))
+        info.delta_thetaF_max_from_guess_deg = max(
+            abs(float(np.rad2deg(thetaF1 - guess_thetaF1))),
+            abs(float(np.rad2deg(thetaF2 - guess_thetaF2))),
+        )
+        info.lambda0_norm = lambda0_norm
+        info.lambda12_norm = lambda12_norm
+        info.lambda_total_norm = lambda_total_norm
+        info.h_original = h
+        info.h_min_used = h
+
+        next_state = AcrobotReducedState(
+            R1=R1_next,
+            R2=R2_next,
+            F1_prev=F1_k,
+            F2_prev=F2_k,
+        )
+        return next_state, info, z
+
+    if not use_multistart:
+        if z_guess is None:
+            z_guess = initial_guess_from_previous(
+                model=model,
+                state=state,
+                previous_z=None,
+            )
+        return solve_from_guess(z_guess)
+
+    if str(multistart_select).lower() not in {"local", "residual"}:
+        raise ValueError("multistart_select must be either 'local' or 'residual'.")
+
+    guesses = _ab_multistart_guesses(model=model, state=state, z_guess=z_guess)
+    candidates: List[Dict[str, Any]] = []
+    last_error: Optional[LGVISolveError] = None
+
+    for idx, guess in enumerate(guesses):
+        try:
+            state_next, info, z = solve_from_guess(guess)
+        except LGVISolveError as exc:
+            last_error = exc
+            continue
+
+        if not np.isfinite(info.residual_inf) or float(info.residual_inf) > float(accept_residual_tol):
+            continue
+
+        theta1, theta2 = _ab_theta_pair_from_z(model, z)
+        guess_theta1, guess_theta2 = _ab_theta_pair_from_z(model, guess)
+        _, _, lam0, lam12 = model.unpack_reduced_solution(z)
+        _, _, lambda_total_norm = _lambda_norms(lam0, lam12)
+        score = _multistart_score(
+            multistart_select=multistart_select,
+            residual_inf=info.residual_inf,
+            theta1=theta1,
+            theta2=theta2,
+            guess_theta1=guess_theta1,
+            guess_theta2=guess_theta2,
+            lambda_total_norm=lambda_total_norm,
+        )
+        candidates.append(
+            {
+                "index": idx,
+                "state_next": state_next,
+                "info": info,
+                "z": z,
+                "score": score,
+            }
+        )
+
+    if not candidates:
+        if last_error is not None:
+            raise last_error
+        raise LGVISolveError(
+            residual_inf=np.inf,
+            message="No AB multi-start candidate reached accept_residual_tol.",
+            nfev=0,
+        )
+
+    selected = min(candidates, key=lambda item: float(item["score"]))
+    info = selected["info"]
+    info.multistart_used = True
+    info.multistart_num_candidates = len(guesses)
+    info.multistart_num_converged = len(candidates)
+    info.multistart_selected_index = int(selected["index"])
+    info.multistart_selected_score = float(selected["score"])
+    return selected["state_next"], info, selected["z"]
 
 
 def cayley_residual_to_ab_solution(y: np.ndarray) -> np.ndarray:
@@ -563,6 +727,8 @@ def lgvi_one_step_cayley(
     accept_residual: bool = True,
     accept_residual_tol: float = 1e-10,
     singularity_margin_deg: float = 5.0,
+    use_multistart: bool = False,
+    multistart_select: str = "local",
 ) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
     """
     Propagate one step using Cayley coordinates for the step rotations.
@@ -571,7 +737,6 @@ def lgvi_one_step_cayley(
 
     h = float(h)
     u_k = float(u_k)
-    y0 = initial_guess_cayley_from_previous(state=state, y_guess=y_guess)
 
     def fun(y: np.ndarray) -> np.ndarray:
         return acrobot_reduced_step_residual_cayley(
@@ -582,85 +747,148 @@ def lgvi_one_step_cayley(
             u_k=u_k,
         )
 
-    sol = root(
-        fun,
-        y0,
-        method="hybr",
-        options={"xtol": root_tol, "maxfev": int(lgvi_maxfev)},
-    )
-
-    residual = fun(sol.x)
-    residual_inf = float(np.linalg.norm(residual, ord=np.inf))
-    accepted_by_residual = bool(
-        not sol.success
-        and accept_residual
-        and np.isfinite(residual_inf)
-        and residual_inf <= float(accept_residual_tol)
-    )
-
-    if not sol.success and not accepted_by_residual:
-        raise LGVISolveError(
-            residual_inf=residual_inf,
-            message=str(sol.message),
-            nfev=int(sol.nfev),
+    def solve_from_guess(guess: np.ndarray) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray, np.ndarray]:
+        sol = root(
+            fun,
+            np.asarray(guess, dtype=float).reshape(6),
+            method="hybr",
+            options={"xtol": root_tol, "maxfev": int(lgvi_maxfev)},
         )
 
-    y = np.asarray(sol.x, dtype=float).reshape(6)
-    q1 = float(y[0])
-    q2 = float(y[1])
-    F1 = F_from_cayley(q1)
-    F2 = F_from_cayley(q2)
-    R1_next = state.R1 @ F1
-    R2_next = state.R2 @ F2
-    near_singularity, near_count = _cayley_near_singularity(
-        q1=q1,
-        q2=q2,
-        singularity_margin_deg=singularity_margin_deg,
-    )
+        residual = fun(sol.x)
+        residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+        accepted_by_residual = bool(
+            not sol.success
+            and accept_residual
+            and np.isfinite(residual_inf)
+            and residual_inf <= float(accept_residual_tol)
+        )
 
-    info = LGVIStepInfo(
-        success=bool(sol.success),
-        residual_inf=residual_inf,
-        nfev=int(sol.nfev),
-        message=str(sol.message),
-        accepted_by_residual=accepted_by_residual,
-        method="cayley",
-        thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1))),
-        thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2))),
-        q1=q1,
-        q2=q2,
-        cayley_near_singularity=bool(near_singularity),
-        singularity_margin_deg=float(singularity_margin_deg),
-        h_original=h,
-        h_min_used=h,
-        near_singularity_count=int(near_count),
-    )
+        if not sol.success and not accepted_by_residual:
+            raise LGVISolveError(
+                residual_inf=residual_inf,
+                message=str(sol.message),
+                nfev=int(sol.nfev),
+            )
 
-    next_state = AcrobotReducedState(
-        R1=R1_next,
-        R2=R2_next,
-        F1_prev=F1,
-        F2_prev=F2,
-    )
+        y = np.asarray(sol.x, dtype=float).reshape(6)
+        q1 = float(y[0])
+        q2 = float(y[1])
+        F1 = F_from_cayley(q1)
+        F2 = F_from_cayley(q2)
+        R1_next = state.R1 @ F1
+        R2_next = state.R2 @ F2
+        guess_thetaF1, guess_thetaF2 = _cayley_theta_pair_from_y(guess)
+        lambda0_norm, lambda12_norm, lambda_total_norm = _lambda_norms(y[2:4], y[4:6])
+        near_singularity, near_count = _cayley_near_singularity(
+            q1=q1,
+            q2=q2,
+            singularity_margin_deg=singularity_margin_deg,
+        )
 
-    return next_state, info, cayley_residual_to_ab_solution(y)
+        info = LGVIStepInfo(
+            success=bool(sol.success),
+            residual_inf=residual_inf,
+            nfev=int(sol.nfev),
+            message=str(sol.message),
+            accepted_by_residual=accepted_by_residual,
+            method="cayley",
+            thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1))),
+            thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2))),
+            thetaF_max_abs_deg=max(
+                abs(float(np.rad2deg(angle_from_cayley(q1)))),
+                abs(float(np.rad2deg(angle_from_cayley(q2)))),
+            ),
+            delta_thetaF_max_from_guess_deg=max(
+                abs(float(np.rad2deg(angle_from_cayley(q1) - guess_thetaF1))),
+                abs(float(np.rad2deg(angle_from_cayley(q2) - guess_thetaF2))),
+            ),
+            q1=q1,
+            q2=q2,
+            thetaF1_net_deg=float(np.rad2deg(angle_from_cayley(q1))),
+            thetaF2_net_deg=float(np.rad2deg(angle_from_cayley(q2))),
+            q1_net=q1,
+            q2_net=q2,
+            cayley_near_singularity=bool(near_singularity),
+            singularity_margin_deg=float(singularity_margin_deg),
+            h_original=h,
+            h_min_used=h,
+            near_singularity_count=int(near_count),
+            lambda0_norm=lambda0_norm,
+            lambda12_norm=lambda12_norm,
+            lambda_total_norm=lambda_total_norm,
+        )
 
+        next_state = AcrobotReducedState(
+            R1=R1_next,
+            R2=R2_next,
+            F1_prev=F1,
+            F2_prev=F2,
+        )
+        return next_state, info, cayley_residual_to_ab_solution(y), y
 
-def _combined_step_z_from_states(
-    model: AcrobotSO2Model,
-    state_start: AcrobotReducedState,
-    state_end: AcrobotReducedState,
-    fallback_z: np.ndarray,
-) -> np.ndarray:
-    """
-    Build an AB-equivalent z for the net rotation from state_start to state_end.
-    """
-    fallback_z = np.asarray(fallback_z, dtype=float).reshape(8)
-    F1_total = state_start.R1.T @ state_end.R1
-    F2_total = state_start.R2.T @ state_end.R2
-    a1, b1 = model.scalars_from_step_rotation(F1_total)
-    a2, b2 = model.scalars_from_step_rotation(F2_total)
-    return np.array([a1, b1, a2, b2, fallback_z[4], fallback_z[5], fallback_z[6], fallback_z[7]], dtype=float)
+    if not use_multistart:
+        y0 = initial_guess_cayley_from_previous(state=state, y_guess=y_guess)
+        state_next, info, z, _ = solve_from_guess(y0)
+        return state_next, info, z
+
+    if str(multistart_select).lower() not in {"local", "residual"}:
+        raise ValueError("multistart_select must be either 'local' or 'residual'.")
+
+    guesses = _cayley_multistart_guesses(state=state, y_guess=y_guess)
+    candidates: List[Dict[str, Any]] = []
+    last_error: Optional[LGVISolveError] = None
+
+    for idx, guess in enumerate(guesses):
+        try:
+            state_next, info, z, y = solve_from_guess(guess)
+        except LGVISolveError as exc:
+            last_error = exc
+            continue
+
+        if not np.isfinite(info.residual_inf) or float(info.residual_inf) > float(accept_residual_tol):
+            continue
+
+        theta1, theta2 = _cayley_theta_pair_from_y(y)
+        guess_theta1, guess_theta2 = _cayley_theta_pair_from_y(guess)
+        lambda0, lambda12 = y[2:4], y[4:6]
+        _, _, lambda_total_norm = _lambda_norms(lambda0, lambda12)
+        score = _multistart_score(
+            multistart_select=multistart_select,
+            residual_inf=info.residual_inf,
+            theta1=theta1,
+            theta2=theta2,
+            guess_theta1=guess_theta1,
+            guess_theta2=guess_theta2,
+            lambda_total_norm=lambda_total_norm,
+        )
+        candidates.append(
+            {
+                "index": idx,
+                "state_next": state_next,
+                "info": info,
+                "z": z,
+                "score": score,
+            }
+        )
+
+    if not candidates:
+        if last_error is not None:
+            raise last_error
+        raise LGVISolveError(
+            residual_inf=np.inf,
+            message="No Cayley multi-start candidate reached accept_residual_tol.",
+            nfev=0,
+        )
+
+    selected = min(candidates, key=lambda item: float(item["score"]))
+    info = selected["info"]
+    info.multistart_used = True
+    info.multistart_num_candidates = len(guesses)
+    info.multistart_num_converged = len(candidates)
+    info.multistart_selected_index = int(selected["index"])
+    info.multistart_selected_score = float(selected["score"])
+    return selected["state_next"], info, selected["z"]
 
 
 def lgvi_one_step_cayley_safe(
@@ -677,6 +905,8 @@ def lgvi_one_step_cayley_safe(
     allow_substepping: bool = False,
     min_substep_h: float = 1e-6,
     max_subdivisions: int = 10,
+    use_multistart: bool = False,
+    multistart_select: str = "local",
     _depth: int = 0,
     _h_original: Optional[float] = None,
 ) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
@@ -698,6 +928,8 @@ def lgvi_one_step_cayley_safe(
             accept_residual=accept_residual,
             accept_residual_tol=accept_residual_tol,
             singularity_margin_deg=singularity_margin_deg,
+            use_multistart=use_multistart,
+            multistart_select=multistart_select,
         )
         should_split = bool(info.cayley_near_singularity)
         split_trigger_near_count = int(info.near_singularity_count) if should_split else 0
@@ -733,15 +965,28 @@ def lgvi_one_step_cayley_safe(
         allow_substepping=allow_substepping,
         min_substep_h=min_substep_h,
         max_subdivisions=max_subdivisions,
+        use_multistart=use_multistart,
+        multistart_select=multistart_select,
         _depth=_depth + 1,
         _h_original=h_original,
+    )
+    y_guess_b = np.array(
+        [
+            cayley_from_R(mid_state.F1_prev),
+            cayley_from_R(mid_state.F2_prev),
+            z_a[4],
+            z_a[5],
+            z_a[6],
+            z_a[7],
+        ],
+        dtype=float,
     )
     end_state, info_b, z_b = lgvi_one_step_cayley_safe(
         model=model,
         h=half_h,
         state=mid_state,
         u_k=u_k,
-        y_guess=None,
+        y_guess=y_guess_b,
         root_tol=root_tol,
         lgvi_maxfev=lgvi_maxfev,
         accept_residual=accept_residual,
@@ -750,11 +995,12 @@ def lgvi_one_step_cayley_safe(
         allow_substepping=allow_substepping,
         min_substep_h=min_substep_h,
         max_subdivisions=max_subdivisions,
+        use_multistart=use_multistart,
+        multistart_select=multistart_select,
         _depth=_depth + 1,
         _h_original=h_original,
     )
 
-    combined_z = _combined_step_z_from_states(model, state, end_state, z_b)
     residual_inf = max(float(info_a.residual_inf), float(info_b.residual_inf))
     near_count = split_trigger_near_count + int(info_a.near_singularity_count) + int(info_b.near_singularity_count)
     num_substeps = int(info_a.num_substeps) + int(info_b.num_substeps)
@@ -762,6 +1008,8 @@ def lgvi_one_step_cayley_safe(
     max_depth = max(int(info_a.substep_depth), int(info_b.substep_depth), _depth + 1)
     q1_total = cayley_from_R(state.R1.T @ end_state.R1)
     q2_total = cayley_from_R(state.R2.T @ end_state.R2)
+    q1_last = cayley_from_R(end_state.F1_prev)
+    q2_last = cayley_from_R(end_state.F2_prev)
 
     combined_info = LGVIStepInfo(
         success=bool(info_a.success and info_b.success),
@@ -770,10 +1018,19 @@ def lgvi_one_step_cayley_safe(
         message=f"substepped: first=({info_a.message}); second=({info_b.message})",
         accepted_by_residual=bool(info_a.accepted_by_residual or info_b.accepted_by_residual),
         method="cayley",
-        thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1_total))),
-        thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2_total))),
-        q1=float(q1_total),
-        q2=float(q2_total),
+        thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1_last))),
+        thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2_last))),
+        thetaF_max_abs_deg=max(
+            abs(float(np.rad2deg(angle_from_cayley(q1_last)))),
+            abs(float(np.rad2deg(angle_from_cayley(q2_last)))),
+        ),
+        delta_thetaF_max_from_guess_deg=float(info_b.delta_thetaF_max_from_guess_deg),
+        q1=float(q1_last),
+        q2=float(q2_last),
+        thetaF1_net_deg=float(np.rad2deg(angle_from_cayley(q1_total))),
+        thetaF2_net_deg=float(np.rad2deg(angle_from_cayley(q2_total))),
+        q1_net=float(q1_total),
+        q2_net=float(q2_total),
         cayley_near_singularity=bool(split_trigger_near_count > 0 or info_a.cayley_near_singularity or info_b.cayley_near_singularity),
         singularity_margin_deg=float(singularity_margin_deg),
         substepping_performed=True,
@@ -782,9 +1039,17 @@ def lgvi_one_step_cayley_safe(
         h_original=h_original,
         h_min_used=h_min_used,
         near_singularity_count=near_count,
+        lambda0_norm=float(info_b.lambda0_norm),
+        lambda12_norm=float(info_b.lambda12_norm),
+        lambda_total_norm=float(info_b.lambda_total_norm),
+        multistart_used=bool(info_a.multistart_used or info_b.multistart_used),
+        multistart_num_candidates=int(info_a.multistart_num_candidates) + int(info_b.multistart_num_candidates),
+        multistart_num_converged=int(info_a.multistart_num_converged) + int(info_b.multistart_num_converged),
+        multistart_selected_index=int(info_b.multistart_selected_index),
+        multistart_selected_score=float(info_b.multistart_selected_score),
     )
 
-    return end_state, combined_info, combined_z
+    return end_state, combined_info, z_b
 
 
 def rollout_lgvi_controls(
@@ -802,6 +1067,8 @@ def rollout_lgvi_controls(
     normalized: bool = False,
     accept_residual: bool = True,
     accept_residual_tol: float = 1e-3,
+    use_multistart: bool = False,
+    multistart_select: str = "local",
 ) -> Dict[str, Any]:
     """
     Roll out reduced SDP-matching dynamics for a given torque sequence.
@@ -860,6 +1127,8 @@ def rollout_lgvi_controls(
                     normalized=normalized,
                     accept_residual=accept_residual,
                     accept_residual_tol=accept_residual_tol,
+                    use_multistart=use_multistart,
+                    multistart_select=multistart_select,
                 )
             else:
                 state_next, info, z = lgvi_one_step_cayley_safe(
@@ -876,6 +1145,8 @@ def rollout_lgvi_controls(
                     allow_substepping=allow_substepping,
                     min_substep_h=min_substep_h,
                     max_subdivisions=max_subdivisions,
+                    use_multistart=use_multistart,
+                    multistart_select=multistart_select,
                 )
         except LGVISolveError as exc:
             exc.local_sim_step = k
@@ -916,7 +1187,17 @@ def rollout_lgvi_controls(
         if method == "ab":
             z_guess = z.copy()
         else:
-            y_guess = np.array([info.q1, info.q2, z[4], z[5], z[6], z[7]], dtype=float)
+            y_guess = np.array(
+                [
+                    cayley_from_R(state_next.F1_prev),
+                    cayley_from_R(state_next.F2_prev),
+                    z[4],
+                    z[5],
+                    z[6],
+                    z[7],
+                ],
+                dtype=float,
+            )
         state = state_next
 
     return {
@@ -950,6 +1231,39 @@ def rollout_lgvi_controls(
         "near_singularity_count": np.asarray(
             [info.near_singularity_count for info in infos], dtype=int
         ),
+        "thetaF_net_deg": np.asarray(
+            [[info.thetaF1_net_deg, info.thetaF2_net_deg] for info in infos],
+            dtype=float,
+        ),
+        "q_net": np.asarray([[info.q1_net, info.q2_net] for info in infos], dtype=float),
+        "thetaF_max_abs_deg": np.asarray(
+            [info.thetaF_max_abs_deg for info in infos],
+            dtype=float,
+        ),
+        "delta_thetaF_max_from_guess_deg": np.asarray(
+            [info.delta_thetaF_max_from_guess_deg for info in infos],
+            dtype=float,
+        ),
+        "lambda0_norm": np.asarray([info.lambda0_norm for info in infos], dtype=float),
+        "lambda12_norm": np.asarray([info.lambda12_norm for info in infos], dtype=float),
+        "lambda_total_norm": np.asarray([info.lambda_total_norm for info in infos], dtype=float),
+        "multistart_used": np.asarray([info.multistart_used for info in infos], dtype=bool),
+        "multistart_num_candidates": np.asarray(
+            [info.multistart_num_candidates for info in infos],
+            dtype=int,
+        ),
+        "multistart_num_converged": np.asarray(
+            [info.multistart_num_converged for info in infos],
+            dtype=int,
+        ),
+        "multistart_selected_index": np.asarray(
+            [info.multistart_selected_index for info in infos],
+            dtype=int,
+        ),
+        "multistart_selected_score": np.asarray(
+            [info.multistart_selected_score for info in infos],
+            dtype=float,
+        ),
         "infos": infos,
         "z_solutions": z_solutions,
         "final_state": state,
@@ -972,6 +1286,8 @@ def simulate_one_control_interval(
     normalized: bool = False,
     accept_residual: bool = True,
     accept_residual_tol: float = 1e-3,
+    use_multistart: bool = False,
+    multistart_select: str = "local",
 ) -> Tuple[AcrobotReducedState, Dict[str, Any]]:
     """
     Simulate one MPC control interval.
@@ -1012,6 +1328,8 @@ def simulate_one_control_interval(
         normalized=normalized,
         accept_residual=accept_residual,
         accept_residual_tol=accept_residual_tol,
+        use_multistart=use_multistart,
+        multistart_select=multistart_select,
     )
 
     return sim["final_state"], sim
@@ -1032,6 +1350,8 @@ def simulate_one_control_interval_from_params(
     normalized: bool = False,
     accept_residual: Optional[bool] = None,
     accept_residual_tol: Optional[float] = None,
+    use_multistart: Optional[bool] = None,
+    multistart_select: Optional[str] = None,
 ) -> Tuple[AcrobotReducedState, Dict[str, Any]]:
     """
     Convenience wrapper using YAML-derived params.
@@ -1052,6 +1372,10 @@ def simulate_one_control_interval_from_params(
         accept_residual = bool(params.get("accept_residual", True))
     if accept_residual_tol is None:
         accept_residual_tol = float(params.get("accept_residual_tol", 1e-3))
+    if use_multistart is None:
+        use_multistart = bool(params.get("use_multistart", False))
+    if multistart_select is None:
+        multistart_select = str(params.get("multistart_select", "local"))
 
     return simulate_one_control_interval(
         model=model,
@@ -1069,6 +1393,8 @@ def simulate_one_control_interval_from_params(
         normalized=normalized,
         accept_residual=accept_residual,
         accept_residual_tol=accept_residual_tol,
+        use_multistart=use_multistart,
+        multistart_select=multistart_select,
     )
 
 
@@ -1085,6 +1411,8 @@ def simulate_lgvi_acrobot(
     root_tol: float = 1e-10,
     maxfev: int = 100,
     verbose: bool = False,
+    use_multistart: bool = False,
+    multistart_select: str = "local",
 ) -> Dict[str, Any]:
     """
     Backward-compatible rollout interface.
@@ -1135,6 +1463,8 @@ def simulate_lgvi_acrobot(
         allow_substepping=allow_substepping,
         root_tol=root_tol,
         lgvi_maxfev=maxfev,
+        use_multistart=use_multistart,
+        multistart_select=multistart_select,
     )
 
     if verbose:
