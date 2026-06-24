@@ -1,0 +1,90 @@
+u,h,method,final_thetaR1_lgvi_deg,final_thetaR2_lgvi_deg,final_thetaR1_ode_deg,final_thetaR2_ode_deg,error_thetaR1_deg,error_thetaR2_deg,error_norm_deg,success,message
+-20.0,0.01,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+-20.0,0.01,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+-20.0,0.005,ab,8.64128549519967,-8.57086879602077,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-20.0,0.005,cayley,8.641285495198355,-8.57086879601722,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-20.0,0.002,ab,35.78154974200237,-84.94740378646102,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-20.0,0.002,cayley,35.781549742002234,-84.94740378645953,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-20.0,0.001,ab,19.341718575420828,-31.640676248879153,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-20.0,0.001,cayley,19.341718714682635,-31.640676563731034,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-20.0,0.0005,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+-20.0,0.0005,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+-10.0,0.01,ab,10.00455170961374,-8.531612303858562,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.01,cayley,10.00455170961413,-8.531612303859445,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.005,ab,31.84788654680655,-139.23579918629994,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.005,cayley,31.84788654680767,-139.23579918629173,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.002,ab,38.152046528753104,-84.27840779588998,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.002,cayley,38.15204652875321,-84.27840779589035,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.001,ab,17.021076169677563,-23.939005771100337,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.001,cayley,17.021078061549893,-23.939009850735268,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.0005,ab,29.3243932930769,-52.48609182711749,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-10.0,0.0005,cayley,29.324393293070443,-52.48609182710024,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.01,ab,20.969137797801952,-31.379853524631336,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.01,cayley,20.96913779780197,-31.37985352463117,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.005,ab,33.327739280645204,-61.10388953628228,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.005,cayley,33.32773928064516,-61.10388953628215,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.002,ab,24.94611923181127,-40.05205118938008,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.002,cayley,24.946119231811338,-40.05205118938026,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+-5.0,0.001,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+-5.0,0.001,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+-5.0,0.0005,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+-5.0,0.0005,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+0.0,0.01,ab,4.330886137624858,5.179046892893042,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.01,cayley,4.330886137624856,5.17904689289304,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.005,ab,4.360152039308677,5.172844166567052,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.005,cayley,4.360152039308677,5.17284416656705,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.002,ab,4.377622807300458,5.169263200197734,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.002,cayley,4.377622807300459,5.169263200197734,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.001,ab,4.383433470470654,5.168090048587621,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.001,cayley,4.383433470470658,5.1680900485876204,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.0005,ab,4.386336552002426,5.167507044773109,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+0.0,0.0005,cayley,4.3863365520024225,5.167507044773114,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.01,ab,-16.033365265494883,58.19192451166487,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.01,cayley,-16.03336526549487,58.19192451166486,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.005,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+5.0,0.005,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+5.0,0.002,ab,-0.9902373137416304,15.824092201381255,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.002,cayley,-0.9902373137425939,15.824092201383717,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.001,ab,-3.8943319035067248,23.366410344922524,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.001,cayley,-3.8943311168831505,23.36640833448944,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.0005,ab,-9.649857273483047,39.356160701857846,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+5.0,0.0005,cayley,-9.649857273469046,39.35616070181584,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+10.0,0.01,ab,-15.227157015871843,51.48758157348129,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+10.0,0.01,cayley,-15.227157015871873,51.48758157348091,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+10.0,0.005,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+10.0,0.005,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+10.0,0.002,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+10.0,0.002,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+10.0,0.001,ab,14.393632976700042,67.62561023183464,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+10.0,0.001,cayley,14.393632975140527,67.6256102393174,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+10.0,0.0005,ab,-16.583879589337865,98.21276670784616,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+10.0,0.0005,cayley,-16.583879588880677,98.21276669018455,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+20.0,0.01,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+20.0,0.01,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+20.0,0.005,ab,-20.49300990206097,71.77415298942361,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+20.0,0.005,cayley,-20.493009902060876,71.77415298942266,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+20.0,0.002,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last ten iterations."
+20.0,0.002,cayley,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+20.0,0.001,ab,4.460655487622687,-1.546213363003279,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+20.0,0.001,cayley,4.460655487191424,-1.5462133620221523,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.
+20.0,0.0005,ab,nan,nan,nan,nan,nan,nan,nan,False,"LGVI failed: The iteration is not making good progress, as measured by the 
+ improvement from the last five Jacobian evaluations."
+20.0,0.0005,cayley,82.34839250719592,150.4678985053502,nan,nan,nan,nan,nan,False,Continuous ODE benchmark is not available yet: AcrobotSO2Model has no rhs_absolute method in Numerical_Simulation_SPOT_MPC.

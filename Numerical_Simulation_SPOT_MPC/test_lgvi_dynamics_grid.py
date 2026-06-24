@@ -264,8 +264,9 @@ def solve_one_step_with_optional_multistart(
     method: str,
     z_guess: Optional[np.ndarray],
     y_guess: Optional[np.ndarray],
+    use_multistart: bool,
 ) -> Tuple[AcrobotReducedState, Any, np.ndarray, Dict[str, Any], Optional[np.ndarray], Optional[np.ndarray]]:
-    if not USE_MULTISTART:
+    if not use_multistart:
         if method == "ab":
             state_next, info, z = lgvi_one_step(
                 model=model,
@@ -300,7 +301,17 @@ def solve_one_step_with_optional_multistart(
             )
             selected_guess = y_guess
             next_z_guess = z_guess
-            next_y_guess = np.array([info.q1, info.q2, z[4], z[5], z[6], z[7]], dtype=float)
+            next_y_guess = np.array(
+                [
+                    cayley_from_R(state_next.F1_prev),
+                    cayley_from_R(state_next.F2_prev),
+                    z[4],
+                    z[5],
+                    z[6],
+                    z[7],
+                ],
+                dtype=float,
+            )
 
         meta = {
             "multistart_used": False,
@@ -411,7 +422,14 @@ def solve_one_step_with_optional_multistart(
     else:
         next_z_guess = z_guess
         next_y_guess = np.array(
-            [selected_info.q1, selected_info.q2, selected_z[4], selected_z[5], selected_z[6], selected_z[7]],
+            [
+                cayley_from_R(selected["state_next"].F1_prev),
+                cayley_from_R(selected["state_next"].F2_prev),
+                selected_z[4],
+                selected_z[5],
+                selected_z[6],
+                selected_z[7],
+            ],
             dtype=float,
         )
 
@@ -664,9 +682,12 @@ def run_case(
     y_guess: Optional[np.ndarray] = None
     rows: List[Dict[str, Any]] = []
     failure: Optional[Dict[str, Any]] = None
+    use_case_multistart = bool(USE_MULTISTART and case_prefix != "equilibrium")
 
     for k in range(n_steps):
         t_k = k * h
+        if k == 0:
+            print(f"Running {case_id} ...", flush=True)
 
         state_k = AcrobotReducedState(
             R1=state.R1.copy(),
@@ -685,6 +706,7 @@ def run_case(
                     method=method,
                     z_guess=z_guess,
                     y_guess=y_guess,
+                    use_multistart=use_case_multistart,
                 )
             )
         except LGVISolveError as exc:
