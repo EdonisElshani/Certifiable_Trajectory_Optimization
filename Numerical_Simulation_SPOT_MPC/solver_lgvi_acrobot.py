@@ -9,7 +9,11 @@ from scipy.optimize import root
 try:
     from Numerical_Simulation.lie_group_so2 import (
         F_from_delta,
+        F_from_cayley,
         angle_from_R,
+        angle_from_cayley,
+        cayley_from_R,
+        cayley_to_ab,
         orth_error_so2,
         det_error_so2,
     )
@@ -22,7 +26,11 @@ except ImportError:
     # Allows running this file from inside Numerical_Simulation.
     from lie_group_so2 import (
         F_from_delta,
+        F_from_cayley,
         angle_from_R,
+        angle_from_cayley,
+        cayley_from_R,
+        cayley_to_ab,
         orth_error_so2,
         det_error_so2,
     )
@@ -73,6 +81,19 @@ class LGVIStepInfo:
     nfev: int
     message: str
     accepted_by_residual: bool = False
+    method: str = "ab"
+    thetaF1_deg: float = np.nan
+    thetaF2_deg: float = np.nan
+    q1: float = np.nan
+    q2: float = np.nan
+    cayley_near_singularity: bool = False
+    singularity_margin_deg: float = np.nan
+    substepping_performed: bool = False
+    substep_depth: int = 0
+    num_substeps: int = 1
+    h_original: float = np.nan
+    h_min_used: float = np.nan
+    near_singularity_count: int = 0
 
 
 class LGVISolveError(RuntimeError):
@@ -429,6 +450,7 @@ def lgvi_one_step(
         nfev=int(sol.nfev),
         message=str(sol.message),
         accepted_by_residual=accepted_by_residual,
+        method="ab",
     )
 
     if not sol.success and not accepted_by_residual:
@@ -446,6 +468,11 @@ def lgvi_one_step(
         z=z,
     )
 
+    info.thetaF1_deg = float(np.rad2deg(angle_from_R(F1_k)))
+    info.thetaF2_deg = float(np.rad2deg(angle_from_R(F2_k)))
+    info.h_original = h
+    info.h_min_used = h
+
     next_state = AcrobotReducedState(
         R1=R1_next,
         R2=R2_next,
@@ -456,11 +483,320 @@ def lgvi_one_step(
     return next_state, info, z
 
 
+def cayley_residual_to_ab_solution(y: np.ndarray) -> np.ndarray:
+    """
+    Convert Cayley unknowns [q1,q2,lambda0,lambda12] to the AB z vector.
+    """
+    y = np.asarray(y, dtype=float).reshape(6)
+    a1, b1 = cayley_to_ab(y[0])
+    a2, b2 = cayley_to_ab(y[1])
+    return np.array([a1, b1, a2, b2, y[2], y[3], y[4], y[5]], dtype=float)
+
+
+def acrobot_reduced_step_residual_cayley(
+    y: np.ndarray,
+    model: AcrobotSO2Model,
+    h: float,
+    state: AcrobotReducedState,
+    u_k: float,
+) -> np.ndarray:
+    """
+    Six-equation Cayley residual: reduced dynamics without explicit SO(2) rows.
+    """
+    z_ab = cayley_residual_to_ab_solution(y)
+    residual = model.reduced_step_residual(
+        z=z_ab,
+        R1_k=state.R1,
+        R2_k=state.R2,
+        F1_prev=state.F1_prev,
+        F2_prev=state.F2_prev,
+        u_k=float(u_k),
+        h=float(h),
+    )
+    return np.asarray(residual, dtype=float).reshape(8)[:6]
+
+
+def initial_guess_cayley_from_previous(
+    state: AcrobotReducedState,
+    y_guess: Optional[np.ndarray] = None,
+) -> np.ndarray:
+    """
+    Initial guess for the 6-dimensional Cayley root solve.
+    """
+    if y_guess is not None:
+        return np.asarray(y_guess, dtype=float).reshape(6).copy()
+
+    return np.array(
+        [
+            cayley_from_R(state.F1_prev),
+            cayley_from_R(state.F2_prev),
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+        dtype=float,
+    )
+
+
+def _cayley_near_singularity(
+    q1: float,
+    q2: float,
+    singularity_margin_deg: float,
+) -> Tuple[bool, int]:
+    margin = np.deg2rad(float(singularity_margin_deg))
+    threshold = np.pi - margin
+    theta1 = abs(angle_from_cayley(q1))
+    theta2 = abs(angle_from_cayley(q2))
+    flags = [theta1 > threshold, theta2 > threshold]
+    return any(flags), int(sum(flags))
+
+
+def lgvi_one_step_cayley(
+    model: AcrobotSO2Model,
+    h: float,
+    state: AcrobotReducedState,
+    u_k: float,
+    y_guess: Optional[np.ndarray] = None,
+    root_tol: float = 1e-12,
+    lgvi_maxfev: int = 5000,
+    accept_residual: bool = True,
+    accept_residual_tol: float = 1e-10,
+    singularity_margin_deg: float = 5.0,
+) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
+    """
+    Propagate one step using Cayley coordinates for the step rotations.
+    """
+    _require_option_b_model(model)
+
+    h = float(h)
+    u_k = float(u_k)
+    y0 = initial_guess_cayley_from_previous(state=state, y_guess=y_guess)
+
+    def fun(y: np.ndarray) -> np.ndarray:
+        return acrobot_reduced_step_residual_cayley(
+            y=y,
+            model=model,
+            h=h,
+            state=state,
+            u_k=u_k,
+        )
+
+    sol = root(
+        fun,
+        y0,
+        method="hybr",
+        options={"xtol": root_tol, "maxfev": int(lgvi_maxfev)},
+    )
+
+    residual = fun(sol.x)
+    residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+    accepted_by_residual = bool(
+        not sol.success
+        and accept_residual
+        and np.isfinite(residual_inf)
+        and residual_inf <= float(accept_residual_tol)
+    )
+
+    if not sol.success and not accepted_by_residual:
+        raise LGVISolveError(
+            residual_inf=residual_inf,
+            message=str(sol.message),
+            nfev=int(sol.nfev),
+        )
+
+    y = np.asarray(sol.x, dtype=float).reshape(6)
+    q1 = float(y[0])
+    q2 = float(y[1])
+    F1 = F_from_cayley(q1)
+    F2 = F_from_cayley(q2)
+    R1_next = state.R1 @ F1
+    R2_next = state.R2 @ F2
+    near_singularity, near_count = _cayley_near_singularity(
+        q1=q1,
+        q2=q2,
+        singularity_margin_deg=singularity_margin_deg,
+    )
+
+    info = LGVIStepInfo(
+        success=bool(sol.success),
+        residual_inf=residual_inf,
+        nfev=int(sol.nfev),
+        message=str(sol.message),
+        accepted_by_residual=accepted_by_residual,
+        method="cayley",
+        thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1))),
+        thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2))),
+        q1=q1,
+        q2=q2,
+        cayley_near_singularity=bool(near_singularity),
+        singularity_margin_deg=float(singularity_margin_deg),
+        h_original=h,
+        h_min_used=h,
+        near_singularity_count=int(near_count),
+    )
+
+    next_state = AcrobotReducedState(
+        R1=R1_next,
+        R2=R2_next,
+        F1_prev=F1,
+        F2_prev=F2,
+    )
+
+    return next_state, info, cayley_residual_to_ab_solution(y)
+
+
+def _combined_step_z_from_states(
+    model: AcrobotSO2Model,
+    state_start: AcrobotReducedState,
+    state_end: AcrobotReducedState,
+    fallback_z: np.ndarray,
+) -> np.ndarray:
+    """
+    Build an AB-equivalent z for the net rotation from state_start to state_end.
+    """
+    fallback_z = np.asarray(fallback_z, dtype=float).reshape(8)
+    F1_total = state_start.R1.T @ state_end.R1
+    F2_total = state_start.R2.T @ state_end.R2
+    a1, b1 = model.scalars_from_step_rotation(F1_total)
+    a2, b2 = model.scalars_from_step_rotation(F2_total)
+    return np.array([a1, b1, a2, b2, fallback_z[4], fallback_z[5], fallback_z[6], fallback_z[7]], dtype=float)
+
+
+def lgvi_one_step_cayley_safe(
+    model: AcrobotSO2Model,
+    h: float,
+    state: AcrobotReducedState,
+    u_k: float,
+    y_guess: Optional[np.ndarray] = None,
+    root_tol: float = 1e-12,
+    lgvi_maxfev: int = 5000,
+    accept_residual: bool = True,
+    accept_residual_tol: float = 1e-10,
+    singularity_margin_deg: float = 5.0,
+    allow_substepping: bool = False,
+    min_substep_h: float = 1e-6,
+    max_subdivisions: int = 10,
+    _depth: int = 0,
+    _h_original: Optional[float] = None,
+) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
+    """
+    Cayley one-step solve with optional recursive h -> h/2+h/2 substepping.
+    """
+    h = float(h)
+    h_original = h if _h_original is None else float(_h_original)
+
+    try:
+        next_state, info, z = lgvi_one_step_cayley(
+            model=model,
+            h=h,
+            state=state,
+            u_k=u_k,
+            y_guess=y_guess,
+            root_tol=root_tol,
+            lgvi_maxfev=lgvi_maxfev,
+            accept_residual=accept_residual,
+            accept_residual_tol=accept_residual_tol,
+            singularity_margin_deg=singularity_margin_deg,
+        )
+        should_split = bool(info.cayley_near_singularity)
+        split_trigger_near_count = int(info.near_singularity_count) if should_split else 0
+    except LGVISolveError as exc:
+        if not allow_substepping or _depth >= int(max_subdivisions) or 0.5 * h < float(min_substep_h):
+            raise
+        should_split = True
+        split_trigger_near_count = 0
+        info = None
+        z = None
+        next_state = None
+
+    if not allow_substepping or not should_split or _depth >= int(max_subdivisions) or 0.5 * h < float(min_substep_h):
+        if info is None or next_state is None or z is None:
+            raise RuntimeError("Cayley substepping reached an inconsistent internal state.")
+        info.h_original = h_original
+        info.h_min_used = h
+        info.substep_depth = _depth
+        return next_state, info, z
+
+    half_h = 0.5 * h
+    mid_state, info_a, z_a = lgvi_one_step_cayley_safe(
+        model=model,
+        h=half_h,
+        state=state,
+        u_k=u_k,
+        y_guess=None,
+        root_tol=root_tol,
+        lgvi_maxfev=lgvi_maxfev,
+        accept_residual=accept_residual,
+        accept_residual_tol=accept_residual_tol,
+        singularity_margin_deg=singularity_margin_deg,
+        allow_substepping=allow_substepping,
+        min_substep_h=min_substep_h,
+        max_subdivisions=max_subdivisions,
+        _depth=_depth + 1,
+        _h_original=h_original,
+    )
+    end_state, info_b, z_b = lgvi_one_step_cayley_safe(
+        model=model,
+        h=half_h,
+        state=mid_state,
+        u_k=u_k,
+        y_guess=None,
+        root_tol=root_tol,
+        lgvi_maxfev=lgvi_maxfev,
+        accept_residual=accept_residual,
+        accept_residual_tol=accept_residual_tol,
+        singularity_margin_deg=singularity_margin_deg,
+        allow_substepping=allow_substepping,
+        min_substep_h=min_substep_h,
+        max_subdivisions=max_subdivisions,
+        _depth=_depth + 1,
+        _h_original=h_original,
+    )
+
+    combined_z = _combined_step_z_from_states(model, state, end_state, z_b)
+    residual_inf = max(float(info_a.residual_inf), float(info_b.residual_inf))
+    near_count = split_trigger_near_count + int(info_a.near_singularity_count) + int(info_b.near_singularity_count)
+    num_substeps = int(info_a.num_substeps) + int(info_b.num_substeps)
+    h_min_used = min(float(info_a.h_min_used), float(info_b.h_min_used))
+    max_depth = max(int(info_a.substep_depth), int(info_b.substep_depth), _depth + 1)
+    q1_total = cayley_from_R(state.R1.T @ end_state.R1)
+    q2_total = cayley_from_R(state.R2.T @ end_state.R2)
+
+    combined_info = LGVIStepInfo(
+        success=bool(info_a.success and info_b.success),
+        residual_inf=residual_inf,
+        nfev=int(info_a.nfev) + int(info_b.nfev),
+        message=f"substepped: first=({info_a.message}); second=({info_b.message})",
+        accepted_by_residual=bool(info_a.accepted_by_residual or info_b.accepted_by_residual),
+        method="cayley",
+        thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1_total))),
+        thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2_total))),
+        q1=float(q1_total),
+        q2=float(q2_total),
+        cayley_near_singularity=bool(split_trigger_near_count > 0 or info_a.cayley_near_singularity or info_b.cayley_near_singularity),
+        singularity_margin_deg=float(singularity_margin_deg),
+        substepping_performed=True,
+        substep_depth=max_depth,
+        num_substeps=num_substeps,
+        h_original=h_original,
+        h_min_used=h_min_used,
+        near_singularity_count=near_count,
+    )
+
+    return end_state, combined_info, combined_z
+
+
 def rollout_lgvi_controls(
     model: AcrobotSO2Model,
     h: float,
     initial_state: AcrobotReducedState,
     u_sequence: np.ndarray,
+    method: str = "ab",
+    allow_substepping: bool = False,
+    min_substep_h: float = 1e-6,
+    max_subdivisions: int = 10,
+    singularity_margin_deg: float = 5.0,
     root_tol: float = 1e-10,
     lgvi_maxfev: int = 2000,
     normalized: bool = False,
@@ -477,6 +813,9 @@ def rollout_lgvi_controls(
 
     u_sequence = np.asarray(u_sequence, dtype=float).reshape(-1)
     num_steps = int(len(u_sequence))
+    method = str(method).lower()
+    if method not in {"ab", "cayley"}:
+        raise ValueError(f"Unknown LGVI method '{method}'. Expected 'ab' or 'cayley'.")
 
     R1 = np.zeros((num_steps + 1, 2, 2), dtype=float)
     R2 = np.zeros((num_steps + 1, 2, 2), dtype=float)
@@ -505,21 +844,39 @@ def rollout_lgvi_controls(
     thetaR[0] = model.angles_from_rotations(state.R1, state.R2)
 
     z_guess: Optional[np.ndarray] = None
+    y_guess: Optional[np.ndarray] = None
 
     for k, u_k in enumerate(u_sequence):
         try:
-            state_next, info, z = lgvi_one_step(
-                model=model,
-                h=h,
-                state=state,
-                u_k=float(u_k),
-                z_guess=z_guess,
-                root_tol=root_tol,
-                lgvi_maxfev=lgvi_maxfev,
-                normalized=normalized,
-                accept_residual=accept_residual,
-                accept_residual_tol=accept_residual_tol,
-            )
+            if method == "ab":
+                state_next, info, z = lgvi_one_step(
+                    model=model,
+                    h=h,
+                    state=state,
+                    u_k=float(u_k),
+                    z_guess=z_guess,
+                    root_tol=root_tol,
+                    lgvi_maxfev=lgvi_maxfev,
+                    normalized=normalized,
+                    accept_residual=accept_residual,
+                    accept_residual_tol=accept_residual_tol,
+                )
+            else:
+                state_next, info, z = lgvi_one_step_cayley_safe(
+                    model=model,
+                    h=h,
+                    state=state,
+                    u_k=float(u_k),
+                    y_guess=y_guess,
+                    root_tol=root_tol,
+                    lgvi_maxfev=lgvi_maxfev,
+                    accept_residual=accept_residual,
+                    accept_residual_tol=accept_residual_tol,
+                    singularity_margin_deg=singularity_margin_deg,
+                    allow_substepping=allow_substepping,
+                    min_substep_h=min_substep_h,
+                    max_subdivisions=max_subdivisions,
+                )
         except LGVISolveError as exc:
             exc.local_sim_step = k
             exc.accepted_failures_before_hard_failure = [
@@ -556,10 +913,14 @@ def rollout_lgvi_controls(
         z_solutions.append(z)
 
         # Warm-start next root solve with current solution.
-        z_guess = z.copy()
+        if method == "ab":
+            z_guess = z.copy()
+        else:
+            y_guess = np.array([info.q1, info.q2, z[4], z[5], z[6], z[7]], dtype=float)
         state = state_next
 
     return {
+        "method": method,
         "t": np.arange(num_steps + 1, dtype=float) * float(h),
         "X": X,
         "R1": R1,
@@ -576,6 +937,19 @@ def rollout_lgvi_controls(
         "accepted_by_residual": np.asarray(
             [info.accepted_by_residual for info in infos], dtype=bool
         ),
+        "substepping_performed": np.asarray(
+            [info.substepping_performed for info in infos], dtype=bool
+        ),
+        "substep_depth": np.asarray([info.substep_depth for info in infos], dtype=int),
+        "num_substeps": np.asarray([info.num_substeps for info in infos], dtype=int),
+        "h_original": np.asarray([info.h_original for info in infos], dtype=float),
+        "h_min_used": np.asarray([info.h_min_used for info in infos], dtype=float),
+        "cayley_near_singularity": np.asarray(
+            [info.cayley_near_singularity for info in infos], dtype=bool
+        ),
+        "near_singularity_count": np.asarray(
+            [info.near_singularity_count for info in infos], dtype=int
+        ),
         "infos": infos,
         "z_solutions": z_solutions,
         "final_state": state,
@@ -588,6 +962,11 @@ def simulate_one_control_interval(
     u_j: float,
     dt_control: float,
     dt_sim: float,
+    method: str = "ab",
+    allow_substepping: bool = False,
+    min_substep_h: float = 1e-6,
+    max_subdivisions: int = 10,
+    singularity_margin_deg: float = 5.0,
     root_tol: float = 1e-10,
     lgvi_maxfev: int = 2000,
     normalized: bool = False,
@@ -623,6 +1002,11 @@ def simulate_one_control_interval(
         h=dt_sim,
         initial_state=state,
         u_sequence=u_sequence,
+        method=method,
+        allow_substepping=allow_substepping,
+        min_substep_h=min_substep_h,
+        max_subdivisions=max_subdivisions,
+        singularity_margin_deg=singularity_margin_deg,
         root_tol=root_tol,
         lgvi_maxfev=lgvi_maxfev,
         normalized=normalized,
@@ -638,6 +1022,11 @@ def simulate_one_control_interval_from_params(
     model: AcrobotSO2Model,
     state: AcrobotReducedState,
     u_j: float,
+    method: str = "ab",
+    allow_substepping: bool = False,
+    min_substep_h: float = 1e-6,
+    max_subdivisions: int = 10,
+    singularity_margin_deg: float = 5.0,
     root_tol: float = 1e-10,
     lgvi_maxfev: Optional[int] = None,
     normalized: bool = False,
@@ -670,6 +1059,11 @@ def simulate_one_control_interval_from_params(
         u_j=u_j,
         dt_control=dt_control,
         dt_sim=dt_sim,
+        method=method,
+        allow_substepping=allow_substepping,
+        min_substep_h=min_substep_h,
+        max_subdivisions=max_subdivisions,
+        singularity_margin_deg=singularity_margin_deg,
         root_tol=root_tol,
         lgvi_maxfev=lgvi_maxfev,
         normalized=normalized,
@@ -685,6 +1079,8 @@ def simulate_lgvi_acrobot(
     alpha0: np.ndarray,
     thetaF0: Optional[np.ndarray] = None,
     u_fun: Optional[Any] = None,
+    method: str = "ab",
+    allow_substepping: bool = False,
     first_step: str = "reduced",
     root_tol: float = 1e-10,
     maxfev: int = 100,
@@ -735,6 +1131,8 @@ def simulate_lgvi_acrobot(
         h=h,
         initial_state=initial_state,
         u_sequence=u_sequence,
+        method=method,
+        allow_substepping=allow_substepping,
         root_tol=root_tol,
         lgvi_maxfev=maxfev,
     )

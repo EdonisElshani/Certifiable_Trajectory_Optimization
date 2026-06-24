@@ -22,6 +22,30 @@ def F_from_delta(theta_delta: float) -> np.ndarray:
     return R_so2(theta_delta)
 
 
+def cayley_to_ab(q: float) -> tuple[float, float]:
+    """Return SO(2) scalar pair (a,b) from the Cayley coordinate q."""
+    q = float(q)
+    denom = 1.0 + q * q
+    return (1.0 - q * q) / denom, (2.0 * q) / denom
+
+
+def F_from_cayley(q: float) -> np.ndarray:
+    """Lee-style Cayley transform F(q) = (I + qS)(I - qS)^-1 for SO(2)."""
+    a, b = cayley_to_ab(q)
+    return np.array([[a, -b], [b, a]], dtype=float)
+
+
+def cayley_from_R(F: np.ndarray) -> float:
+    """Return q = tan(theta/2) from an SO(2) matrix."""
+    theta = angle_from_R(np.asarray(F, dtype=float).reshape(2, 2))
+    return float(np.tan(0.5 * theta))
+
+
+def angle_from_cayley(q: float) -> float:
+    """Recover the principal SO(2) step angle theta = 2 atan(q)."""
+    return float(2.0 * np.arctan(float(q)))
+
+
 def angle_from_R(R: np.ndarray) -> float:
     """Return the rotation angle of an SO(2) matrix."""
     return float(np.arctan2(R[1, 0], R[0, 0]))
