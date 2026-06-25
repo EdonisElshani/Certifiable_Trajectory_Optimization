@@ -16,6 +16,7 @@ try:
         cayley_to_ab,
         orth_error_so2,
         det_error_so2,
+        angle_diff_rad,
     )
 
     from .Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import (
@@ -33,6 +34,7 @@ except ImportError:
         cayley_to_ab,
         orth_error_so2,
         det_error_so2,
+        angle_diff_rad,
     )
 
     from Discrete_Mechanical_Models_Lie_Groups.model_acrobot_so2 import (
@@ -80,6 +82,7 @@ class LGVIStepInfo:
     residual_inf: float
     nfev: int
     message: str
+    raw_success: bool = False
     accepted_by_residual: bool = False
     method: str = "ab"
     thetaF1_deg: float = np.nan
@@ -103,6 +106,11 @@ class LGVIStepInfo:
     lambda0_norm: float = np.nan
     lambda12_norm: float = np.nan
     lambda_total_norm: float = np.nan
+    root_solver: str = "hybr"
+    newton_iterations: int = 0
+    line_search_failures: int = 0
+    min_alpha_used: float = np.nan
+    jacobian_cond: float = np.nan
     multistart_used: bool = False
     multistart_num_candidates: int = 1
     multistart_num_converged: int = 0
@@ -389,6 +397,140 @@ def initial_guess_from_previous(
     )
 
 
+
+def finite_difference_jacobian(
+    fun: Any,
+    y: np.ndarray,
+    eps: float = 1e-7,
+) -> Tuple[np.ndarray, int]:
+    """Central finite-difference Jacobian for small reduced root systems.
+
+    Returns the Jacobian and the number of residual evaluations used.  This is
+    intentionally simple and robust for the 6D Cayley residual.
+    """
+    y = np.asarray(y, dtype=float).reshape(-1)
+    r0 = np.asarray(fun(y), dtype=float).reshape(-1)
+    J = np.zeros((r0.size, y.size), dtype=float)
+    nfev = 1
+
+    for j in range(y.size):
+        step = float(eps) * max(1.0, abs(float(y[j])))
+        dy = np.zeros_like(y)
+        dy[j] = step
+        rp = np.asarray(fun(y + dy), dtype=float).reshape(-1)
+        rm = np.asarray(fun(y - dy), dtype=float).reshape(-1)
+        J[:, j] = (rp - rm) / (2.0 * step)
+        nfev += 2
+
+    return J, nfev
+
+
+def damped_newton_solve(
+    fun: Any,
+    y0: np.ndarray,
+    tol: float = 1e-12,
+    max_iter: int = 30,
+    jac_eps: float = 1e-7,
+    armijo_c: float = 1e-4,
+    min_alpha: float = 1e-8,
+) -> Tuple[np.ndarray, Dict[str, Any]]:
+    """Solve fun(y)=0 with Newton plus backtracking line search.
+
+    This is the reduced-model analogue of the explicit Newton/warm-start/line
+    search strategy often used in constrained variational integrator codes.  It
+    does not clip rotations or enforce artificial bounds; the line search only
+    asks for residual decrease.
+    """
+    y = np.asarray(y0, dtype=float).reshape(-1).copy()
+    r = np.asarray(fun(y), dtype=float).reshape(-1)
+    nfev = 1
+    r_norm = float(np.linalg.norm(r, ord=np.inf))
+
+    info: Dict[str, Any] = {
+        "success": bool(np.isfinite(r_norm) and r_norm <= float(tol)),
+        "residual_inf": r_norm,
+        "iterations": 0,
+        "nfev": nfev,
+        "message": "initial residual below tolerance" if r_norm <= float(tol) else "not converged",
+        "line_search_failures": 0,
+        "min_alpha_used": 1.0,
+        "jacobian_cond": np.nan,
+    }
+
+    if info["success"]:
+        return y, info
+
+    for it in range(1, int(max_iter) + 1):
+        J, jac_nfev = finite_difference_jacobian(fun, y, eps=jac_eps)
+        nfev += jac_nfev
+        try:
+            cond_J = float(np.linalg.cond(J))
+        except Exception:
+            cond_J = np.inf
+        info["jacobian_cond"] = cond_J
+
+        try:
+            delta = np.linalg.solve(J, -r)
+        except np.linalg.LinAlgError:
+            delta, *_ = np.linalg.lstsq(J, -r, rcond=None)
+
+        alpha = 1.0
+        accepted = False
+        best_y = y.copy()
+        best_r = r.copy()
+        best_norm = r_norm
+
+        while alpha >= float(min_alpha):
+            y_trial = y + alpha * delta
+            r_trial = np.asarray(fun(y_trial), dtype=float).reshape(-1)
+            nfev += 1
+            r_trial_norm = float(np.linalg.norm(r_trial, ord=np.inf))
+
+            if np.isfinite(r_trial_norm) and r_trial_norm < best_norm:
+                best_y = y_trial
+                best_r = r_trial
+                best_norm = r_trial_norm
+
+            if np.isfinite(r_trial_norm) and r_trial_norm <= (1.0 - float(armijo_c) * alpha) * r_norm:
+                y = y_trial
+                r = r_trial
+                r_norm = r_trial_norm
+                accepted = True
+                info["min_alpha_used"] = min(float(info["min_alpha_used"]), float(alpha))
+                break
+
+            alpha *= 0.5
+
+        if not accepted:
+            # If Armijo fails but we found any decrease, take the best decrease.
+            if best_norm < r_norm:
+                y = best_y
+                r = best_r
+                r_norm = best_norm
+                info["min_alpha_used"] = min(float(info["min_alpha_used"]), float(max(alpha, min_alpha)))
+            else:
+                info["line_search_failures"] = int(info["line_search_failures"]) + 1
+                info["message"] = "line search failed to reduce residual"
+                info["iterations"] = it
+                info["nfev"] = nfev
+                info["residual_inf"] = r_norm
+                return y, info
+
+        info["iterations"] = it
+        info["nfev"] = nfev
+        info["residual_inf"] = r_norm
+
+        if np.isfinite(r_norm) and r_norm <= float(tol):
+            info["success"] = True
+            info["message"] = "damped Newton converged"
+            return y, info
+
+    info["success"] = False
+    info["message"] = "damped Newton reached max_iter"
+    info["nfev"] = nfev
+    info["residual_inf"] = r_norm
+    return y, info
+
 def _lambda_norms(lambda0: np.ndarray, lambda12: np.ndarray) -> Tuple[float, float, float]:
     lambda0_norm = float(np.linalg.norm(np.asarray(lambda0, dtype=float).reshape(2)))
     lambda12_norm = float(np.linalg.norm(np.asarray(lambda12, dtype=float).reshape(2)))
@@ -460,8 +602,8 @@ def _multistart_score(
         return float(residual_inf)
     theta_max_abs_deg = max(abs(float(np.rad2deg(theta1))), abs(float(np.rad2deg(theta2))))
     delta_max_deg = max(
-        abs(float(np.rad2deg(theta1 - guess_theta1))),
-        abs(float(np.rad2deg(theta2 - guess_theta2))),
+        abs(float(np.rad2deg(angle_diff_rad(theta1, guess_theta1)))),
+        abs(float(np.rad2deg(angle_diff_rad(theta2, guess_theta2)))),
     )
     return float(theta_max_abs_deg + 0.1 * delta_max_deg + 1.0e-6 * lambda_total_norm)
 
@@ -479,6 +621,11 @@ def lgvi_one_step(
     accept_residual_tol: float = 1e-3,
     use_multistart: bool = False,
     multistart_select: str = "local",
+    root_solver: str = "hybr",
+    newton_max_iter: int = 30,
+    newton_jac_eps: float = 1e-7,
+    newton_armijo_c: float = 1e-4,
+    newton_min_alpha: float = 1e-8,
 ) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
     """
     Propagate the reduced acrobot by one SDP-matching implicit step.
@@ -531,8 +678,9 @@ def lgvi_one_step(
         )
 
         info = LGVIStepInfo(
-            success=bool(sol.success),
+            success=bool(sol.success or accepted_by_residual),
             residual_inf=residual_inf,
+            raw_success=bool(sol.success),
             nfev=int(sol.nfev),
             message=str(sol.message),
             accepted_by_residual=accepted_by_residual,
@@ -562,8 +710,8 @@ def lgvi_one_step(
         info.thetaF2_deg = float(np.rad2deg(thetaF2))
         info.thetaF_max_abs_deg = max(abs(info.thetaF1_deg), abs(info.thetaF2_deg))
         info.delta_thetaF_max_from_guess_deg = max(
-            abs(float(np.rad2deg(thetaF1 - guess_thetaF1))),
-            abs(float(np.rad2deg(thetaF2 - guess_thetaF2))),
+            abs(float(np.rad2deg(angle_diff_rad(thetaF1, guess_thetaF1)))),
+            abs(float(np.rad2deg(angle_diff_rad(thetaF2, guess_thetaF2)))),
         )
         info.lambda0_norm = lambda0_norm
         info.lambda12_norm = lambda12_norm
@@ -729,6 +877,11 @@ def lgvi_one_step_cayley(
     singularity_margin_deg: float = 5.0,
     use_multistart: bool = False,
     multistart_select: str = "local",
+    root_solver: str = "hybr",
+    newton_max_iter: int = 30,
+    newton_jac_eps: float = 1e-7,
+    newton_armijo_c: float = 1e-4,
+    newton_min_alpha: float = 1e-8,
 ) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
     """
     Propagate one step using Cayley coordinates for the step rotations.
@@ -748,30 +901,61 @@ def lgvi_one_step_cayley(
         )
 
     def solve_from_guess(guess: np.ndarray) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray, np.ndarray]:
-        sol = root(
-            fun,
-            np.asarray(guess, dtype=float).reshape(6),
-            method="hybr",
-            options={"xtol": root_tol, "maxfev": int(lgvi_maxfev)},
-        )
+        root_solver_l = str(root_solver).lower()
+        if root_solver_l == "hybr":
+            sol = root(
+                fun,
+                np.asarray(guess, dtype=float).reshape(6),
+                method="hybr",
+                options={"xtol": root_tol, "maxfev": int(lgvi_maxfev)},
+            )
+            y_candidate = np.asarray(sol.x, dtype=float).reshape(6)
+            residual = fun(y_candidate)
+            residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+            raw_success = bool(sol.success)
+            nfev = int(sol.nfev)
+            message = str(sol.message)
+            newton_iterations = 0
+            line_search_failures = 0
+            min_alpha_used = np.nan
+            jacobian_cond = np.nan
+        elif root_solver_l == "damped_newton":
+            y_candidate, dn_info = damped_newton_solve(
+                fun=fun,
+                y0=np.asarray(guess, dtype=float).reshape(6),
+                tol=float(root_tol),
+                max_iter=int(newton_max_iter),
+                jac_eps=float(newton_jac_eps),
+                armijo_c=float(newton_armijo_c),
+                min_alpha=float(newton_min_alpha),
+            )
+            residual = fun(y_candidate)
+            residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+            raw_success = bool(dn_info.get("success", False))
+            nfev = int(dn_info.get("nfev", 0)) + 1
+            message = str(dn_info.get("message", "damped Newton finished"))
+            newton_iterations = int(dn_info.get("iterations", 0))
+            line_search_failures = int(dn_info.get("line_search_failures", 0))
+            min_alpha_used = float(dn_info.get("min_alpha_used", np.nan))
+            jacobian_cond = float(dn_info.get("jacobian_cond", np.nan))
+        else:
+            raise ValueError("root_solver must be either 'hybr' or 'damped_newton'.")
 
-        residual = fun(sol.x)
-        residual_inf = float(np.linalg.norm(residual, ord=np.inf))
         accepted_by_residual = bool(
-            not sol.success
+            (not raw_success)
             and accept_residual
             and np.isfinite(residual_inf)
             and residual_inf <= float(accept_residual_tol)
         )
 
-        if not sol.success and not accepted_by_residual:
+        if not raw_success and not accepted_by_residual:
             raise LGVISolveError(
                 residual_inf=residual_inf,
-                message=str(sol.message),
-                nfev=int(sol.nfev),
+                message=message,
+                nfev=nfev,
             )
 
-        y = np.asarray(sol.x, dtype=float).reshape(6)
+        y = y_candidate
         q1 = float(y[0])
         q2 = float(y[1])
         F1 = F_from_cayley(q1)
@@ -787,12 +971,18 @@ def lgvi_one_step_cayley(
         )
 
         info = LGVIStepInfo(
-            success=bool(sol.success),
+            success=bool(raw_success or accepted_by_residual),
             residual_inf=residual_inf,
-            nfev=int(sol.nfev),
-            message=str(sol.message),
+            raw_success=bool(raw_success),
+            nfev=int(nfev),
+            message=message,
             accepted_by_residual=accepted_by_residual,
             method="cayley",
+            root_solver=root_solver_l,
+            newton_iterations=int(newton_iterations),
+            line_search_failures=int(line_search_failures),
+            min_alpha_used=float(min_alpha_used),
+            jacobian_cond=float(jacobian_cond),
             thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1))),
             thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2))),
             thetaF_max_abs_deg=max(
@@ -800,8 +990,8 @@ def lgvi_one_step_cayley(
                 abs(float(np.rad2deg(angle_from_cayley(q2)))),
             ),
             delta_thetaF_max_from_guess_deg=max(
-                abs(float(np.rad2deg(angle_from_cayley(q1) - guess_thetaF1))),
-                abs(float(np.rad2deg(angle_from_cayley(q2) - guess_thetaF2))),
+                abs(float(np.rad2deg(angle_diff_rad(angle_from_cayley(q1), guess_thetaF1)))),
+                abs(float(np.rad2deg(angle_diff_rad(angle_from_cayley(q2), guess_thetaF2)))),
             ),
             q1=q1,
             q2=q2,
@@ -907,6 +1097,11 @@ def lgvi_one_step_cayley_safe(
     max_subdivisions: int = 10,
     use_multistart: bool = False,
     multistart_select: str = "local",
+    root_solver: str = "hybr",
+    newton_max_iter: int = 30,
+    newton_jac_eps: float = 1e-7,
+    newton_armijo_c: float = 1e-4,
+    newton_min_alpha: float = 1e-8,
     _depth: int = 0,
     _h_original: Optional[float] = None,
 ) -> Tuple[AcrobotReducedState, LGVIStepInfo, np.ndarray]:
@@ -930,6 +1125,11 @@ def lgvi_one_step_cayley_safe(
             singularity_margin_deg=singularity_margin_deg,
             use_multistart=use_multistart,
             multistart_select=multistart_select,
+            root_solver=root_solver,
+            newton_max_iter=newton_max_iter,
+            newton_jac_eps=newton_jac_eps,
+            newton_armijo_c=newton_armijo_c,
+            newton_min_alpha=newton_min_alpha,
         )
         should_split = bool(info.cayley_near_singularity)
         split_trigger_near_count = int(info.near_singularity_count) if should_split else 0
@@ -967,6 +1167,11 @@ def lgvi_one_step_cayley_safe(
         max_subdivisions=max_subdivisions,
         use_multistart=use_multistart,
         multistart_select=multistart_select,
+        root_solver=root_solver,
+        newton_max_iter=newton_max_iter,
+        newton_jac_eps=newton_jac_eps,
+        newton_armijo_c=newton_armijo_c,
+        newton_min_alpha=newton_min_alpha,
         _depth=_depth + 1,
         _h_original=h_original,
     )
@@ -997,6 +1202,11 @@ def lgvi_one_step_cayley_safe(
         max_subdivisions=max_subdivisions,
         use_multistart=use_multistart,
         multistart_select=multistart_select,
+        root_solver=root_solver,
+        newton_max_iter=newton_max_iter,
+        newton_jac_eps=newton_jac_eps,
+        newton_armijo_c=newton_armijo_c,
+        newton_min_alpha=newton_min_alpha,
         _depth=_depth + 1,
         _h_original=h_original,
     )
@@ -1012,12 +1222,18 @@ def lgvi_one_step_cayley_safe(
     q2_last = cayley_from_R(end_state.F2_prev)
 
     combined_info = LGVIStepInfo(
-        success=bool(info_a.success and info_b.success),
+        success=bool((info_a.success or info_a.accepted_by_residual) and (info_b.success or info_b.accepted_by_residual)),
         residual_inf=residual_inf,
+        raw_success=bool(info_a.raw_success and info_b.raw_success),
         nfev=int(info_a.nfev) + int(info_b.nfev),
         message=f"substepped: first=({info_a.message}); second=({info_b.message})",
         accepted_by_residual=bool(info_a.accepted_by_residual or info_b.accepted_by_residual),
         method="cayley",
+        root_solver=str(root_solver).lower(),
+        newton_iterations=int(info_a.newton_iterations) + int(info_b.newton_iterations),
+        line_search_failures=int(info_a.line_search_failures) + int(info_b.line_search_failures),
+        min_alpha_used=float(np.nanmin([info_a.min_alpha_used, info_b.min_alpha_used])) if np.isfinite([info_a.min_alpha_used, info_b.min_alpha_used]).any() else np.nan,
+        jacobian_cond=float(np.nanmax([info_a.jacobian_cond, info_b.jacobian_cond])) if np.isfinite([info_a.jacobian_cond, info_b.jacobian_cond]).any() else np.nan,
         thetaF1_deg=float(np.rad2deg(angle_from_cayley(q1_last))),
         thetaF2_deg=float(np.rad2deg(angle_from_cayley(q2_last))),
         thetaF_max_abs_deg=max(
@@ -1069,6 +1285,11 @@ def rollout_lgvi_controls(
     accept_residual_tol: float = 1e-3,
     use_multistart: bool = False,
     multistart_select: str = "local",
+    root_solver: str = "hybr",
+    newton_max_iter: int = 30,
+    newton_jac_eps: float = 1e-7,
+    newton_armijo_c: float = 1e-4,
+    newton_min_alpha: float = 1e-8,
 ) -> Dict[str, Any]:
     """
     Roll out reduced SDP-matching dynamics for a given torque sequence.
@@ -1087,13 +1308,20 @@ def rollout_lgvi_controls(
     R1 = np.zeros((num_steps + 1, 2, 2), dtype=float)
     R2 = np.zeros((num_steps + 1, 2, 2), dtype=float)
 
+    # Net rotation over each requested step: R[k+1] = R[k] @ F[k].
+    # If Cayley substepping is used, this is the accumulated/net update.
     F1 = np.zeros((num_steps, 2, 2), dtype=float)
     F2 = np.zeros((num_steps, 2, 2), dtype=float)
+
+    # Actual final implicit substep rotation used as F_prev for the next solve.
+    F1_last_substep = np.zeros((num_steps, 2, 2), dtype=float)
+    F2_last_substep = np.zeros((num_steps, 2, 2), dtype=float)
 
     X = np.zeros((num_steps + 1, 4), dtype=float)
 
     thetaR = np.zeros((num_steps + 1, 2), dtype=float)
     thetaF = np.zeros((num_steps, 2), dtype=float)
+    thetaF_last_substep = np.zeros((num_steps, 2), dtype=float)
 
     lam0 = np.zeros((num_steps, 2), dtype=float)
     lam12 = np.zeros((num_steps, 2), dtype=float)
@@ -1129,6 +1357,11 @@ def rollout_lgvi_controls(
                     accept_residual_tol=accept_residual_tol,
                     use_multistart=use_multistart,
                     multistart_select=multistart_select,
+                    root_solver=root_solver,
+                    newton_max_iter=newton_max_iter,
+                    newton_jac_eps=newton_jac_eps,
+                    newton_armijo_c=newton_armijo_c,
+                    newton_min_alpha=newton_min_alpha,
                 )
             else:
                 state_next, info, z = lgvi_one_step_cayley_safe(
@@ -1147,6 +1380,11 @@ def rollout_lgvi_controls(
                     max_subdivisions=max_subdivisions,
                     use_multistart=use_multistart,
                     multistart_select=multistart_select,
+                    root_solver=root_solver,
+                    newton_max_iter=newton_max_iter,
+                    newton_jac_eps=newton_jac_eps,
+                    newton_armijo_c=newton_armijo_c,
+                    newton_min_alpha=newton_min_alpha,
                 )
         except LGVISolveError as exc:
             exc.local_sim_step = k
@@ -1157,13 +1395,22 @@ def rollout_lgvi_controls(
             ]
             raise
 
-        F1_k, F2_k, lam0_k, lam12_k = model.unpack_reduced_solution(z)
+        F1_last_k, F2_last_k, lam0_k, lam12_k = model.unpack_reduced_solution(z)
 
         R1[k + 1] = state_next.R1
         R2[k + 1] = state_next.R2
 
-        F1[k] = F1_k
-        F2[k] = F2_k
+        # Public F arrays are the net rotations over the requested step.
+        # This keeps R[k+1] = R[k] @ F[k] true even when Cayley substepping
+        # internally used several smaller steps.
+        F1_net_k = state.R1.T @ state_next.R1
+        F2_net_k = state.R2.T @ state_next.R2
+        F1[k] = F1_net_k
+        F2[k] = F2_net_k
+
+        # Last actual substep, used as F_prev for the next implicit solve.
+        F1_last_substep[k] = F1_last_k
+        F2_last_substep[k] = F2_last_k
 
         X[k + 1] = reconstruct_X_from_R(model, state_next.R1, state_next.R2)
 
@@ -1172,8 +1419,10 @@ def rollout_lgvi_controls(
             state_next.R2,
         )
 
-        thetaF[k, 0] = angle_from_R(F1_k)
-        thetaF[k, 1] = angle_from_R(F2_k)
+        thetaF[k, 0] = angle_from_R(F1_net_k)
+        thetaF[k, 1] = angle_from_R(F2_net_k)
+        thetaF_last_substep[k, 0] = angle_from_R(F1_last_k)
+        thetaF_last_substep[k, 1] = angle_from_R(F2_last_k)
 
         lam0[k] = lam0_k
         lam12[k] = lam12_k
@@ -1208,13 +1457,17 @@ def rollout_lgvi_controls(
         "R2": R2,
         "F1": F1,
         "F2": F2,
+        "F1_last_substep": F1_last_substep,
+        "F2_last_substep": F2_last_substep,
         "thetaR": thetaR,
         "thetaF": thetaF,
+        "thetaF_last_substep": thetaF_last_substep,
         "lambda0": lam0,
         "lambda12": lam12,
         "u": u_sequence,
         "residual_inf": residual_inf,
         "solver_success": np.asarray([info.success for info in infos], dtype=bool),
+        "solver_raw_success": np.asarray([info.raw_success for info in infos], dtype=bool),
         "accepted_by_residual": np.asarray(
             [info.accepted_by_residual for info in infos], dtype=bool
         ),
@@ -1247,6 +1500,13 @@ def rollout_lgvi_controls(
         "lambda0_norm": np.asarray([info.lambda0_norm for info in infos], dtype=float),
         "lambda12_norm": np.asarray([info.lambda12_norm for info in infos], dtype=float),
         "lambda_total_norm": np.asarray([info.lambda_total_norm for info in infos], dtype=float),
+        "h_lambda_total_norm": float(h) * np.asarray([info.lambda_total_norm for info in infos], dtype=float),
+        "h2_lambda_total_norm": float(h) ** 2 * np.asarray([info.lambda_total_norm for info in infos], dtype=float),
+        "root_solver": np.asarray([info.root_solver for info in infos], dtype=object),
+        "newton_iterations": np.asarray([info.newton_iterations for info in infos], dtype=int),
+        "line_search_failures": np.asarray([info.line_search_failures for info in infos], dtype=int),
+        "min_alpha_used": np.asarray([info.min_alpha_used for info in infos], dtype=float),
+        "jacobian_cond": np.asarray([info.jacobian_cond for info in infos], dtype=float),
         "multistart_used": np.asarray([info.multistart_used for info in infos], dtype=bool),
         "multistart_num_candidates": np.asarray(
             [info.multistart_num_candidates for info in infos],
@@ -1288,6 +1548,11 @@ def simulate_one_control_interval(
     accept_residual_tol: float = 1e-3,
     use_multistart: bool = False,
     multistart_select: str = "local",
+    root_solver: str = "hybr",
+    newton_max_iter: int = 30,
+    newton_jac_eps: float = 1e-7,
+    newton_armijo_c: float = 1e-4,
+    newton_min_alpha: float = 1e-8,
 ) -> Tuple[AcrobotReducedState, Dict[str, Any]]:
     """
     Simulate one MPC control interval.
@@ -1330,6 +1595,11 @@ def simulate_one_control_interval(
         accept_residual_tol=accept_residual_tol,
         use_multistart=use_multistart,
         multistart_select=multistart_select,
+        root_solver=root_solver,
+        newton_max_iter=newton_max_iter,
+        newton_jac_eps=newton_jac_eps,
+        newton_armijo_c=newton_armijo_c,
+        newton_min_alpha=newton_min_alpha,
     )
 
     return sim["final_state"], sim
@@ -1352,6 +1622,11 @@ def simulate_one_control_interval_from_params(
     accept_residual_tol: Optional[float] = None,
     use_multistart: Optional[bool] = None,
     multistart_select: Optional[str] = None,
+    root_solver: Optional[str] = None,
+    newton_max_iter: Optional[int] = None,
+    newton_jac_eps: Optional[float] = None,
+    newton_armijo_c: Optional[float] = None,
+    newton_min_alpha: Optional[float] = None,
 ) -> Tuple[AcrobotReducedState, Dict[str, Any]]:
     """
     Convenience wrapper using YAML-derived params.
@@ -1376,6 +1651,16 @@ def simulate_one_control_interval_from_params(
         use_multistart = bool(params.get("use_multistart", False))
     if multistart_select is None:
         multistart_select = str(params.get("multistart_select", "local"))
+    if root_solver is None:
+        root_solver = str(params.get("root_solver", "hybr"))
+    if newton_max_iter is None:
+        newton_max_iter = int(params.get("newton_max_iter", 30))
+    if newton_jac_eps is None:
+        newton_jac_eps = float(params.get("newton_jac_eps", 1e-7))
+    if newton_armijo_c is None:
+        newton_armijo_c = float(params.get("newton_armijo_c", 1e-4))
+    if newton_min_alpha is None:
+        newton_min_alpha = float(params.get("newton_min_alpha", 1e-8))
 
     return simulate_one_control_interval(
         model=model,
@@ -1395,6 +1680,11 @@ def simulate_one_control_interval_from_params(
         accept_residual_tol=accept_residual_tol,
         use_multistart=use_multistart,
         multistart_select=multistart_select,
+        root_solver=root_solver,
+        newton_max_iter=newton_max_iter,
+        newton_jac_eps=newton_jac_eps,
+        newton_armijo_c=newton_armijo_c,
+        newton_min_alpha=newton_min_alpha,
     )
 
 
@@ -1413,6 +1703,7 @@ def simulate_lgvi_acrobot(
     verbose: bool = False,
     use_multistart: bool = False,
     multistart_select: str = "local",
+    root_solver: str = "hybr",
 ) -> Dict[str, Any]:
     """
     Backward-compatible rollout interface.
@@ -1465,6 +1756,7 @@ def simulate_lgvi_acrobot(
         lgvi_maxfev=maxfev,
         use_multistart=use_multistart,
         multistart_select=multistart_select,
+        root_solver=root_solver,
     )
 
     if verbose:

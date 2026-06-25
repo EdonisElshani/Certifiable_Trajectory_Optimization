@@ -51,6 +51,31 @@ def angle_from_R(R: np.ndarray) -> float:
     return float(np.arctan2(R[1, 0], R[0, 0]))
 
 
+def wrap_angle_rad(angle: float | np.ndarray) -> float | np.ndarray:
+    """Wrap angle(s) to the principal interval [-pi, pi)."""
+    return (np.asarray(angle) + np.pi) % (2.0 * np.pi) - np.pi
+
+
+def wrap_angle_deg(angle_deg: float | np.ndarray) -> float | np.ndarray:
+    """Wrap degree angle(s) to the principal interval [-180, 180)."""
+    return (np.asarray(angle_deg) + 180.0) % 360.0 - 180.0
+
+
+def angle_diff_rad(a: float | np.ndarray, b: float | np.ndarray) -> float | np.ndarray:
+    """Return wrapped SO(2) angle difference a - b in radians."""
+    return wrap_angle_rad(np.asarray(a) - np.asarray(b))
+
+
+def angle_diff_deg(a_deg: float | np.ndarray, b_deg: float | np.ndarray) -> float | np.ndarray:
+    """Return wrapped SO(2) angle difference a - b in degrees."""
+    return wrap_angle_deg(np.asarray(a_deg) - np.asarray(b_deg))
+
+
+def angle_diff_vec_deg(a_deg: np.ndarray, b_deg: np.ndarray) -> np.ndarray:
+    """Vectorized wrapped degree difference for SO(2) angle arrays."""
+    return np.asarray(angle_diff_deg(a_deg, b_deg), dtype=float)
+
+
 def vee2(A: np.ndarray) -> float:
     """Vee map for a 2x2 skew matrix a*S.
 

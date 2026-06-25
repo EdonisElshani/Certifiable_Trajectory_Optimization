@@ -16,6 +16,8 @@ from typing import Any, Dict, List
 import numpy as np
 from scipy.integrate import solve_ivp
 
+from lie_group_so2 import angle_diff_vec_deg
+
 from solver_lgvi_acrobot import (
     LGVISolveError,
     make_model_from_params,
@@ -47,6 +49,8 @@ TF = 0.1
 
 INITIAL_THETAR_DEG = np.array([5.0, 5.0], dtype=float)
 INITIAL_THETAF_DEG = np.array([0.0, 0.0], dtype=float)
+# Continuous ODE state uses angular velocities, not discrete step angles.
+INITIAL_OMEGA_DEG_PER_S = np.array([0.0, 0.0], dtype=float)
 
 
 def write_csv(path: Path, rows: List[Dict[str, Any]]) -> None:
@@ -89,7 +93,7 @@ def solve_continuous_reference(model: Any, u_const: float, tf: float) -> np.ndar
     y0 = np.array(
         [
             *np.deg2rad(INITIAL_THETAR_DEG),
-            *np.deg2rad(INITIAL_THETAF_DEG),
+            *np.deg2rad(INITIAL_OMEGA_DEG_PER_S),
         ],
         dtype=float,
     )
@@ -133,6 +137,7 @@ def run_lgvi_case(model: Any, method: str, u_const: float, h: float, tf: float) 
         accept_residual_tol=1e-10,
         use_multistart=True,
         multistart_select="local",
+        root_solver=("damped_newton" if method == "cayley" else "hybr"),
     )
     return np.asarray(sim["thetaR"][-1], dtype=float)
 
@@ -156,7 +161,7 @@ def main() -> None:
             for method in METHODS:
                 try:
                     theta_lgvi = run_lgvi_case(model, method=method, u_const=u_const, h=h, tf=TF)
-                    err = np.rad2deg(theta_lgvi - theta_ode)
+                    err = angle_diff_vec_deg(np.rad2deg(theta_lgvi), np.rad2deg(theta_ode))
                     success = bool(np.all(np.isfinite(theta_ode)))
                     message = ode_message
                 except LGVISolveError as exc:

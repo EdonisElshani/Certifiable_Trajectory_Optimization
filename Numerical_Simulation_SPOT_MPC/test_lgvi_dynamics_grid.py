@@ -33,7 +33,7 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 import numpy as np
 
-from lie_group_so2 import angle_from_R, angle_from_cayley, cayley_from_R, det_error_so2, orth_error_so2
+from lie_group_so2 import angle_from_R, angle_from_cayley, cayley_from_R, det_error_so2, orth_error_so2, angle_diff_deg, angle_diff_vec_deg
 from solver_lgvi_acrobot import (
     AcrobotReducedState,
     LGVISolveError,
@@ -103,6 +103,13 @@ ACCEPT_RESIDUAL = True
 ACCEPT_RESIDUAL_TOL = 1e-10
 USE_MULTISTART = True
 MULTISTART_SELECT = "local"  # options: "residual", "local"
+# For Cayley, choose "hybr" for SciPy's root solver or "damped_newton"
+# for explicit Newton with residual-decreasing backtracking line search.
+CAYLEY_ROOT_SOLVER = "damped_newton"
+CAYLEY_NEWTON_MAX_ITER = 30
+CAYLEY_NEWTON_JAC_EPS = 1e-7
+CAYLEY_NEWTON_ARMIJO_C = 1e-4
+CAYLEY_NEWTON_MIN_ALPHA = 1e-8
 LAMBDA_SPIKE_THRESHOLD = 1e4
 CAYLEY_ALLOW_SUBSTEPPING = True
 CAYLEY_MIN_SUBSTEP_H = 1e-6
@@ -249,7 +256,7 @@ def candidate_score(
         return float(residual_inf)
     thetaF_max_abs_deg = max(abs(thetaF1_deg), abs(thetaF2_deg))
     if np.isfinite(thetaF1_guess_deg) and np.isfinite(thetaF2_guess_deg):
-        delta_max = max(abs(thetaF1_deg - thetaF1_guess_deg), abs(thetaF2_deg - thetaF2_guess_deg))
+        delta_max = max(abs(float(angle_diff_deg(thetaF1_deg, thetaF1_guess_deg))), abs(float(angle_diff_deg(thetaF2_deg, thetaF2_guess_deg))))
     else:
         delta_max = 0.0
     lambda_total_norm = lambda_total_norm_from_parts(lambda0_norm, lambda12_norm)
@@ -266,182 +273,78 @@ def solve_one_step_with_optional_multistart(
     y_guess: Optional[np.ndarray],
     use_multistart: bool,
 ) -> Tuple[AcrobotReducedState, Any, np.ndarray, Dict[str, Any], Optional[np.ndarray], Optional[np.ndarray]]:
-    if not use_multistart:
-        if method == "ab":
-            state_next, info, z = lgvi_one_step(
-                model=model,
-                h=float(h),
-                state=state,
-                u_k=float(u_const),
-                z_guess=z_guess,
-                root_tol=ROOT_TOL,
-                lgvi_maxfev=LGVI_MAXFEV,
-                normalized=False,
-                accept_residual=ACCEPT_RESIDUAL,
-                accept_residual_tol=ACCEPT_RESIDUAL_TOL,
-            )
-            selected_guess = z_guess
-            next_z_guess = z.copy()
-            next_y_guess = y_guess
-        else:
-            state_next, info, z = lgvi_one_step_cayley_safe(
-                model=model,
-                h=float(h),
-                state=state,
-                u_k=float(u_const),
-                y_guess=y_guess,
-                root_tol=ROOT_TOL,
-                lgvi_maxfev=LGVI_MAXFEV,
-                accept_residual=ACCEPT_RESIDUAL,
-                accept_residual_tol=ACCEPT_RESIDUAL_TOL,
-                singularity_margin_deg=CAYLEY_SINGULARITY_MARGIN_DEG,
-                allow_substepping=CAYLEY_ALLOW_SUBSTEPPING,
-                min_substep_h=CAYLEY_MIN_SUBSTEP_H,
-                max_subdivisions=CAYLEY_MAX_SUBDIVISIONS,
-            )
-            selected_guess = y_guess
-            next_z_guess = z_guess
-            next_y_guess = np.array(
-                [
-                    cayley_from_R(state_next.F1_prev),
-                    cayley_from_R(state_next.F2_prev),
-                    z[4],
-                    z[5],
-                    z[6],
-                    z[7],
-                ],
-                dtype=float,
-            )
+    """
+    Thin validation wrapper around the solver-level implementation.
 
-        meta = {
-            "multistart_used": False,
-            "multistart_num_candidates": 1,
-            "multistart_num_converged": int(float(info.residual_inf) <= ACCEPT_RESIDUAL_TOL),
-            "multistart_selected_index": 0,
-            "multistart_selected_score": math.nan,
-            "selected_guess": selected_guess,
-        }
-        return state_next, info, z, meta, next_z_guess, next_y_guess
-
-    guesses = (
-        build_ab_multistart_guesses(model, state, z_guess)
-        if method == "ab"
-        else build_cayley_multistart_guesses(state, y_guess)
-    )
-    candidates: List[Dict[str, Any]] = []
-    last_error: Optional[LGVISolveError] = None
-
-    for idx, guess in enumerate(guesses):
-        try:
-            if method == "ab":
-                state_next, info, z = lgvi_one_step(
-                    model=model,
-                    h=float(h),
-                    state=state,
-                    u_k=float(u_const),
-                    z_guess=guess,
-                    root_tol=ROOT_TOL,
-                    lgvi_maxfev=LGVI_MAXFEV,
-                    normalized=False,
-                    accept_residual=ACCEPT_RESIDUAL,
-                    accept_residual_tol=ACCEPT_RESIDUAL_TOL,
-                )
-            else:
-                state_next, info, z = lgvi_one_step_cayley_safe(
-                    model=model,
-                    h=float(h),
-                    state=state,
-                    u_k=float(u_const),
-                    y_guess=guess,
-                    root_tol=ROOT_TOL,
-                    lgvi_maxfev=LGVI_MAXFEV,
-                    accept_residual=ACCEPT_RESIDUAL,
-                    accept_residual_tol=ACCEPT_RESIDUAL_TOL,
-                    singularity_margin_deg=CAYLEY_SINGULARITY_MARGIN_DEG,
-                    allow_substepping=CAYLEY_ALLOW_SUBSTEPPING,
-                    min_substep_h=CAYLEY_MIN_SUBSTEP_H,
-                    max_subdivisions=CAYLEY_MAX_SUBDIVISIONS,
-                )
-        except LGVISolveError as exc:
-            last_error = exc
-            continue
-
-        if float(info.residual_inf) > ACCEPT_RESIDUAL_TOL:
-            continue
-
-        F1, F2, lam0, lam12 = model.unpack_reduced_solution(z)
-        info_q1 = float(getattr(info, "q1", math.nan))
-        info_q2 = float(getattr(info, "q2", math.nan))
-        if method == "cayley" and np.isfinite(info_q1) and np.isfinite(info_q2):
-            thetaF1 = angle_from_cayley(info_q1)
-            thetaF2 = angle_from_cayley(info_q2)
-        else:
-            thetaF1, thetaF2 = angle_from_R(F1), angle_from_R(F2)
-        thetaF1_deg = float(rad2deg(thetaF1))
-        thetaF2_deg = float(rad2deg(thetaF2))
-        thetaF1_guess, thetaF2_guess = theta_guess_from_candidate(method, model, guess)
-        thetaF1_guess_deg = float(rad2deg(thetaF1_guess)) if np.isfinite(thetaF1_guess) else math.nan
-        thetaF2_guess_deg = float(rad2deg(thetaF2_guess)) if np.isfinite(thetaF2_guess) else math.nan
-        score = candidate_score(
-            thetaF1_deg=thetaF1_deg,
-            thetaF2_deg=thetaF2_deg,
-            thetaF1_guess_deg=thetaF1_guess_deg,
-            thetaF2_guess_deg=thetaF2_guess_deg,
-            lambda0_norm=float(np.linalg.norm(lam0)),
-            lambda12_norm=float(np.linalg.norm(lam12)),
-            residual_inf=float(info.residual_inf),
-        )
-        candidates.append(
-            {
-                "index": idx,
-                "guess": guess,
-                "state_next": state_next,
-                "info": info,
-                "z": z,
-                "score": score,
-            }
-        )
-
-    if not candidates:
-        if last_error is not None:
-            raise last_error
-        raise LGVISolveError(
-            residual_inf=math.inf,
-            message="No multi-start candidate reached ACCEPT_RESIDUAL_TOL.",
-            nfev=0,
-        )
-
-    selected = min(candidates, key=lambda c: float(c["score"]))
-    selected_info = selected["info"]
-    selected_z = selected["z"]
-    selected_guess = selected["guess"]
-
+    Older versions duplicated multistart in this test script.  That made the
+    tests validate a different code path than MPC.  The test now delegates
+    multistart selection to solver_lgvi_acrobot.py and only records the
+    solver diagnostics.
+    """
     if method == "ab":
-        next_z_guess = selected_z.copy()
+        selected_guess = z_guess
+        state_next, info, z = lgvi_one_step(
+            model=model,
+            h=float(h),
+            state=state,
+            u_k=float(u_const),
+            z_guess=z_guess,
+            root_tol=ROOT_TOL,
+            lgvi_maxfev=LGVI_MAXFEV,
+            normalized=False,
+            accept_residual=ACCEPT_RESIDUAL,
+            accept_residual_tol=ACCEPT_RESIDUAL_TOL,
+            use_multistart=use_multistart,
+            multistart_select=MULTISTART_SELECT,
+            root_solver=CAYLEY_ROOT_SOLVER,
+            newton_max_iter=CAYLEY_NEWTON_MAX_ITER,
+            newton_jac_eps=CAYLEY_NEWTON_JAC_EPS,
+            newton_armijo_c=CAYLEY_NEWTON_ARMIJO_C,
+            newton_min_alpha=CAYLEY_NEWTON_MIN_ALPHA,
+        )
+        next_z_guess = z.copy()
         next_y_guess = y_guess
     else:
+        selected_guess = y_guess
+        state_next, info, z = lgvi_one_step_cayley_safe(
+            model=model,
+            h=float(h),
+            state=state,
+            u_k=float(u_const),
+            y_guess=y_guess,
+            root_tol=ROOT_TOL,
+            lgvi_maxfev=LGVI_MAXFEV,
+            accept_residual=ACCEPT_RESIDUAL,
+            accept_residual_tol=ACCEPT_RESIDUAL_TOL,
+            singularity_margin_deg=CAYLEY_SINGULARITY_MARGIN_DEG,
+            allow_substepping=CAYLEY_ALLOW_SUBSTEPPING,
+            min_substep_h=CAYLEY_MIN_SUBSTEP_H,
+            max_subdivisions=CAYLEY_MAX_SUBDIVISIONS,
+            use_multistart=use_multistart,
+            multistart_select=MULTISTART_SELECT,
+        )
         next_z_guess = z_guess
         next_y_guess = np.array(
             [
-                cayley_from_R(selected["state_next"].F1_prev),
-                cayley_from_R(selected["state_next"].F2_prev),
-                selected_z[4],
-                selected_z[5],
-                selected_z[6],
-                selected_z[7],
+                cayley_from_R(state_next.F1_prev),
+                cayley_from_R(state_next.F2_prev),
+                z[4],
+                z[5],
+                z[6],
+                z[7],
             ],
             dtype=float,
         )
 
     meta = {
-        "multistart_used": True,
-        "multistart_num_candidates": len(guesses),
-        "multistart_num_converged": len(candidates),
-        "multistart_selected_index": int(selected["index"]),
-        "multistart_selected_score": float(selected["score"]),
+        "multistart_used": bool(getattr(info, "multistart_used", use_multistart)),
+        "multistart_num_candidates": int(getattr(info, "multistart_num_candidates", 1)),
+        "multistart_num_converged": int(getattr(info, "multistart_num_converged", 0)),
+        "multistart_selected_index": int(getattr(info, "multistart_selected_index", 0)),
+        "multistart_selected_score": float(getattr(info, "multistart_selected_score", math.nan)),
         "selected_guess": selected_guess,
     }
-    return selected["state_next"], selected_info, selected_z, meta, next_z_guess, next_y_guess
+    return state_next, info, z, meta, next_z_guess, next_y_guess
 
 
 # =============================================================================
@@ -544,10 +447,10 @@ def evaluate_step(
     thetaF1_guess_deg = float(rad2deg(thetaF1_guess)) if np.isfinite(thetaF1_guess) else math.nan
     thetaF2_guess_deg = float(rad2deg(thetaF2_guess)) if np.isfinite(thetaF2_guess) else math.nan
     delta_thetaF1_from_guess_deg = (
-        thetaF1_deg - thetaF1_guess_deg if np.isfinite(thetaF1_guess_deg) else math.nan
+        float(angle_diff_deg(thetaF1_deg, thetaF1_guess_deg)) if np.isfinite(thetaF1_guess_deg) else math.nan
     )
     delta_thetaF2_from_guess_deg = (
-        thetaF2_deg - thetaF2_guess_deg if np.isfinite(thetaF2_guess_deg) else math.nan
+        float(angle_diff_deg(thetaF2_deg, thetaF2_guess_deg)) if np.isfinite(thetaF2_guess_deg) else math.nan
     )
     finite_deltas = [
         abs(x) for x in [delta_thetaF1_from_guess_deg, delta_thetaF2_from_guess_deg] if np.isfinite(x)
@@ -556,6 +459,11 @@ def evaluate_step(
     lambda0_norm = float(np.linalg.norm(lam0))
     lambda12_norm = float(np.linalg.norm(lam12))
     lambda_total_norm = lambda_total_norm_from_parts(lambda0_norm, lambda12_norm)
+    h_used = float(getattr(info, "h_min_used", h))
+    h_lambda_total_norm = float(h) * lambda_total_norm
+    h2_lambda_total_norm = float(h) ** 2 * lambda_total_norm
+    h_min_lambda_total_norm = h_used * lambda_total_norm
+    h_min2_lambda_total_norm = h_used ** 2 * lambda_total_norm
 
     X_next = model.reconstruct_positions_from_rotations(
         state_next.R1,
@@ -627,7 +535,17 @@ def evaluate_step(
         "lambda0_norm": lambda0_norm,
         "lambda12_norm": lambda12_norm,
         "lambda_total_norm": lambda_total_norm,
+        "h_lambda_total_norm": h_lambda_total_norm,
+        "h2_lambda_total_norm": h2_lambda_total_norm,
+        "h_min_lambda_total_norm": h_min_lambda_total_norm,
+        "h_min2_lambda_total_norm": h_min2_lambda_total_norm,
         "lambda_spike_warning": bool(lambda_total_norm > LAMBDA_SPIKE_THRESHOLD),
+
+        "root_solver": str(getattr(info, "root_solver", "hybr")),
+        "newton_iterations": int(getattr(info, "newton_iterations", 0)),
+        "line_search_failures": int(getattr(info, "line_search_failures", 0)),
+        "min_alpha_used": float(getattr(info, "min_alpha_used", math.nan)),
+        "jacobian_cond": float(getattr(info, "jacobian_cond", math.nan)),
 
         "substepping_performed": bool(getattr(info, "substepping_performed", False)),
         "substep_depth": int(getattr(info, "substep_depth", 0)),
@@ -853,10 +771,21 @@ def summarize_case(
             "max_lambda0_norm": math.nan,
             "max_lambda12_norm": math.nan,
             "max_lambda_total_norm": math.nan,
+            "max_h_lambda_total_norm": math.nan,
+            "max_h2_lambda_total_norm": math.nan,
+            "max_h_min_lambda_total_norm": math.nan,
+            "max_h_min2_lambda_total_norm": math.nan,
             "num_lambda_spike_warnings": 0,
+            "root_solver": "hybr" if method == "ab" else CAYLEY_ROOT_SOLVER,
+            "max_newton_iterations": 0,
+            "total_line_search_failures": 0,
+            "min_alpha_used_min": math.nan,
+            "max_jacobian_cond": math.nan,
             "final_thetaR1_deg": math.nan,
             "final_thetaR2_deg": math.nan,
             "substepping_case": False,
+            "total_executed_substeps": 0,
+            "extra_substeps": 0,
             "total_substeps": 0,
             "max_substep_depth": 0,
             "min_h_used": math.nan,
@@ -898,7 +827,9 @@ def summarize_case(
 
     last = rows[-1]
     substepping_case = any(bool(r.get("substepping_performed", False)) for r in rows)
-    total_substeps = sum(int(r.get("num_substeps", 1)) for r in rows)
+    total_executed_substeps = sum(int(r.get("num_substeps", 1)) for r in rows)
+    extra_substeps = sum(max(0, int(r.get("num_substeps", 1)) - 1) for r in rows)
+    total_substeps = total_executed_substeps
     max_substep_depth = max(int(r.get("substep_depth", 0)) for r in rows)
     h_values = [float(r.get("h_min_used", r.get("h", h))) for r in rows]
     near_singularity_count = sum(int(r.get("near_singularity_count", 0)) for r in rows)
@@ -943,7 +874,16 @@ def summarize_case(
         "max_lambda0_norm": max_col(rows, "lambda0_norm"),
         "max_lambda12_norm": max_col(rows, "lambda12_norm"),
         "max_lambda_total_norm": max_col(rows, "lambda_total_norm"),
+        "max_h_lambda_total_norm": max_col(rows, "h_lambda_total_norm"),
+        "max_h2_lambda_total_norm": max_col(rows, "h2_lambda_total_norm"),
+        "max_h_min_lambda_total_norm": max_col(rows, "h_min_lambda_total_norm"),
+        "max_h_min2_lambda_total_norm": max_col(rows, "h_min2_lambda_total_norm"),
         "num_lambda_spike_warnings": count_true(rows, "lambda_spike_warning"),
+        "root_solver": str(last.get("root_solver", "hybr" if method == "ab" else CAYLEY_ROOT_SOLVER)),
+        "max_newton_iterations": int(max(int(r.get("newton_iterations", 0)) for r in rows)),
+        "total_line_search_failures": int(sum(int(r.get("line_search_failures", 0)) for r in rows)),
+        "min_alpha_used_min": min_finite_col(rows, "min_alpha_used"),
+        "max_jacobian_cond": max_abs_finite_col(rows, "jacobian_cond"),
 
         "max_abs_thetaR1_deg": max_abs_col(rows, "thetaR1_deg"),
         "max_abs_thetaR2_deg": max_abs_col(rows, "thetaR2_deg"),
@@ -963,6 +903,8 @@ def summarize_case(
         "final_thetaR2_deg": float(last["thetaR2_deg"]),
 
         "substepping_case": bool(substepping_case),
+        "total_executed_substeps": int(total_executed_substeps),
+        "extra_substeps": int(extra_substeps),
         "total_substeps": int(total_substeps),
         "max_substep_depth": int(max_substep_depth),
         "min_h_used": float(min(h_values)) if h_values else math.nan,
@@ -1035,7 +977,7 @@ def compute_convergence_summary(case_summaries: List[Dict[str, Any]]) -> List[Di
                 ],
                 dtype=float,
             )
-            err = theta - ref_theta
+            err = angle_diff_vec_deg(theta, ref_theta)
 
             rows.append(
                 {
@@ -1092,10 +1034,13 @@ def compute_method_comparison(case_summaries: List[Dict[str, Any]]) -> List[Dict
             and str(cayley.get("status")) != "FAIL"
         )
         both_completed = bool(ab_completed and cayley_completed)
-        comparison_valid = both_completed
         cayley_substepping_case = bool(cayley.get("substepping_case", False))
         both_completed_and_no_substepping = bool(both_completed and not cayley_substepping_case)
-        diff = cayley_theta - ab_theta if comparison_valid else np.array([math.nan, math.nan], dtype=float)
+        both_strict_success = bool(ab.get("success", False) and cayley.get("success", False))
+        completed_comparison_valid = bool(both_completed)
+        comparison_valid = bool(both_completed and both_strict_success)
+        strict_comparison_valid = bool(comparison_valid)
+        diff = angle_diff_vec_deg(cayley_theta, ab_theta) if comparison_valid else np.array([math.nan, math.nan], dtype=float)
 
         rows.append(
             {
@@ -1114,8 +1059,11 @@ def compute_method_comparison(case_summaries: List[Dict[str, Any]]) -> List[Dict
                 "ab_completed": bool(ab_completed),
                 "cayley_completed": bool(cayley_completed),
                 "both_completed": bool(both_completed),
+                "completed_comparison_valid": bool(completed_comparison_valid),
                 "comparison_valid": bool(comparison_valid),
-                "both_completed_and_no_substepping": bool(both_completed_and_no_substepping),
+                "both_completed_and_no_substepping": bool(both_completed_and_no_substepping and comparison_valid),
+                "both_strict_success": bool(both_strict_success),
+                "strict_comparison_valid": bool(strict_comparison_valid),
                 "ab_final_thetaR1_deg": float(ab_theta[0]),
                 "ab_final_thetaR2_deg": float(ab_theta[1]),
                 "cayley_final_thetaR1_deg": float(cayley_theta[0]),
@@ -1130,6 +1078,8 @@ def compute_method_comparison(case_summaries: List[Dict[str, Any]]) -> List[Dict
                 "cayley_max_abs_thetaF1_deg": float(cayley.get("max_abs_thetaF1_deg", math.nan)),
                 "cayley_max_abs_thetaF2_deg": float(cayley.get("max_abs_thetaF2_deg", math.nan)),
                 "cayley_substepping_case": cayley_substepping_case,
+                "cayley_total_executed_substeps": int(cayley.get("total_executed_substeps", cayley.get("total_substeps", 0))),
+                "cayley_extra_substeps": int(cayley.get("extra_substeps", 0)),
                 "cayley_total_substeps": int(cayley.get("total_substeps", 0)),
                 "cayley_near_singularity_case": bool(cayley.get("near_singularity_case", False)),
                 "cayley_near_singularity_count": int(cayley.get("near_singularity_count", 0)),
@@ -1178,6 +1128,7 @@ def print_method_console_summary(
     cayley_failures = sum(s.get("status") == "FAIL" for s in cayley_summaries)
     cayley_substep_cases = [s for s in cayley_summaries if bool(s.get("substepping_case", False))]
     cayley_near_cases = [s for s in cayley_summaries if bool(s.get("near_singularity_case", False))]
+    completed_comparisons = [r for r in comparison_rows if bool(r.get("completed_comparison_valid", False))]
     valid_comparisons = [r for r in comparison_rows if bool(r.get("comparison_valid", False))]
     invalid_comparisons = [r for r in comparison_rows if not bool(r.get("comparison_valid", False))]
     valid_with_substepping = [r for r in valid_comparisons if bool(r.get("cayley_substepping_case", False))]
@@ -1209,8 +1160,9 @@ def print_method_console_summary(
     print(f"Cayley successes: {cayley_successes}")
     print(f"AB failures: {ab_failures}")
     print(f"Cayley failures: {cayley_failures}")
-    print(f"Valid AB-vs-Cayley comparisons: {len(valid_comparisons)}")
-    print(f"Invalid comparisons: {len(invalid_comparisons)}")
+    print(f"Completed AB-vs-Cayley comparisons: {len(completed_comparisons)}")
+    print(f"Strict valid AB-vs-Cayley comparisons: {len(valid_comparisons)}")
+    print(f"Invalid/failed/CHECK comparisons: {len(invalid_comparisons)}")
     print(f"Valid comparisons with Cayley substepping: {len(valid_with_substepping)}")
     print(f"Valid comparisons without Cayley substepping: {len(valid_without_substepping)}")
     print(f"Cayley cases with substepping: {len(cayley_substep_cases)}")
