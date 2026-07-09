@@ -53,7 +53,7 @@
 \contentsline {subsection}{\numberline {5.2.2}Sparse Relaxations}{38}{subsection.5.2.2}%
 \contentsline {section}{\numberline {5.3}Optimization Formulation}{39}{section.5.3}%
 \contentsline {subsection}{\numberline {5.3.1}Control of 3D Pendulum}{39}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Control of the Acrobot in Position-Only Maximal Coordinates}{42}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.2}Control of the Acrobot with the Kinematic-Substituted Reduced Model}{42}{subsection.5.3.2}%
 \contentsline {paragraph}{Scalar polynomial form.}{44}{section*.24}%
 \contentsline {chapter}{\numberline {6}Evaluation}{47}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Numerical Simulation Results}{47}{section.6.1}%
@@ -63,16 +63,19 @@
 \contentsline {subsubsection}{Unforced 3D-Pendulum}{50}{section*.28}%
 \contentsline {subsubsection}{Controlled 3D-Pendulum}{51}{section*.30}%
 \contentsline {subsection}{\numberline {6.1.2}Acrobot}{54}{subsection.6.1.2}%
-\contentsline {subsubsection}{Unforced Acrobot}{54}{section*.32}%
-\contentsline {subsubsection}{Controlled Acrobot}{54}{section*.34}%
-\contentsline {section}{\numberline {6.2}Optimization Results}{54}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Controlled 3D-Pendulum}{54}{subsection.6.2.1}%
-\contentsline {subsubsection}{Minimal degree chordal extension}{54}{section*.36}%
-\contentsline {chapter}{\numberline {7}Discussion}{59}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Conclusion}{61}{chapter.8}%
-\contentsline {chapter}{List of Figures}{63}{section*.38}%
-\contentsline {chapter}{List of Tables}{65}{section*.40}%
-\contentsline {chapter}{Acronyms}{67}{section*.42}%
-\contentsline {chapter}{Notation}{69}{section*.44}%
-\contentsline {chapter}{List of Symbols}{71}{section*.46}%
-\contentsline {chapter}{Bibliography}{73}{section*.48}%
+\contentsline {subsubsection}{Unforced Acrobot}{56}{section*.32}%
+\contentsline {subsubsection}{Controlled Acrobot}{57}{section*.33}%
+\contentsline {section}{\numberline {6.2}3D-Pendulum Optimization Results}{58}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Acrobot Optimization Results}{59}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Semidefinite Optimization Results}{59}{subsection.6.3.1}%
+\contentsline {subsubsection}{Position Reduction LGVI Model}{59}{section*.36}%
+\contentsline {subsubsection}{Discretized Euler-Lagrange Model}{59}{section*.37}%
+\contentsline {subsection}{\numberline {6.3.2}Model Predictive SDP Control Results}{59}{subsection.6.3.2}%
+\contentsline {chapter}{\numberline {7}Discussion}{63}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Conclusion}{65}{chapter.8}%
+\contentsline {chapter}{List of Figures}{67}{section*.39}%
+\contentsline {chapter}{List of Tables}{69}{section*.41}%
+\contentsline {chapter}{Acronyms}{71}{section*.43}%
+\contentsline {chapter}{Notation}{73}{section*.45}%
+\contentsline {chapter}{List of Symbols}{75}{section*.47}%
+\contentsline {chapter}{Bibliography}{77}{section*.49}%

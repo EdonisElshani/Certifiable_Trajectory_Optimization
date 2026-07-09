@@ -103,6 +103,12 @@ Taeyoung Lee.
 \newblock Phd dissertation, The University of Michigan, Ann Arbor, Michigan,
   2008.
 
+\bibitem[LLM07]{LeeLeokMcClamroch2007DiscreteControlSystems}
+Taeyoung Lee, Melvin Leok, and N.~Harris McClamroch.
+\newblock Discrete control systems.
+\newblock {\em arXiv preprint arXiv:0705.3868}, 2007.
+\newblock \href {https://arxiv.org/abs/0705.3868} {\path{arXiv:0705.3868}}.
+
 \bibitem[MR99]{MarsdenRatiu1999}
 Jerrold~E. Marsden and Tudor~S. Ratiu.
 \newblock {\em Introduction to Mechanics and Symmetry: A Basic Exposition of

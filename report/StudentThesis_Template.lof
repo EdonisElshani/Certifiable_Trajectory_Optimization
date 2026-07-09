@@ -8,8 +8,8 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {6.1}{\ignorespaces Comparison of the numerical preservation properties for the unforced $3$D pendulum.}}{50}{figure.caption.29}%
 \contentsline {figure}{\numberline {6.2}{\ignorespaces Comparison of the forced LGVI and RK4 simulation for the controlled $3$D pendulum.}}{53}{figure.caption.31}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Comparison of the numerical preservation properties for the unforced Acrobot.}}{55}{figure.caption.33}%
-\contentsline {figure}{\numberline {6.4}{\ignorespaces Comparison of the numerical preservation properties for the controlled Acrobot.}}{56}{figure.caption.35}%
-\contentsline {figure}{\numberline {6.5}{\ignorespaces SPOT optimization results for the controlled $3$D pendulum performing a $90^\circ $ rotation about the $x$-axis using the MD sparsity setting.}}{57}{figure.caption.37}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Comparison of the numerical preservation properties for the unforced Acrobot.}}{59}{figure.caption.34}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Comparison of the numerical preservation properties for the controlled Acrobot.}}{60}{figure.caption.35}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces SPOT optimization results for the controlled $3$D pendulum performing a $90^\circ $ rotation about the $x$-axis using the MD sparsity setting.}}{61}{figure.caption.38}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

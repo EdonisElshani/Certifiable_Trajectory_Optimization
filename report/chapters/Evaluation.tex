@@ -395,9 +395,204 @@ consistent short-time dynamics of LGVI and RK4, while the numerical trajectories
 simulation continues.
 
 \subsection{Acrobot}
-\label{sec:numercial_simulation_acrobot}
+\label{subsec:evaluation_acrobot}
+
+TODO: bm all vectors and matrices also simplify and explain Cayley transformation used
+
+To evaluate the geometric properties preservation of the previously defined Acrobot (see Section \ref{sec:acrobot}), 
+numerical simulations are conducted for the unforced and controlled case similar to those conducted for the 3D-pendulum 
+in Section \ref{sec:numerical_simulation_3d_pendulum}.
+In contrast to the 3D-pendulum, the Acrobot is a constrained multi-body system in maximal coordinates with the configuration 
+\[
+\bm{q}_k =
+\left(
+\bm{x}_{1,k},
+\bm{R}_{1,k},
+\bm{x}_{2,k},
+\bm{R}_{2,k}
+\right)
+\in
+\left(\mathbb{R}^{2}\times SO(2)\right)^2 ,
+\]
+Therefore, the validation does not only focus on the preservation of the Lie-group structure of the attitude variables, but also on the preservation of the holonomic joint constraints $\bm{\phi}_0(\bm{q}_k)$ and $\bm{\phi}_{12}(\bm{q}_k)$. 
+The physical parameters are chosen as two identical uniform rods with
+\[
+    m_1=m_2=1\,\mathrm{kg},
+    \qquad
+    l_1=l_2=0.5\,\mathrm{m},
+    \qquad
+    g=9.81\,\mathrm{m/s^2},
+\]
+and the center of mass of each link is located at $\frac{l_i}{2}$.
+Since the maximal-coordinate formulation already represents the translational
+motion of the link centers of mass, the rotational inertia is taken about the
+corresponding center of mass. \cite{Benacquista2018ClassicalMechanics} defines
+the rotational inertia of a uniform rod about its center of mass as
+\[
+    J_i^{\mathrm{com}}
+    =
+    \frac{1}{12}m_i l_i^2.
+\]
+The defined non-standard inertia matrix in \ref{eq:non-standard_inertia}
+is valid for $SO(3)$. Therefore, the planar
+\(SO(2)\) rotational kinetic term of the discrete Lagrangian in
+\cite{LeeLeokMcClamroch2007DiscreteControlSystems} is rewritten, which gives the relation of a planar non-standard
+inertia to the standard inertia as
+\begin{align}\label{eq:2D_nonstandard_inertia}
+    J_{d,i}
+    =
+    \frac{1}{2}J_i^{\mathrm{com}} I_2.
+\end{align}
+Therefore, the discrete-time inertia matrices of both links are
+\[
+    J_{d,1}
+    =
+    J_{d,2}
+    =
+    \begin{bmatrix}
+        0.0104167 & 0\\
+        0 & 0.0104167
+    \end{bmatrix}
+    \mathrm{kg\,m^2},
+\]
+substituting the chosen values of $m_i$ and $l_i$ into \eqref{eq:2D_nonstandard_inertia}.
+The base point is fixed at
+\[
+    \bm{p}_0 =
+    \begin{bmatrix}
+        0 & 0
+    \end{bmatrix}^{\top}.
+\]
+Using the body-fixed link convention from Section 4.3.1, the joint vectors are
+\[
+\rho_{1,0}
+=
+\begin{bmatrix}
+0 & 0.25
+\end{bmatrix}^{\top}\mathrm{m},
+\qquad
+\rho_{1,12}
+=
+\begin{bmatrix}
+0 & -0.25
+\end{bmatrix}^{\top}\mathrm{m},
+\qquad
+\rho_{2,12}
+=
+\begin{bmatrix}
+0 & 0.25
+\end{bmatrix}^{\top}\mathrm{m},
+\]
+illustrated in Fig. \ref{fig:acrobot_maximal_coordinates}.
+
+As in the controlled 3D-pendulum simulation, the classical RK4 method is used as a reference method. However, the projected RK4 method from the unforced 3D-pendulum comparison is not used for the Acrobot. Although a projection based on the singular value decomposition can enforce the orthogonality condition after each RK4 step, the resulting method is not derived from a discrete variational principle. Therefore, it does not automatically inherit the symplectic and momentum-preserving properties of variational integrators \cite{Marsden2001,CELLEDONI2003421,Hairer2000}. Moreover, the projection modifies the numerical flow after the RK4 update. This can influence dynamical quantities such as momentum and energy, as already observed in the 3D-pendulum simulation. Consequently, for the Acrobot, the RK4 reference is integrated in relative coordinates and reconstructed into maximal coordinates. This is a more meaningful comparison, since the relative-coordinate RK4 trajectory satisfies the joint geometry by construction, while the LGVI directly enforces the holonomic constraints in maximal coordinates.
+
+The following metrics are used for the Acrobot simulation. The total mechanical energy is evaluated as
+\[
+E_k
+=
+\frac{1}{2}v_{1,k}^{\top}M_1v_{1,k}
++
+\frac{1}{2}v_{2,k}^{\top}M_2v_{2,k}
++
+\frac{1}{2}J_1\omega_{1,k}^{2}
++
+\frac{1}{2}J_2\omega_{2,k}^{2}
++
+g e_2^{\top}M_1x_{1,k}
++
+g e_2^{\top}M_2x_{2,k},
+\]
+where $e_2=[0\;1]^{\top}$ denotes the vertical direction. The position difference between the LGVI trajectory and the reconstructed RK4 reference trajectory is computed by
+\[
+\Delta x_k
+=
+\left\|
+X_{k,\mathrm{RK4}}
+-
+X_{k,\mathrm{LGVI}}
+\right\|_2,
+\]
+with
+\[
+X_k =
+\begin{bmatrix}
+x_{1,k}^{\top} & x_{2,k}^{\top}
+\end{bmatrix}^{\top}.
+\]
+The holonomic constraint residuals are evaluated separately as
+\[
+\|\bm{\phi}_{0,k}\|_2,
+\qquad
+\|\bm{\phi}_{12,k}\|_2,
+\]
+where $\bm{\phi}_{0,k}$ denotes the fixed-base constraint and $\bm{\phi}_{12,k}$ denotes the elbow constraint. Finally, the Lie-group preservation of both link attitudes is measured by
+\[
+e_{\mathrm{orth},i,k}
+=
+\left|
+I_2 - R_{i,k}^{\top}R_{i,k}
+\right|_F,
+\qquad
+i\in{1,2}.
+\]
+In contrast to the 3D-pendulum, no momentum-map error is evaluated for the Acrobot. Due to the fixed base joint and the holonomic coupling between the links, the system does not have the same rotational symmetry about the gravity direction as the 3D-pendulum. Therefore, the holonomic constraint residuals are the more relevant structure-preservation metric for the constrained multi-body system.
 
 \subsubsection{Unforced Acrobot}
+
+The first Acrobot simulation considers the unforced case with $u_k=0$. The simulation is performed with the step size
+\[
+h=\SI{0.1}{\second}
+\]
+over the final time
+\[
+t_f=\SI{10000}{\second},
+\]
+which corresponds to $N=100000$ discrete-time steps. The purpose of this experiment is to evaluate the long-time qualitative behaviour of the maximal-coordinate LGVI and to compare it with the RK4 reference trajectory. In addition, the implementation also computes an RK4 trajectory in maximal coordinates with acceleration-level constraints. This trajectory is used as an additional diagnostic for constraint drift, since acceleration-level constraints enforce $\ddot{\phi}=0$, but do not project the position-level constraint $\phi=0$. The plots in Fig.~6.3 focus on the comparison between the maximal-coordinate LGVI and the relative-coordinate RK4 reference.
+
+The total energy evolution is shown in Fig.~6.3(a). Since the system is unforced, the exact mechanical energy is expected to remain constant. The LGVI energy remains close to its initial value and shows bounded oscillations over the long-time horizon. This behaviour is consistent with the symplectic structure of variational integrators, which generally leads to good long-time energy behaviour instead of monotonic numerical drift. In contrast, the RK4 reference shows a visible drift of the energy over time. This agrees with the observation from the unforced 3D-pendulum simulation in Fig.~6.1, where the LGVI preserved the qualitative energy behaviour more reliably than the classical RK4 method.
+
+Fig.~6.3(b) shows the position error norm $\|\Delta x_k\|$ between the LGVI trajectory and the reconstructed RK4 reference. At the beginning of the simulation, both methods produce similar trajectories. Over the long-time horizon, however, small differences in the numerical integration accumulate and lead to a visible separation of the center-of-mass trajectories. The error remains oscillatory, which is expected for the coupled pendulum-like motion of the Acrobot. Therefore, the plot does not indicate a violation of the constraints, but rather the long-time separation of two different numerical discretizations.
+
+The holonomic constraint residuals are shown in Fig.~6.3(c). Both the base constraint residual $\|\phi_{0,k}\|_2$ and the elbow constraint residual $\|\phi_{12,k}\|_2$ remain close to machine precision over the complete simulation. This confirms that the constrained LGVI enforces the fixed-base joint and the elbow joint at the position level. This result is particularly important for the Acrobot, since the constraints define the physical two-link mechanism. If the constraints were not preserved, the maximal-coordinate states would no longer represent a valid Acrobot configuration.
+
+Finally, Fig.~6.3(d) shows the orthogonality error of both link rotations. The LGVI preserves the $SO(2)$ structure of both attitudes by the multiplicative update $R_{i,k+1}=R_{i,k}F_{i,k}$ with $F_{i,k}\in SO(2)$. The RK4 reference also remains close to machine precision in this plot, because it is integrated in relative coordinates and then reconstructed into rotation matrices. Hence, the RK4 curve should not be interpreted as an additive matrix RK4 method on $SO(2)$. The main differences between both approaches are instead the energy behaviour and the direct preservation of the holonomic constraints in maximal coordinates.
+
+Overall, the unforced Acrobot simulation confirms that the derived constrained LGVI preserves the geometric structure of the maximal-coordinate model. The link attitudes remain on $SO(2)$, the joint constraints remain satisfied, and the energy shows bounded long-time behaviour. This validates the unforced Acrobot discretization derived in Section~4.3.1.
+
+\subsubsection{Controlled Acrobot}
+
+In the controlled case, the Acrobot is actuated by a scalar torque at the elbow joint. As derived in Section~4.3.1, this torque is an internal joint torque acting between the two links. Therefore, it enters the absolute-link virtual work as
+\[
+\tau_k
+=
+\begin{bmatrix}
+-u_k \\
+u_k
+\end{bmatrix}.
+\]
+The control input is chosen as the sinusoidal elbow torque
+\[
+u(t):=0.15\sin(0.7t)\,\si{\newton\meter}.
+\]
+The discrete input is obtained by evaluating the continuous input at the time nodes, $u_k=u(t_k)$. The forced simulation uses the same physical parameters and initial condition as the unforced case. The simulation is performed with
+\[
+h=\SI{0.001}{\second},
+\qquad
+t_f=\SI{100}{\second},
+\]
+which again corresponds to (N=100000) discrete-time steps. The same metrics as in the unforced case are evaluated. However, the total mechanical energy is no longer expected to be conserved, since the elbow motor performs work on the system.
+
+The total energy of the controlled Acrobot is shown in Fig.~6.4(a). In contrast to the unforced simulation, the applied torque changes the mechanical energy of the system. Therefore, the relevant observation is not conservation of $E_k$, but the consistency between the LGVI and RK4 energy evolution under the same control input. Both methods show a similar energy behaviour with small oscillations caused by the sinusoidal actuation. This indicates that the forced discrete Lagrange--d'Alembert contribution has been implemented consistently.
+
+Fig.~6.4(b) shows the position error norm $\|\Delta x_k\|$ between the LGVI trajectory and the reconstructed RK4 reference. Compared to the unforced long-time simulation, the error remains significantly smaller over the considered horizon. The difference grows slowly, but stays several orders of magnitude below the link length scale. This confirms that the forced maximal-coordinate LGVI and the relative-coordinate RK4 reference produce nearly identical short-time dynamics under the sinusoidal elbow input. The remaining difference is expected, since the two methods discretize the dynamics differently.
+
+The holonomic constraint residuals are plotted in Fig.~6.4(c). The base and elbow constraint residuals remain close to numerical precision over the complete simulation. Hence, also in the forced case, the maximal-coordinate LGVI prevents constraint drift and keeps the Acrobot links physically connected. This is essential for the later SDP formulation, since the polynomial equality constraints in the optimization problem are based on the same fixed-base and elbow-joint equations.
+
+Finally, Fig.~6.4(d) shows the orthogonality error of both link rotations. As in the unforced simulation, the LGVI preserves the $SO(2)$ structure through the multiplicative attitude update. The reconstructed RK4 reference also remains close to machine precision, since its rotations are computed from relative angles. Therefore, the controlled Acrobot simulation confirms that both the forcing term and the constrained Lie-group update are numerically consistent.
+
+In summary, the Acrobot results in Fig.~6.3 and Fig.~6.4 extend the numerical validation from the single rigid-body 3D pendulum to a constrained multi-body system. The LGVI preserves the $SO(2)$ attitude structure, enforces the holonomic constraints, and shows stable long-time energy behaviour in the unforced case. Under sinusoidal actuation, the forced LGVI remains consistent with the RK4 reference while maintaining the constraint manifold. Therefore, the numerical simulations support the correctness of the derived Acrobot variational integrator and its use as the dynamics model for the optimization formulation in Section~5.3.2.
+
 
 \begin{figure}[t]
     \centering
@@ -430,8 +625,6 @@ simulation continues.
     \caption{Comparison of the numerical preservation properties for the unforced Acrobot.}
     \label{fig:simulation_results_acrobot_unforced}
 \end{figure}
-
-\subsubsection{Controlled Acrobot}
 
 \begin{figure}[t]
     \centering
@@ -466,18 +659,33 @@ simulation continues.
 \end{figure}
 
 
-
-
-\section{Optimization Results}
+\section{3D-Pendulum Optimization Results}
 \label{sec:optimization_results}
 
 SPOT-Based Implementation
 
-\subsection{Controlled 3D-Pendulum}
-\label{subsec:optimizedcontrolled_3d_pendulum}
+Minimal Cordal Extension MD
 
-\subsubsection{Minimal degree chordal extension}
-\label{subsec:minimal_degree_chordal_extension}
+\section{Acrobot Optimization Results}
+\label{sec:acrobot_optimization_results}
+Reduced Models...
+
+\subsection{Semidefinite Optimization Results}
+\label{subsec:acrobot_optimization_results}
+
+\subsubsection{Position Reduction LGVI Model}
+
+\subsubsection{Discretized Euler-Lagrange Model}
+
+
+Tabelle 0 45 90 180 Degree SELF cliques
+
+\subsection{Model Predictive SDP Control Results}
+
+
+
+
+
 
 \begin{figure}[t]
     \centering
