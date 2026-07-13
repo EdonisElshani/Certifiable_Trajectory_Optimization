@@ -383,16 +383,16 @@ for $h = t_{k+1}-t_k$ \cite{butcher2016numerical}. Applying \eqref{eq:trapezodia
 \begin{align}\label{eq:discrete_potential_3D_pendulum}
     \int_{t_k}^{t_{k+1}} U(\bm{R}) \, dt
     =
-    \int_{t_k}^{t_{k+1}} mg\,\bm{e}_3^{\top} \bm{R} \bm{\rho}_c \, dt
+    \int_{t_k}^{t_{k+1}} -mg\,\bm{e}_3^{\top} \bm{R} \bm{\rho}_c \, dt
     &\approx
-    \frac{h}{2}\, mg\,\bm{e}_3^{\top}  \bm{R}_k \bm{\rho}_c
-    +
+    -\frac{h}{2}\, mg\,\bm{e}_3^{\top}  \bm{R}_k \bm{\rho}_c
+    -
     \frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_{k+1} \bm{\rho}_c \notag \\
     &=
-    \frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_k \bm{\rho}_c
-    +
+    -\frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_k \bm{\rho}_c
+    -
     \frac{h}{2}\, mg\,\bm{e}_3^{\top} \bm{R}_k \bm{F}_k \bm{\rho}_c, \notag \\
-    &=U(\bm{R}_k)+U(\bm{R}_k \bm{F}_k),
+    &=\frac{h}{2}U(\bm{R}_k)+\frac{h}{2}U(\bm{R}_k \bm{F}_k),
 \end{align}
 using \eqref{eq:discrete_attitude_kinematics_equation_SO3}, as only the potential energy $U(\bm{R})$ of the continuous Lagrangian depends on $\bm{R}$. Substituting \eqref{eq:discrete_velocity_approximation} and \eqref{eq:discrete_potential_3D_pendulum} into \eqref{eq:discrete_3D_pendulum_lagrangian}, the discrete Lagrangian is calculated to
 \begin{align}
@@ -1077,11 +1077,12 @@ Therefore, the gravitational potential energy is given by the translational case
 \begin{equation}
     V_T(\bm{x}_1,\bm{x}_2)
     =
+    -
     \sum_{i=1}^{2}
     g\,\bm{e}_2^{\top}\bm{M}_i\bm{x}_i,
     \label{eq:acrobot_potential_energy}
 \end{equation}
-where \(\bm{e}_2\in\mathbb{R}^2\) denotes the vertical unit vector in the inertial frame.
+where \(\bm{e}_2\in\mathbb{R}^2\) denotes the unit vector in gravity direction in the inertial frame.
 Consequently, the continuous Lagrangian
 \(L:TQ_{\mathrm{max}}\rightarrow\mathbb{R}\) is defined as
 \begin{equation}
@@ -1100,7 +1101,7 @@ Consequently, the continuous Lagrangian
         \hat{\omega}_i^{\top}
     \right]
     \right)
-    -
+    +
     \sum_{i=1}^{2}
     g\,\bm{e}_2^{\top}\bm{M}_i\bm{x}_i .
     \end{aligned}
@@ -1189,6 +1190,7 @@ is given by
 \begin{equation}
     V_{d,T}(q_k,q_{k+1})
     =
+    -
     \frac{h}{2}
     \sum_{i=1}^{2}
     m_i g
@@ -1240,7 +1242,7 @@ discrete Lagrangian
     \bm{J}_{d,i}
     \right]   \\
     &
-    -
+    +
     \frac{h}{2}
     \sum_{i=1}^{2}
     g
@@ -1307,7 +1309,7 @@ the variation of the translational component is given as
     -
     \bm{v}_{i,k+1}
     \right)
-    -
+    +
     g\bm{M}_i\bm{e}_2
     +
     \bm{G}_{x_i,k+1}^{\top}\bm{\lambda}_{k+1},
@@ -1376,7 +1378,7 @@ Therefore, substituting the gradient \eqref{eq:acrobot_translational_constraint_
     -
     \bm{v}_{1,k}
     \right)
-    +
+    -
     g\bm{M}_{1}\bm{e}_{2}
     -
     \left(
@@ -1394,7 +1396,7 @@ Therefore, substituting the gradient \eqref{eq:acrobot_translational_constraint_
     -
     \bm{v}_{2,k}
     \right)
-    +
+    -
     g\bm{M}_{2}\bm{e}_{2}
     +
     \bm{\lambda}_{12,k+1}
@@ -1660,7 +1662,7 @@ Finally, the full discrete Euler-Lagrange equations of the unforced Acrobot in m
         -
         \bm{v}_{1,k}
     \right)
-    +
+    -
     g\bm{M}_{1}\bm{e}_2
     -
     \left(
@@ -1679,7 +1681,7 @@ Finally, the full discrete Euler-Lagrange equations of the unforced Acrobot in m
         -
         \bm{v}_{2,k}
     \right)
-    +
+    -
     g\bm{M}_{2}\bm{e}_2
     +
     \bm{\lambda}_{12,k+1}
@@ -1871,4 +1873,3 @@ Therefore, the controlled rotational discrete Euler-Lagrange equations are deriv
 \end{subequations}
 For \(u_{k+1}=0\), these equations reduce to the corresponding unforced rotational
 equations derived previously.
-

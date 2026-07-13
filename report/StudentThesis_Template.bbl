@@ -141,6 +141,12 @@ Jinglai Shen, A.K. Sanyal, N.A. Chaturvedi, D.~Bernstein, and H.~McClamroch.
 \newblock \href {https://doi.org/10.1109/CDC.2004.1428650}
   {\path{doi:10.1109/CDC.2004.1428650}}.
 
+\bibitem[Ted23]{tedrake_underactuated}
+Russ Tedrake.
+\newblock {\em Underactuated Robotics}.
+\newblock 2023.
+\newblock URL: \url{https://underactuated.csail.mit.edu}.
+
 \bibitem[TJVG25]{Sangli2025}
 Sangli Teng, Ashkan Jasour, Ram Vasudevan, and Maani Ghaffari.
 \newblock Convex geometric motion planning of multi-body systems on lie groups
