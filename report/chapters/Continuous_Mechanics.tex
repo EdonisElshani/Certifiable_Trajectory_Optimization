@@ -1,9 +1,49 @@
 \chapter{Continuous Mechanics of Rigid Bodies on Lie Groups}
+\label{chapter:continous_mechanics_of_rigid_bodies_on_lie_groups}
+
 
 \section{Lagrangian Mechanics}
 \label{section:continuous_lagrangian_mechanics}
 
 \subsection{Euler-Lagrange Equations}
+
+\paragraph{Variations on Lie groups}
+Variations are taken in the tangent space and mapped back to the group G with the exponential map. Let \(g(t)\in G\) and let \(\bm{\eta}(t)\in\mathfrak{g}\) satisfy \(\bm{\eta}(t_{0})=\bm{\eta}(t_{f})=0\). A varied curve that remains on \(G\) is
+\begin{equation}
+    g^{\epsilon}(t)
+    =
+    g(t)\exp\!\left(\epsilon\bm{\eta}(t)\right),
+    \qquad
+    \delta g
+    =
+    \left.\frac{\mathrm{d}}{\mathrm{d}\epsilon}\right|_{\epsilon=0}g^{\epsilon}
+    =
+    g\bm{\eta}.
+    \label{eq:lie_group_variation}
+\end{equation}
+For \(\bm{\xi}=g^{-1}\dot{g}\), the corresponding constrained velocity variation is
+\begin{equation}
+    \delta\bm{\xi}
+    =
+    \dot{\bm{\eta}}+[\bm{\xi},\bm{\eta}]
+    =
+    \dot{\bm{\eta}}+\operatorname{ad}_{\bm{\xi}}\bm{\eta}.
+    \label{eq:left_trivialized_velocity_variation}
+\end{equation}
+In discrete mechanics, \(f_{k}=g_{k}^{-1}g_{k+1}\) and \(\delta g_{k}=g_{k}\bm{\eta}_{k}\) imply
+\begin{equation}
+    \delta f_{k}
+    =
+    -\bm{\eta}_{k}f_{k}+f_{k}\bm{\eta}_{k+1}
+    =
+    f_{k}\!\left(
+        \bm{\eta}_{k+1}
+        -
+        \operatorname{Ad}_{f_{k}^{-1}}\bm{\eta}_{k}
+    \right).
+    \label{eq:relative_group_variation}
+\end{equation}
+For rotations, \(\bm{R}^{\epsilon}=\bm{R}\exp(\epsilon\widehat{\bm{\eta}})\) gives \(\delta\bm{R}=\bm{R}\widehat{\bm{\eta}}\). Analogously, \(\bm{T}^{\epsilon}=\bm{T}\exp(\epsilon\bm{\Xi})\) on \(\mathrm{SE}(n)\) gives \(\delta\bm{T}=\bm{T}\bm{\Xi}\) \cite{Lee2008}.
 
 \begin{equation}\label{eq:continuous_euler_lagrange}
     Euler
@@ -264,7 +304,7 @@ where $ \hat{\bm{\Pi}} \in \mathfrak{so}(3)^*$. By substituting \eqref{eq:contin
 \end{subequations}
 Finally, the derived Euler-Lagrange equations \eqref{eq:continuous_3D_pendulum_euler_lagrange} and the Hamilton equations \eqref{eq:continuous_3D_pendulum_hamilton} correspond to the given 3D-pendulum results of \cite{Lee2008}.
 
-\subsection{Verification Of Momentum Conservation}
+\subsection{Verification of Momentum Conservation}
 \label{sec:continuous_3D_pendulum_momentum_validation}
 
 The verification of momentum conservation is particularly relevant in the context of this thesis, since the use of Lagrangian mechanics on Lie groups preserves the intrinsic geometric structure of the dynamics, which is essential for accurate simulation and for certifiable trajectory optimization methods \cite{Sangli2025}. Therefore, in the following, the momentum conservation property of the continuous 3D pendulum is verified based on its symmetry and Noether's theorem.

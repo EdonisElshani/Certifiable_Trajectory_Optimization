@@ -21,3 +21,224 @@
 \section{Spellcheck reminder}
 Before handing in your thesis, even for an intermediate review, please perform a proper spellcheck and correct grammar mistakes. Otherwise, there is a high likelihood that your supervisor will return your report immediately without making any comments.
 \fi
+
+\chapter{Experimental Details}
+\label{appendix:experimental_details}
+
+\section{Acrobot Evaluation Models}
+\label{appendix:acrobot_evaluation_models}
+
+\subsection{Reduced Maximal-Coordinates LGVI Model}
+\label{appendix:reduced_maximal_coordinates_LGVI_model}
+
+\textbf{Approximation used.} This model is algebraically equivalent to Model 1 in the exact polynomial problem, but uses the kinematics to remove \(R_{k-1}\) from the dynamics clique. The neighboring rotations are replaced by
+\[
+R_{i,k+1}=R_{i,k}F_{i,k},
+\qquad
+R_{i,k-1}=R_{i,k}F_{i,k-1}^{\top}.
+\]
+Hence
+\[
+\widehat\Delta^s_{i,k}
+=s_{i,k}(a_{i,k}+a_{i,k-1}-2)+c_{i,k}(b_{i,k}-b_{i,k-1}),
+\]
+\[
+\widehat\Delta^c_{i,k}
+=c_{i,k}(a_{i,k}+a_{i,k-1}-2)-s_{i,k}(b_{i,k}-b_{i,k-1}).
+\]
+These are exactly the same second differences as in Model 1, only rewritten with \(R_k,F_{k-1},F_k\).
+
+\textbf{Reduced translational dynamics.}
+\[
+m_1\frac{\ell_1}{2}\widehat\Delta^s_{1,k}
+-h^2\Big(\bar\lambda^{(1)}_{0,k}+\bar\lambda^{(1)}_{12,k}\Big)=0,
+\]
+\[
+-m_1\frac{\ell_1}{2}\widehat\Delta^c_{1,k}
++h^2m_1g
+-h^2\Big(\bar\lambda^{(2)}_{0,k}+\bar\lambda^{(2)}_{12,k}\Big)=0,
+\]
+\[
+m_2\left[\ell_1\widehat\Delta^s_{1,k}+\frac{\ell_2}{2}\widehat\Delta^s_{2,k}\right]
++h^2\bar\lambda^{(1)}_{12,k}=0,
+\]
+\[
+-m_2\left[\ell_1\widehat\Delta^c_{1,k}+\frac{\ell_2}{2}\widehat\Delta^c_{2,k}\right]
++h^2m_2g+h^2\bar\lambda^{(2)}_{12,k}=0.
+\]
+
+\textbf{Clique choice.} Since \(R_{k-1}\) does not appear explicitly after substitution, one interior stage can be covered by
+\[
+\boxed{\mathcal C^{21}_k=
+\{R_k,R_{k+1},F_{k-1},F_k,\lambda_{0,k},\lambda_{12,k},u_k\}},
+\qquad k=1,\dots,N-1.
+\]
+The size is
+\[
+2\cdot4+2\cdot4+4+1=\boxed{21}.
+\]
+Boundary and terminal cliques remain
+\[
+\mathcal C_0=\{R_0,R_1, R_2, F_0, F_1, \lambda_{0,1},\lambda_{12,1},u_1\},\qquad |\mathcal C_0|=25,
+\]
+\[
+\mathcal C_N=\{R_{N-1}, R_N, F_{N-2}, F_{N-1}, \lambda_{0,N-1},\lambda_{12,N-1},u_{N-1}\},\qquad |\mathcal C_N|=21.
+\]
+The total number of variables is again \(13N-1\). The advantage is the smaller clique. The drawback is that the sparse relaxation can become weaker,
+because \(R_{k-1}\) is not in the same moment block as the rest of the three-node stencil.
+
+\subsection{Discretized Newton-Euler-Lagrange Model}
+\label{appendix:discretized_newton_euler_lagrange_model}
+
+\paragraph{Coordinates and approximation.}
+Let
+\[
+q_k=
+\begin{bmatrix}q_{1,k}\\q_{2,k}\end{bmatrix},
+\qquad
+\dot q_k=\omega_k=
+\begin{bmatrix}\omega_{1,k}\\\omega_{2,k}\end{bmatrix},
+\]
+where $q_{1,k}$ is the absolute shoulder angle and $q_{2,k}$ is the
+relative elbow angle. Thus, $R_{2,k}$ represents the relative joint
+coordinate, not the absolute orientation of the second link. For
+$i\in\{1,2\}$, define
+\[
+R_{i,k}=
+\begin{bmatrix}
+c_{i,k}&-s_{i,k}\\
+s_{i,k}&c_{i,k}
+\end{bmatrix},
+\qquad
+F_{i,k}=
+\begin{bmatrix}
+a_{i,k}&-b_{i,k}\\
+b_{i,k}&a_{i,k}
+\end{bmatrix}.
+\]
+Over the interval $[t_{k-1},t_k]$, the torque and angular velocity are
+evaluated at the left endpoint:
+\[
+u(t)\approx u_{k-1},\qquad
+\dot q(t_{k-1})=\omega_{k-1},\qquad
+\ddot q(t_{k-1})
+\approx\frac{\omega_k-\omega_{k-1}}{h}.
+\]
+The Lie-group reconstruction is
+\[
+R_{i,k}=R_{i,k-1}F_{i,k-1},
+\]
+or equivalently
+\[
+c_{i,k}-c_{i,k-1}a_{i,k-1}+s_{i,k-1}b_{i,k-1}=0,
+\]
+\[
+s_{i,k}-s_{i,k-1}a_{i,k-1}-c_{i,k-1}b_{i,k-1}=0.
+\]
+Following the cubic approximation, the step sine is related
+to the physical angular velocity by
+\[
+b_{i,k-1}
+-h\omega_{i,k-1}
++\frac{h^3}{6}\omega_{i,k-1}^3=0.
+\]
+The associated polynomial rotation constraints are
+\[
+c_{i,k}^2+s_{i,k}^2=1,\qquad
+a_{i,k}^2+b_{i,k}^2=1,\qquad
+a_{i,k}\geq a_{\min}>0.
+\]
+
+\paragraph{Discrete Newton--Euler--Lagrange dynamics.}
+The mass matrix, Coriolis vector, and gravity torque evaluated at node
+$k$ are
+\[
+M_k=
+\begin{bmatrix}
+I_1+I_2+m_2l_1^2+2m_2l_1l_{c2}c_{2,k}
+&
+I_2+m_2l_1l_{c2}c_{2,k}
+\\
+I_2+m_2l_1l_{c2}c_{2,k}
+&
+I_2
+\end{bmatrix},
+\]
+\[
+\gamma_k:=C(q_k,\omega_k)\omega_k
+=
+\begin{bmatrix}
+-m_2l_1l_{c2}s_{2,k}
+\left(
+2\omega_{1,k}\omega_{2,k}
++\omega_{2,k}^2
+\right)
+\\
+m_2l_1l_{c2}s_{2,k}\omega_{1,k}^2
+\end{bmatrix},
+\]
+\[
+\tau_{g,k}
+=
+\begin{bmatrix}
+-m_1gl_{c1}s_{1,k}
+-m_2g\!\left[
+l_1s_{1,k}
++l_{c2}
+\left(
+s_{1,k}c_{2,k}
++c_{1,k}s_{2,k}
+\right)
+\right]
+\\
+-m_2gl_{c2}
+\left(
+s_{1,k}c_{2,k}
++c_{1,k}s_{2,k}
+\right)
+\end{bmatrix},
+\qquad
+B=
+\begin{bmatrix}
+0\\1
+\end{bmatrix}.
+\]
+Hence, for $k=1,\ldots,N$, the left-endpoint polynomial dynamics are
+\[
+\boxed{
+M_{k-1}\left(\omega_k-\omega_{k-1}\right)
++hC(q_{k-1},\omega_{k-1})\omega_{k-1}
+-h\tau_{g,k-1}
+-hBu_{k-1}=0.
+}
+\]
+These two scalar equations, together with the reconstruction, cubic-step,
+and circle constraints, form the discrete transition model. The highest
+polynomial degree is three.
+
+\paragraph{Trajectory optimization and chain clique.}
+Define the augmented polynomial state
+\[
+x_k=
+\begin{bmatrix}
+c_{1,k}&s_{1,k}&a_{1,k}&b_{1,k}&\omega_{1,k}&
+c_{2,k}&s_{2,k}&a_{2,k}&b_{2,k}&\omega_{2,k}
+\end{bmatrix}^{\!T}\in\mathbb{R}^{10}.
+\]
+
+The standard interior chain clique is
+\[
+\boxed{
+z(I_k)=\{x_{k-1},u_{k-1},x_k\},
+\qquad |I_k|=10+1+10=21.
+}
+\]
+
+\section{Model Evaluation}
+\label{appenidx:model_evaluation}
+
+\subsection{Numerical Simulation Validation}
+\label{appendix:numerical_simulation_validation}
+
+\subsection{SDP Tightness and Dynamic Residuals}
+\label{appendix:SDP_tightness_and_dynamic_residuals}

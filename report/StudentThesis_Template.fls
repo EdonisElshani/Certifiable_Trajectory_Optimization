@@ -501,13 +501,13 @@ INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
 INPUT .\chapters\Preliminaries.tex
 INPUT .\chapters\Preliminaries.tex
 INPUT chapters\Preliminaries.tex
-INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti12.tfm
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\latex\amsfonts\ueuf.fd
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\latex\amsfonts\ueuf.fd
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\latex\amsfonts\ueuf.fd
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\euler\eufm10.tfm
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\euler\eufm10.tfm
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\euler\eufm7.tfm
+INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti12.tfm
 INPUT .\chapters\Continuous_Mechanics.tex
 INPUT .\chapters\Continuous_Mechanics.tex
 INPUT chapters\Continuous_Mechanics.tex

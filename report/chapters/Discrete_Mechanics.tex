@@ -1,4 +1,6 @@
-\chapter{Discrete Mechanics For Rigid Bodies On Lie Groups}
+\chapter{Discrete Mechanics for Rigid Bodies on Lie Groups}
+\label{chapter:discrete_mechanics_for_rigid_bodies_on_lie_groups}
+
 
 \section{Discrete Lagrangian Mechanics}
 \label{section:discrete_lagrangian_mechanics}
@@ -117,6 +119,7 @@ using eq. \eqref{eq:delta_fk_TL}.
 \subsection{Discrete Hamiltonian Mechanics}
 
 \subsection{Discrete Legendre Transformation}
+\label{sec:discrete_legendre_transformation}
 
 \subsection{Properties of the Discrete Lagrangian Flow}
 
@@ -357,11 +360,8 @@ As introduced in \eqref{eq:discrete_exact_lagrangian}, the discrete Lagrangian $
     L(\bm{R}, \hat{\bm{\omega}}) = T(\bm{R}, \hat{\bm{\omega}}) - U(\bm{R})
     = \frac{1}{2}\operatorname{tr}[\hat{\bm{\omega}} \bm{J}_d \hat{\bm{\omega}}^\top] + mg\, \bm{e}_3^\top \bm{R}\bm{\rho}_c,
 \end{equation}
-the time dependent angular velocity $\hat{\bm{\omega}}(t)$ and rotation matrix $\bm{R}(t)$ have to be represented on the discrete time interval $[t_k,t_{k+1}]$ \cite{Marsden2001}. Given the definition of the exponential for an $n\times n$ matrix $\bm{X}$
-\[
-    \exp(\bm{X})=\sum_{m=0}^{\infty} \frac{\bm{X}^m}{m},
-\]
-\cite{Hall2000LieGroups}, its first-order expansion can be written as
+the time dependent angular velocity $\hat{\bm{\omega}}(t)$ and rotation matrix $\bm{R}(t)$ have to be represented on the discrete time interval $[t_k,t_{k+1}]$ \cite{Marsden2001}. Given the definition of the exponential \eqref{eq:matrix_exponential} for an $n\times n$ matrix $\bm{X}$,
+its first-order expansion can be written as
 \begin{equation}\label{eq:first_order_expansion_exponential}
     \exp(\bm{X}) = \bm{I} + \bm{X} + O(\bm{X}^2).
 \end{equation}
@@ -782,6 +782,7 @@ It can be observed that, for $\bm{u}_k=\bm{0}$, the forced discrete Euler-Lagran
 reduce to the corresponding unforced equations \eqref{eq:discrete_3D_pendulum_EL}, \eqref{eq:discrete_3D_pendulum_hamilton} derived previously.
 
 \section{Multi-body Systems}
+\label{sec:multi_body_systems}
 
 The previous sections considered the discrete mechanics of a single rigid body whose
 configuration evolves directly on a Lie group. For multibody systems, the individual

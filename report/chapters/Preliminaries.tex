@@ -1,8 +1,148 @@
-\chapter{Preliminaries On Special Embedded Matrix Lie Groups}
+\chapter{Preliminaries on Special Embedded Matrix Lie Groups}
+\label{chap:preliminaries_lie_groups}
+
+This chapter summarizes the Lie group notation required for the continuous and discrete rigid-body mechanics developed in chapters \ref{chapter:continous_mechanics_of_rigid_bodies_on_lie_groups} and \ref{chapter:discrete_mechanics_for_rigid_bodies_on_lie_groups}, following the definition of Lie group and algebra in \cite{Hall2000LieGroups} and the geometric-mechanics notation in \cite{Lee2008}.
 
 \section{Special Matrix Lie Groups}
+\label{sec:special_matrix_lie_groups}
+
+A Lie group is a smooth manifold that is also a group, where multiplication and inversion are smooth maps. A real matrix Lie group is a closed subgroup
+$G\subset\mathrm{GL}(N,\mathbb{R})$. Its group operation is matrix
+multiplication, and it is an embedded smooth manifold for which
+multiplication and inversion are smooth maps
+\cite{Hall2000LieGroups}.
+
+Rotations in \(n\) dimensions are represented by the special orthogonal group
+\begin{equation}
+    \mathrm{SO}(n)
+    =
+    \left\{
+        \bm{R}\in\mathbb{R}^{n\times n}
+        \;\middle|\;
+        \bm{R}^{\top}\bm{R}=\bm{I}_{n},\;
+        \det(\bm{R})=1
+    \right\}.
+    \label{eq:so_group}
+\end{equation}
+The groups \(\mathrm{SO}(2)\) and \(\mathrm{SO}(3)\) describe planar and spatial rotations \cite{Lee2008}.
+
+Combined rotational and translational motion is represented by the special Euclidean group
+\begin{equation}
+    \mathrm{SE}(n)
+    =
+    \left\{
+        \bm{T}
+        =
+        \begin{bmatrix}
+            \bm{R} & \bm{p}\\
+            \bm{0} & 1
+        \end{bmatrix}
+        \;\middle|\;
+        \bm{R}\in\mathrm{SO}(n),\;
+        \bm{p}\in\mathbb{R}^{n}
+    \right\}.
+    \label{eq:se_group}
+\end{equation}
+Here, \(\bm{R}\) denotes the attitude and \(\bm{p}\) the position \cite{Hall2000LieGroups}. However, in this thesis 
+rotations and translations are represented separately
+in maximal coordinates, elaborated in Section \ref{sec:multi_body_systems}. Therefore, the derivations mainly use
+$\mathrm{SO}(n)$ and its Lie algebra $\mathrm{so}(n)$.
 
 \section{Special Lie Algebras}
+\label{sec:special_lie_algebras}
+
+\paragraph{Lie algebras and the exponential map}
+\cite{Hall2000LieGroups} defines the Lie algebra \(\mathfrak{g}\) of a matrix Lie group \(G\) is its tangent space at the identity,
+\begin{equation}
+    \mathfrak{g}=T_{e}G.
+    \label{eq:lie_algebra_tangent_space}
+\end{equation}
+For matrix Lie groups, the Lie bracket $[\cdot,\cdot]: \mathfrak{g} \times \mathfrak{g} \to \mathfrak{g}$ 
+is defined as
+\begin{equation}
+    [\bm{a},\bm{b}]
+    =
+    \bm{a}\bm{b}-\bm{b}\bm{a},
+    \qquad
+    \bm{a},\bm{b}\in\mathfrak{g},
+    \label{eq:matrix_lie_bracket}
+\end{equation}
+which is bilinear and skew-symmetric \cite{Hall2000LieGroups}. The Lie algebras corresponding to \(\mathrm{SO}(n)\) and \(\mathrm{SE}(n)\) are
+\begin{align}
+    \mathfrak{so}(n)
+    &=
+    \left\{
+        \bm{\omega}\in\mathbb{R}^{n\times n}
+        \;\middle|\;
+        \bm{\omega}^{\top}=-\bm{\omega}
+    \right\}
+    \label{eq:so_algebra},
+    \qquad
+    &\mathfrak{so}(n) = T_{e}\mathrm{SO}(n)
+    \\
+    \mathfrak{se}(n)
+    &=
+    \left\{
+        \begin{bmatrix}
+            \bm{\omega} & \bm{v}\\
+            \bm{0}^{\top} & 0
+        \end{bmatrix}
+        \;\middle|\;
+        \bm{\omega}\in\mathfrak{so}(n),\;
+        \bm{v}\in\mathbb{R}^{n}
+    \right\},
+    \qquad
+    &\mathfrak{se}(n) = T_{e}\mathrm{SE}(n).
+    \label{eq:se_algebra}
+\end{align}
+For \(\mathrm{SO}(2)\), \cite{Lee2008} defines the hat map $(\cdot)^\wedge: \mathbb{R} \rightarrow \mathfrak{so}(2)$ as
+\begin{equation}
+    \widehat{\omega}
+    =
+    \begin{bmatrix}
+        0 & -\omega\\
+        \omega & 0
+    \end{bmatrix},
+    \label{eq:hat_map_so2}
+\end{equation}
+with $\omega \in \mathbb{R}$.
+Additionally, for \(\mathrm{SO}(3)\), the hat map \((\cdot)^{\wedge}:\mathbb{R}^{3}\rightarrow\mathfrak{so}(3)\) is defined by
+\begin{equation}
+    \widehat{\bm{\omega}}
+    =
+    \begin{bmatrix}
+        0 & -\omega_{3} & \omega_{2}\\
+        \omega_{3} & 0 & -\omega_{1}\\
+        -\omega_{2} & \omega_{1} & 0
+    \end{bmatrix},
+    \qquad
+    \widehat{\bm{\omega}}\bm{b}=\bm{\omega}\times\bm{b},
+    \label{eq:hat_map_so3}
+\end{equation}
+with $\bm{\omega}, \bm{b} \in \mathbb{R}^3$ and the corresponding inverse map \((\cdot)^{\vee}: \mathfrak{so}(3) \rightarrow \mathbb{R}^3\).
+
+The matrix exponential of an $n\times n$ matrix $\bm{X}$
+\begin{equation}
+    \exp(\bm{X})=\sum_{m=0}^{\infty} \frac{\bm{X}^m}{m!}
+    \label{eq:matrix_exponential}
+\end{equation}
+defines the exponential map \(\exp:\mathfrak{g}\rightarrow G\) as a local diffeomorphism between a neighborhood of \(\bm{0}\in\mathfrak{g}\) and a neighborhood of \(e\in G\) \cite{Hall2000LieGroups,Lee2008}.
+
+\paragraph{Left and right translations}
+For \(g,h\in G\), the left and right translation maps are
+\begin{equation}
+    L_{h}(g)=hg,
+    \qquad
+    R_{h}(g)=gh.
+    \label{eq:left_right_translation}
+\end{equation}
+Thereby, \cite{Lee2008} expresses that for a differentiable curve $g(t) \in G$, the left-trivialized or body-fixed velocity $\bm{\xi} \in \mathfrak{g}$ is given by
+\begin{equation}
+    \bm{\xi}=g^{-1}\dot{g},
+    \qquad
+    \dot{g}=g\bm{\xi}.
+    \label{eq:left_trivialized_velocity}
+\end{equation}
 
 \begin{proposition}[Differential of left translation on a matrix Lie group: $T_{x}L_{h}$]
 Let $G\subset GL(n,\mathbb{R})$ be a matrix Lie group.
@@ -21,7 +161,7 @@ By the definition of the tangent space of an embedded submanifold given in \cite
 In \cite{Lee2012ISM}, the differential is defined as
 \[
 T_xL_h(v)=\left.\frac{d}{dt}L_h(\gamma(t))\right|_{t=0}
-=\left.\frac{d}{dt}(h\gamma(t))\right|_{t=0},
+=\left.\frac{d}{dt}(h\gamma(t))\right|_{t=0}=h\dot{\gamma}(0),
 \]
 with the left translation map $L_h(g)=hg$. Since $h$ is constant and $\dot{\gamma}(0)=v$, it follows that
 \[
@@ -29,11 +169,11 @@ T_xL_h(v)=h\dot{\gamma}(0)=hv.
 \]
 \end{proof}
 
-It can be observed that $L_{h}(g)=hg$ and $T_xL_{h}(v)=hv$ have the same matrix expression, but acting on different objects. The left translation map $L_{h}(g)$ is multiplying group elements $g \in G$, while the differential of the left translation map is the pushforward of tangent vectors $v \in T_{x}G \subset \mathbb{R}^{n \times n}$. The differential of a left translation can be applied to the special embedded matrix Lie groups $SO(n)$, $SE(n)$ and their corresponding lie algebras $\mathfrak{so}(n)$, $\mathfrak{se}(n)$. 
+It can be observed that $L_{h}(g)=hg$ and $T_xL_{h}(v)=hv$ have the same matrix expression, but acting on different objects. The left translation map $L_{h}(g)$ is multiplying group elements $g \in G$, while the differential of the left translation map is the pushforward of tangent vectors $v \in T_{x}G \subset \mathbb{R}^{n \times n}$. The differential of a left translation can be applied to the special embedded matrix Lie groups $SO(n)$ and their corresponding lie algebras $\mathfrak{so}(n)$. 
 
 \paragraph{Differential of left translation $T_RL_H$ on $SO(n)$}
 
-The left translation map in $SO(n)$ is defined as $L_{H}(R) = HR$ with $H,R \in G := SO(n)$. Applied to eq. \eqref{eq:preliminaries_differential_left_translation} with $v \in T_{R}G$, it follows that 
+The left translation map in $SO(n)$ is defined as $L_{H}(R) = HR$ with $H,R \in G$. Applied to eq. \eqref{eq:preliminaries_differential_left_translation} with $v \in T_{R}G$, it follows that 
 \begin{align*}
     T_{R}L_{H}(v)= Hv.
 \end{align*}
@@ -42,16 +182,156 @@ The tangent vector $v \in T_RG$ can be represented by $v = T_{e}L_{R}(\omega) = 
     T_RL_H(R \omega) = H(R \omega).
 \end{align}
 
-\paragraph{Differential of left translation $T_gL_h$ on $SE(n)$}
+%\paragraph{Differential of left translation $T_gL_h$ on $SE(n)$}
 
-The left translation map in $SE(n)$ is defined as $L_{h}(g) = hg$ with $h,g \in G := SE(n)$. Applied to eq. \eqref{eq:preliminaries_differential_left_translation} with $v \in T_{g}G$, it follows that 
-\begin{align*}
-    T_{g}L_{h}(v)= hv.
-\end{align*}
-The tangent vector $v \in T_gG$ can be represented by $v = T_{e}L_{g}(\xi) = g\xi$ using the left translation map of $\xi \in \mathfrak g := \mathfrak{se}(n)$ resulting in 
-\begin{align}\label{eq:preliminaries_differential_left_SE}
-    T_gL_h(g \xi) = h(g \xi).
+%The left translation map in $SE(n)$ is defined as $L_{h}(g) = hg$ with $h,g \in G$. Applied to eq. \eqref{eq:preliminaries_differential_left_translation} with $v \in T_{g}G$, it follows that 
+%\begin{align*}
+%    T_{g}L_{h}(v)= hv.
+%\end{align*}
+%The tangent vector $v \in T_gG$ can be represented by $v = T_{e}L_{g}(\xi) = g\xi$ using the left translation map of $\xi \in \mathfrak g := \mathfrak{se}(n)$ resulting in 
+%\begin{align}\label{eq:preliminaries_differential_left_SE}
+%    T_gL_h(g \xi) = h(g \xi).
+%\end{align}
+
+
+
+\paragraph{Adjoint and coadjoint operators}
+\cite{Lee2008} introduces the adjoint operator $\operatorname{Ad}_g: \mathfrak{g} \to \mathfrak{g}$ as
+\begin{equation}
+    \operatorname{Ad}_{g}\bm{\eta}
+    =
+    g\bm{\eta}g^{-1}.
+    \label{eq:adjoint_matrix}
+\end{equation}
+and its derivative  $\operatorname{ad}_\xi: \mathfrak{g} \to \mathfrak{g}$ as
+\begin{equation}
+    \operatorname{ad}_{\bm{\xi}}\bm{\eta}
+    =
+    \left.\frac{\mathrm{d}}{\mathrm{d}\epsilon}\right|_{\epsilon=0}
+    \operatorname{Ad}_{\exp(\epsilon\bm{\xi})}\bm{\eta}
+    =
+    [\bm{\xi},\bm{\eta}]
+    = \bm{\xi}\bm{\eta} - \bm{\eta}\bm{\xi},
+    \label{eq:ad_lie_bracket}
+\end{equation}
+using the Lie bracket $[\cdot,\cdot]$ defined in \eqref{eq:matrix_lie_bracket}.
+
+Let \(\mathfrak{g}^{*}\) be the dual space of \(\mathfrak{g}\). The notation \(\langle\bm{\mu},\bm{\xi}\rangle\) denotes the pairing of a covector \(\bm{\mu}\in\mathfrak{g}^{*}\) with a vector \(\bm{\xi}\in\mathfrak{g}\) \cite{Lee2008}. 
+Using the pairing, the coadjoint operator \(\operatorname{Ad}_{g}^{*}:\mathfrak{g}^{*}\rightarrow\mathfrak{g}^{*}\) is defined as 
+\begin{equation}
+    \left\langle
+        \operatorname{Ad}_{g}^{*}\bm{\mu},
+        \bm{\xi}
+    \right\rangle
+    =
+    \left\langle
+        \bm{\mu},
+        \operatorname{Ad}_{g}\bm{\xi}
+    \right\rangle.
+    \label{eq:coadjoint_definition}
+\end{equation}
+and its derivative \(\operatorname{ad}_{\bm{\eta}}^{*}:\mathfrak{g}^{*}\rightarrow\mathfrak{g}^{*}\) is given to
+\begin{align}
+    \left\langle\operatorname{ad}_{\bm{\eta}}^{*}\bm{\mu},\bm{\xi}\right\rangle
+    &=
+    \left\langle\bm{\mu},\operatorname{ad}_{\bm{\eta}}\bm{\xi}\right\rangle
+    =
+    \left\langle\bm{\mu},[\bm{\eta},\bm{\xi}]\right\rangle
+    =
+        \left\langle\bm{\mu},\bm{\eta}\bm{\xi} - \bm{\xi}\bm{\eta}\right\rangle
+.
+    \label{eq:coad_definition}
 \end{align}
+
+Additionally, the pairing can be used for defining the inner product on the dual space of the Lie algebra \cite{Lee2008}. Using the trace inner product, $\mathfrak{so}(n)$ is identified with its
+dual. For $n\in\{2,3\}$, the hat map gives
+\begin{equation}
+    \left\langle\widehat{\bm a},\widehat{\bm b}\right\rangle
+    =
+    \frac{1}{2}\operatorname{tr}\!\left(
+        \widehat{\bm a}^{\top}\widehat{\bm b}
+    \right)
+    =
+    \bm a^{\top}\bm b = \bm{a} \cdot \bm{b},
+    \label{eq:trace_inner_product}
+\end{equation}
+where $\bm a,\bm b\in\mathbb{R}$ for $n=2$ and
+$\bm a,\bm b\in\mathbb{R}^{3}$ for $n=3$.
+
+
+\paragraph{Variations on Matrix Lie Groups}
+
+For $g\in G$ and $\eta\in\mathfrak{g}=T_eG$, a local variation of
+$g$ is defined by
+\begin{equation}
+    g^\epsilon = g\exp(\epsilon\eta),
+\end{equation}
+where $\epsilon\in (-c,c)$ is the variation parameter for $c>0$. Since the
+variation is constructed through the group operation, $g^\epsilon$
+remains in $G$ \cite{Lee2008}. 
+
+\begin{proposition}[Infinitesimal variation on a matrix Lie group]
+    Let $G$ be a matrix Lie group with Lie algebra
+    $\mathfrak{g}=T_eG$ \cite{Hall2000LieGroups}. For any
+    $g\in G$ and $\eta\in\mathfrak{g}$, define the smooth curve
+    $\gamma:(-c,c)\rightarrow G$ by
+    \begin{equation}
+        \gamma(\epsilon)
+        =
+        g\exp(\epsilon\eta),
+        \qquad c>0.
+    \end{equation}
+    The corresponding infinitesimal variation is
+    \begin{equation}
+        \delta g
+        =
+        \left.
+        \frac{d}{d\epsilon}
+        \right|_{\epsilon=0}
+        \gamma(\epsilon)
+        =
+        g\eta
+        =
+        T_eL_g(\eta)
+        \in T_gG.
+        \label{eq:infinitesimal_variation_matrix_lie_group}
+    \end{equation}
+\end{proposition}
+
+\begin{proof}
+For any $\eta\in\mathfrak{g}$, the curve
+$\gamma(\epsilon)=g\exp(\epsilon\eta)$ is a smooth curve on $G$
+satisfying $\gamma(0)=g$. Therefore,
+\begin{align}
+\delta g
+&=
+\dot{\gamma}(0)
+=
+\left.
+\frac{d}{d\epsilon}
+\right|_{\epsilon=0}
+\gamma(\epsilon)
+=
+\left.
+\frac{d}{d\epsilon}
+\right|_{\epsilon=0}
+g\exp(\epsilon\eta)
+\notag\\
+&=
+g
+\left.
+\frac{d}{d\epsilon}
+\right|_{\epsilon=0}
+\exp(\epsilon\eta)
+=
+g\eta
+=
+T_eL_g(\eta),
+\end{align}
+where $\delta g$ is the infinitesimal variation of $g$ induced by
+$\eta$ \cite{Lee2008}.
+\end{proof}
+
 
 %Explain brackets
 %Inner product 
