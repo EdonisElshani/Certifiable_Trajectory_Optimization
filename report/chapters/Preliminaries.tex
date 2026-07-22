@@ -261,76 +261,38 @@ $\bm a,\bm b\in\mathbb{R}^{3}$ for $n=3$.
 
 \paragraph{Variations on Matrix Lie Groups}
 
-For $g\in G$ and $\eta\in\mathfrak{g}=T_eG$, a local variation of
-$g$ is defined by
+For $g\in G$ and $\eta\in\mathfrak{g}=T_eG$, define the local variation
+curve $\gamma:(-c,c)\rightarrow G$ by
 \begin{equation}
-    g^\epsilon = g\exp(\epsilon\eta),
+    \gamma(\epsilon)
+    =
+    g\exp(\epsilon\eta),
+    \qquad c>0,
+    \label{eq:variation_curve_matrix_lie_group}
 \end{equation}
-where $\epsilon\in (-c,c)$ is the variation parameter for $c>0$. Since the
-variation is constructed through the group operation, $g^\epsilon$
-remains in $G$ \cite{Lee2008}. 
-
-\begin{proposition}[Infinitesimal variation on a matrix Lie group]
-    Let $G$ be a matrix Lie group with Lie algebra
-    $\mathfrak{g}=T_eG$ \cite{Hall2000LieGroups}. For any
-    $g\in G$ and $\eta\in\mathfrak{g}$, define the smooth curve
-    $\gamma:(-c,c)\rightarrow G$ by
-    \begin{equation}
-        \gamma(\epsilon)
-        =
-        g\exp(\epsilon\eta),
-        \qquad c>0.
-    \end{equation}
-    The corresponding infinitesimal variation is
-    \begin{equation}
-        \delta g
-        =
-        \left.
-        \frac{d}{d\epsilon}
-        \right|_{\epsilon=0}
-        \gamma(\epsilon)
-        =
-        g\eta
-        =
-        T_eL_g(\eta)
-        \in T_gG.
-        \label{eq:infinitesimal_variation_matrix_lie_group}
-    \end{equation}
-\end{proposition}
-
-\begin{proof}
-For any $\eta\in\mathfrak{g}$, the curve
-$\gamma(\epsilon)=g\exp(\epsilon\eta)$ is a smooth curve on $G$
-satisfying $\gamma(0)=g$. Therefore,
-\begin{align}
-\delta g
-&=
-\dot{\gamma}(0)
-=
-\left.
-\frac{d}{d\epsilon}
-\right|_{\epsilon=0}
-\gamma(\epsilon)
-=
-\left.
-\frac{d}{d\epsilon}
-\right|_{\epsilon=0}
-g\exp(\epsilon\eta)
-\notag\\
-&=
-g
-\left.
-\frac{d}{d\epsilon}
-\right|_{\epsilon=0}
-\exp(\epsilon\eta)
-=
-g\eta
-=
-T_eL_g(\eta),
-\end{align}
-where $\delta g$ is the infinitesimal variation of $g$ induced by
-$\eta$ \cite{Lee2008}.
-\end{proof}
+where $\epsilon$ is the variation parameter. Since
+$\exp(\epsilon\eta)\in G$, the curve $\gamma(\epsilon)$ remains in
+$G$ and satisfies $\gamma(0)=g$ \cite{Lee2008}. The corresponding
+infinitesimal variation is
+\begin{equation}
+    \delta g
+    =
+    \left.
+    \frac{d}{d\epsilon}
+    \right|_{\epsilon=0}
+    \gamma(\epsilon)
+    =
+    \left.
+    \frac{d}{d\epsilon}
+    \right|_{\epsilon=0}
+    g\exp(\epsilon\eta)
+    =
+    g\eta
+    =
+    T_eL_g(\eta)
+    \in T_gG.
+    \label{eq:infinitesimal_variation_matrix_lie_group}
+\end{equation}
 
 
 %Explain brackets

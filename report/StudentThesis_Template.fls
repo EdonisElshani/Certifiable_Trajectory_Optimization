@@ -247,6 +247,9 @@ INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\generic\uniquecounter\uniq
 INPUT .\include\customize.tex
 INPUT .\include\customize.tex
 INPUT include\customize.tex
+INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryarrows.meta.code.tex
+INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryarrows.meta.code.tex
+INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryarrows.meta.code.tex
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\latex\pgfplots\pgfplots.sty
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\latex\pgfplots\pgfplots.sty
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\tex\generic\pgfplots\pgfplots.revision.tex
@@ -512,6 +515,8 @@ INPUT .\chapters\Continuous_Mechanics.tex
 INPUT .\chapters\Continuous_Mechanics.tex
 INPUT chapters\Continuous_Mechanics.tex
 INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti8.tfm
+INPUT C:\Users\ASUS\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti7.tfm
 INPUT .\chapters\Discrete_Mechanics.tex
 INPUT .\chapters\Discrete_Mechanics.tex
 INPUT chapters\Discrete_Mechanics.tex

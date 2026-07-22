@@ -2,60 +2,166 @@
 \label{chapter:continous_mechanics_of_rigid_bodies_on_lie_groups}
 
 
+This chapter introduces the continous mechanics of rigid bodies on Lie groups, which is the foundation for the discrete mechanics formulation in Chapter~\ref{chapter:discrete_mechanics_for_rigid_bodies_on_lie_groups}. 
+Therefore, Section \ref{sec:continuous_lagrangian_mechanics} presents the representation of geometric mechanics on Lie group,
+by deriving the Euler-Lagrange equations and the Legendre transformation. Moreover, the properties of the Lagrangian flow are discussed. Consequently, 
+Section \ref{section:continuous_3D_pendulum} applies the derived framework to the unforced 3D-pendulum as an example of a mechanical system on a Lie group, and verifies the momentum preservation properties of the Lagrangian 
+flow of the model, based on the work of \cite{Lee2008}. 
+
+% Chapter 3.1: Lagrangian Mechanics
+% Required cross-reference in Chapter 2:
+% Add \label{prop:infinitesimal_variation_matrix_lie_group}
+% immediately after
+% \begin{proposition}[Infinitesimal variation on a matrix Lie group]
+
 \section{Lagrangian Mechanics}
-\label{section:continuous_lagrangian_mechanics}
+\label{sec:continuous_lagrangian_mechanics}
 
-\subsection{Euler-Lagrange Equations}
+Differential geometry provides a framework for describing geometric mechanics, by
+exploring the geometric structure of a Lagrangian or Hamiltonian system \cite{Lee2008}.
+Thereby, Lagrangian mechanics describes the motion of a mechanical system through
+a variational principle. Instead of directly discretizing or integrating
+the equations of motion, the trajectory is obtained from the stationary
+value of the action integral. This formulation provides the continuous 
+foundation for the discrete variational integrators introduced in 
+Chapter~\ref{chapter:discrete_mechanics_for_rigid_bodies_on_lie_groups}. 
+In particular, the variational construction keeps the symplectic and 
+momentum-preserving structure of mechanical systems, which is later used 
+for the geometric trajectory optimization formulation via Semidefinite Programming (SDP) Relaxation in Chapter~\ref{chap:certifiable_trajectory_optimization}.
+\cite{Lee2008,Marsden2001,Sangli2025}.
 
-\paragraph{Variations on Lie groups}
-Variations are taken in the tangent space and mapped back to the group G with the exponential map. Let \(g(t)\in G\) and let \(\bm{\eta}(t)\in\mathfrak{g}\) satisfy \(\bm{\eta}(t_{0})=\bm{\eta}(t_{f})=0\). A varied curve that remains on \(G\) is
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.9cm and 1.2cm,
+        box/.style={
+            draw, rectangle, align=center, minimum width=4.6cm,
+            minimum height=1.2cm, inner sep=6pt
+        },
+        arrow/.style={-Latex}
+    ]
+        \node[box] (manifold){Configuration and velocity\\ $(g,\dot g)\in TG$};
+        \node[box, below=of manifold] (lagrangian) {Lagrangian\\ $L(g,\xi)$};
+        \node[box, below left=of lagrangian, xshift=1.3cm, yshift=-0.3cm] (action) {Action integral\\ $\mathcal S=\int_{t_0}^{t_f} L(g,\xi)\,dt$};
+        \node[box, below right=of lagrangian, xshift=-1.3cm, yshift=-0.3cm] (legendre) {Legendre transform.\\ $p=\mathbb{F}L(g,\xi)$};
+        \node[box, below=of action] (variation) {Variation\\ $\delta\mathcal S=\frac{d}{d\epsilon}\mathcal S^{\epsilon}=0$};
+        \node[box, below=of legendre] (hamilton) {Hamilton equations};
+        \node[box, below=of variation] (euler) {Euler--Lagrange equations};
+
+        \draw[arrow] (manifold) -- (lagrangian);
+        \draw[arrow] (lagrangian) -- (action);
+        \draw[arrow] (lagrangian) -- (legendre);
+        \draw[arrow] (action) -- (variation);
+        \draw[arrow] (legendre) -- (hamilton);
+        \draw[arrow] (variation) -- (euler);
+    \end{tikzpicture}
+    \caption{General method to derive the Euler-Lagrange equations of a mechanical system on a Lie group (Adapted from \cite{Lee2008}).}
+    \label{fig:continuous_mechanics}
+\end{figure}
+
+Adapted from \cite{Lee2008}, Fig. \ref{fig:continuous_mechanics} summarizes the general method to derive the Euler-Lagrange
+equations of a mechanical system on a Lie group. Thereby, the path for which the action of a Lagrangian is stationary
+over time has to be derived. The variation of the trajectory gives the Euler-Lagrange equations. 
+Alternatively, the Legendre transformation can be used to derive the Hamiltonian equations of motion.   
+
+
+\subsection{Euler--Lagrange Equations}
+\label{sec:continuous_euler_lagrange_equations}
+
+Following \cite{Lee2008}, the configuration manifold is a matrix Lie group $G$ with Lie algebra $\mathfrak g$. By left trivialization, the tangent bundle $TG$ is identified with $G\times\mathfrak g$ in \eqref{eq:left_trivialized_velocity}.
+A mechanical system on $G$ is described by the Lagrangian
+\begin{equation}
+    L:G\times\mathfrak g\rightarrow\mathbb R,
+    \qquad
+    L(g,\xi)=T(g,\xi)-U(g),
+    \label{eq:continuous_lagrangian_lie_group}
+\end{equation}
+where $T$ and $U$ denote the kinetic and potential energy. On the interval $[t_0,t_f]$, the action integral is given as
+\begin{equation}
+    \mathcal S
+    =
+    \int_{t_0}^{t_f}L(g,\xi)\,\mathrm dt.
+    \label{eq:continuous_action_integral}
+\end{equation}
+To derive the Euler--Lagrange equations, the variation of the action integral has to be computed. By definition, Hamilton's principle states that the action is stationary
+\begin{equation}
+    \delta\mathcal S
+    =
+    \delta\int_{t_0}^{t_f}L(g,\xi)\,\mathrm dt
+    =
+    \int_{t_0}^{t_f}\delta L(g,\xi)\,\mathrm dt
+    =
+    0,
+    \label{eq:hamilton_principle_lie_group}
+\end{equation}
+for all variations with fixed endpoints at $t_0$ and $t_f$ \cite{Lee2008,Marsden2001}.
+The variation of the Lagrangian is expressed as
+\begin{equation}
+    \delta L(g,\xi)
+    =
+    \left\langle D_gL(g,\xi),\delta g\right\rangle
+    +
+    \left\langle D_{\xi}L(g,\xi),\delta\xi\right\rangle,
+    \label{eq:variation_continuous_lagrangian}
+\end{equation}
+with the partial derivatives $D_gL(g,\xi)\in T_g^*G$ with respect to $g$ and $D_{\xi}L(g,\xi)\in\mathfrak g^*$ with respect to $\xi$ \cite{Marsden2001}.
+\cite{Lee2008} extends the local group variation introduced in \eqref{eq:infinitesimal_variation_matrix_lie_group} to a trajectory defined by
 \begin{equation}
     g^{\epsilon}(t)
     =
-    g(t)\exp\!\left(\epsilon\bm{\eta}(t)\right),
+    g(t)\exp(\epsilon\eta(t)),
     \qquad
-    \delta g
-    =
-    \left.\frac{\mathrm{d}}{\mathrm{d}\epsilon}\right|_{\epsilon=0}g^{\epsilon}
-    =
-    g\bm{\eta}.
-    \label{eq:lie_group_variation}
+    \text{for}
+    \qquad
+    \eta(t_0)=\eta(t_f)=0,
+    \label{eq:continuous_curve_variation_lie_group}
 \end{equation}
-For \(\bm{\xi}=g^{-1}\dot{g}\), the corresponding constrained velocity variation is
+for a differentiable curve $\eta:[t_0,t_f]\rightarrow\mathfrak g$ and defines the corresponding infinitesimal variations are
 \begin{equation}
-    \delta\bm{\xi}
+    \delta g=g\eta,
+    \qquad
+    \delta\xi
     =
-    \dot{\bm{\eta}}+[\bm{\xi},\bm{\eta}]
-    =
-    \dot{\bm{\eta}}+\operatorname{ad}_{\bm{\xi}}\bm{\eta}.
-    \label{eq:left_trivialized_velocity_variation}
+    \dot\eta+\operatorname{ad}_{\xi}\eta.
+    \label{eq:continuous_lie_group_variations}
 \end{equation}
-In discrete mechanics, \(f_{k}=g_{k}^{-1}g_{k+1}\) and \(\delta g_{k}=g_{k}\bm{\eta}_{k}\) imply
-\begin{equation}
-    \delta f_{k}
+The endpoint conditions in \eqref{eq:continuous_curve_variation_lie_group} keep the initial and terminal configurations fixed and remove the boundary contribution arising from integration by parts.
+
+Substituting \eqref{eq:variation_continuous_lagrangian} and \eqref{eq:continuous_lie_group_variations} into \eqref{eq:hamilton_principle_lie_group}, the variation of the action integral is given by
+\begin{align}
+    \delta\mathcal S
     =
-    -\bm{\eta}_{k}f_{k}+f_{k}\bm{\eta}_{k+1}
-    =
-    f_{k}\!\left(
-        \bm{\eta}_{k+1}
-        -
-        \operatorname{Ad}_{f_{k}^{-1}}\bm{\eta}_{k}
-    \right).
-    \label{eq:relative_group_variation}
-\end{equation}
-For rotations, \(\bm{R}^{\epsilon}=\bm{R}\exp(\epsilon\widehat{\bm{\eta}})\) gives \(\delta\bm{R}=\bm{R}\widehat{\bm{\eta}}\). Analogously, \(\bm{T}^{\epsilon}=\bm{T}\exp(\epsilon\bm{\Xi})\) on \(\mathrm{SE}(n)\) gives \(\delta\bm{T}=\bm{T}\bm{\Xi}\) \cite{Lee2008}.
+    \int_{t_0}^{t_f}
+    \Bigg\langle
+        T_e^*L_g\,D_gL(g,\xi)
+        +\operatorname{ad}_{\xi}^*D_{\xi}L(g,\xi)
+        -\frac{\mathrm d}{\mathrm dt}D_{\xi}L(g,\xi),
+        \eta
+    \Bigg\rangle
+    \mathrm dt
+    =0,
+    \label{eq:variation_action_after_integration_by_parts}
+\end{align}
+where $T_e^*L_g:T_g^*G\rightarrow\mathfrak g^*$ denotes the dual of the differential $T_eL_g$ \cite{Lee2008}. Since \eqref{eq:variation_action_after_integration_by_parts} holds for all $\eta \in \mathfrak{g}$ satisfying $\eta(t_0)=\eta(t_f)=0$, the continuous Euler--Lagrange equations on $G$ are defined as
+\begin{subequations}
+\label{eq:continuous_euler_lagrange_lie_group}
+\begin{align}
+    \frac{\mathrm d}{\mathrm dt}D_{\xi}L(g,\xi)
+    -\operatorname{ad}_{\xi}^*D_{\xi}L(g,\xi)
+    -T_e^*L_g\,D_gL(g,\xi)
+    &=0,
+    \label{eq:continuous_euler_lagrange_momentum_balance}\\
+    \dot g&=g\xi.
+    \label{eq:continuous_euler_lagrange_reconstruction}
+\end{align}
+\end{subequations}
+The equation \eqref{eq:continuous_euler_lagrange_momentum_balance} is the dynamical representation of the system with velocity $\xi$ being expressed in the body-fixed frame, while \eqref{eq:continuous_euler_lagrange_reconstruction} reconstructs the trajectory on the configuration manifold \cite{Lee2008}.
 
-\begin{equation}\label{eq:continuous_euler_lagrange}
-    Euler
-\end{equation}
-
-
-
-
+In order to derive the Euler-Lagrange equations in the following sections, a general method for calculating the partial derivatives of the Lagrangian with respect to $\xi$ and $g$ has to be defined.
 
 \begin{proposition}[Directional derivative representation of $D_\xi L(g,\xi)$]
 Let $G$ be a Lie group with Lie algebra $\mathfrak g$ \cite{Hall2000LieGroups}. Let $L:G\times\mathfrak g\to\mathbb R$
-be smooth. For all $\delta\xi\in\mathfrak g$ we regard the partial derivative $D_\xi L(g,\xi)\in\mathfrak g^*$ as the covector characterized by
+be smooth. For all $\delta\xi\in\mathfrak g$ the partial derivative $D_\xi L(g,\xi)\in\mathfrak g^*$ is characterized by
 \begin{equation}\label{eq:derivative_omega}
 \langle D_\xi L(g,\xi),\delta\xi\rangle
 =\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L(g,\xi+\varepsilon\,\delta\xi).
@@ -73,13 +179,16 @@ The corresponding directional derivative is
 =
 \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L(g,\xi+\varepsilon\,\delta\xi),
 \]
-using $\langle D_\xi L(g,\xi),\delta\xi\rangle = D_\xi L(g,\xi)(\delta\xi).$
+using $\left\langle D_\xi L(g,\xi),\delta\xi\right\rangle
+=
+D_\xi L(g,\xi)(\delta\xi)$.
 \end{proof}
 
 
 \begin{proposition}[Directional derivative representation of $D_g L(g,\xi)$]
 Let $G$ be a Lie group with Lie algebra $\mathfrak g$ \cite{Hall2000LieGroups}. Let $L:G\times\mathfrak g\to\mathbb R$
-be smooth and $\eta$ an arbitrary curve in $\mathfrak g$ . For all $\delta g\in T_gG$ we regard the partial derivative $D_g L(g,\xi)\in T_g^*G$ as the covector characterized by
+be smooth and $\eta$ an arbitrary curve in $\mathfrak g$ . For all $\delta g=T_eL_g(\eta)=g\eta\in T_gG$ \eqref{eq:continuous_lie_group_variations} 
+the partial derivative $D_g L(g,\xi)\in T_g^*G$ is characterized by
 \begin{equation} \label{eq:derivative_rotation}
 \langle D_g L(g,\xi),\delta g\rangle
 =
@@ -90,37 +199,158 @@ be smooth and $\eta$ an arbitrary curve in $\mathfrak g$ . For all $\delta g\in 
 \end{proposition}
 
 \begin{proof}
-Since $G$ is a smooth manifold, the differential of the map $L(g,\xi)$ is a linear map $T_gG\to\mathbb R$, as $\xi$ is fixed. Therefore the partial derivative $D_gL(g,\xi)$ is an element of the dual space $T_g^*G$. Moreover, for any $\eta \in \mathfrak g $, let $\gamma(\varepsilon)=g\exp{(\varepsilon \eta)}$ being the smooth curve on the manifold. Then
-$\gamma(0)=g$ and 
-\begin{align} \label{eq:delta_g_TL}
-\delta g \;=\; \dot\gamma(0)
-&= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\gamma(\varepsilon)
-= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0} g\exp(\varepsilon\eta) \notag\\
-&= g\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\exp(\varepsilon\eta)
-= g\,\eta \notag\\
-&= T_eL_g(\eta),
-\end{align}
-with $\delta g$ being the infinitesimal variation of g induced by $\eta$  for any $\varepsilon \in (-c,c)$ \cite{Lee2008}. The corresponding directional derivative is,
+Since $G$ is a smooth manifold, the differential of the map $L(g,\xi)$ is a linear map $T_gG\to\mathbb R$, as $\xi$ is fixed. Therefore the partial derivative $D_gL(g,\xi)$ is an element of the dual space $T_g^*G$. 
+Using the definition of the variation $g^{\epsilon}$ \eqref{eq:continuous_curve_variation_lie_group}, the corresponding directional derivative is,
 \[
 \langle D_g L(g,\xi),\delta g\rangle
-= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L(\gamma(\varepsilon),\xi)
+= \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L(g^{\epsilon},\xi)
 = \left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}L(g\exp{(\varepsilon \eta)},\xi),
 \]
-using $\langle D_{g} L(g,\xi),\delta g \rangle = D_g L(g,\xi)(\delta g)$ \cite{Lee2008}. Additionally, the directional derivative can be expressed by the pulled-back covector $\mu_g = T_e^* L_g D_g L(g,\xi)$ to  
+using $\left\langle D_g L(g,\xi),\delta g\right\rangle
+=
+D_g L(g,\xi)(\delta g)$ \cite{Lee2008}. Additionally, the directional derivative can be expressed by the covector and 
+the definition of the
+differential of the left translation $g \eta = T_eL_g(\eta)$ defined in \eqref{eq:preliminaries_differential_left_translation}, which leads to  
 \[
 \langle D_g L(g,\xi),\delta g\rangle
 = \langle D_g L(g,\xi),g \eta \rangle
 = \langle D_g L(g,\xi), T_eL_g(\eta) \rangle
-= \langle T_e ^* L_g D_g L(g,\xi), \eta \rangle,
+= \langle T_e ^* L_g D_g L(g,\xi), \eta \rangle.
 \]
-using eq. \eqref{eq:delta_g_TL}.
 \end{proof}
 
-\subsection{Hamiltonian Mechanics}
+\subsection{Legendre Transformation and Hamiltonian Mechanics}
+\label{sec:continuous_legendre_hamiltonian_mechanics}
 
-\subsection{Legendre Transformation}
+The Hamiltonian formulation represents the state on the cotangent bundle $T^*G$. Using left trivialization, this phase space is identified with $G\times\mathfrak g^*$, where a state is written as $(g,\mu)$ with the body-fixed momentum $\mu\in\mathfrak g^*$. In local canonical coordinates $(q^i,p_i)$, a Hamiltonian $H:T^*G\rightarrow\mathbb R$ satisfies
+\begin{equation}
+    \dot q^i=\frac{\partial H}{\partial p_i},
+    \qquad
+    \dot p_i=-\frac{\partial H}{\partial q^i}.
+    \label{eq:canonical_hamilton_equations}
+\end{equation}
+
+The Lagrangian and Hamiltonian descriptions are related by the Legendre transformation
+\begin{equation}
+    \mathbb{F}L:G\times\mathfrak g\rightarrow G\times\mathfrak g^*,
+    \qquad
+    \mathbb{F}L(g,\xi)=(g,\mu),
+    \label{eq:continuous_legendre_transformation}
+\end{equation}
+with
+\begin{equation}
+    \mu=D_{\xi}L(g,\xi).
+    \label{eq:continuous_generalized_momentum}
+\end{equation}
+If $\mathbb{F}L$ is a diffeomorphism, the Lagrangian is called hyperregular, and the velocity $\xi$ can be uniquely recovered from $(g,\mu)$. The corresponding Hamiltonian is defined by
+\begin{equation}
+    H(g,\mu)
+    =
+    \left\langle\mu,\xi\right\rangle-L(g,\xi),
+    \qquad
+    \xi=(\mathbb{F}L)^{-1}(g,\mu).
+    \label{eq:continuous_hamiltonian_legendre}
+\end{equation}
+Under this transformation, the Euler--Lagrange equations \eqref{eq:continuous_euler_lagrange_lie_group} are equivalently written as
+\begin{subequations}
+\label{eq:continuous_hamilton_equations_lie_group}
+\begin{align}
+    \dot\mu
+    -\operatorname{ad}_{\xi}^*\mu
+    -T_e^*L_g\,D_gL(g,\xi)
+    &=0,
+    \label{eq:continuous_hamilton_momentum_equation}\\
+    \dot g&=g\xi,
+    \label{eq:continuous_hamilton_reconstruction}
+\end{align}
+\end{subequations}
+where $\mu=D_{\xi}L(g,\xi)$. Hence, the Legendre transformation changes the velocity variable into momentum without changing the physical trajectory \cite{Lee2008}.
 
 \subsection{Properties of the Lagrangian Flow}
+\label{sec:properties_continuous_lagrangian_flow}
+
+The Euler--Lagrange equations define the Lagrangian flow
+\begin{equation}
+    F_L^t:G\times\mathfrak g\rightarrow G\times\mathfrak g,
+    \qquad
+    F_L^t(g_0,\xi_0)=(g(t),\xi(t)),
+    \label{eq:continuous_lagrangian_flow}
+\end{equation}
+which maps an initial state to the corresponding state at time $t$. Variationally derived mechanical flows possess geometric properties that are independent of the selected coordinates \cite{Lee2008,Marsden2001}.
+
+\paragraph{Symplecticity}
+The Lagrangian one-form $\Theta_L$ on $G\times\mathfrak g$ is defined by
+\begin{equation}
+    \Theta_L(g,\xi)\cdot(\delta g,\delta\xi)
+    =
+    \left\langle
+        D_{\xi}L(g,\xi),
+        g^{-1}\delta g
+    \right\rangle.
+    \label{eq:continuous_lagrangian_one_form}
+\end{equation}
+With the Lagrangian symplectic two-form
+\begin{equation}
+    \Omega_L=\mathrm d\Theta_L,
+    \label{eq:continuous_lagrangian_symplectic_form}
+\end{equation}
+the flow preserves symplecticity according to
+\begin{equation}
+    \left(F_L^t\right)^*\Omega_L=\Omega_L.
+    \label{eq:continuous_lagrangian_flow_symplecticity}
+\end{equation}
+This property provides the continuous geometric structure inherited by variational integrators after discretization.
+
+\paragraph{Noether's theorem}
+Let a Lie group $H$ with Lie algebra $\mathfrak h$ act smoothly on $G$ by
+\begin{equation}
+    \Phi:H\times G\rightarrow G,
+    \qquad
+    \Phi_h(g)=\Phi(h,g).
+    \label{eq:symmetry_group_action}
+\end{equation}
+For $\zeta\in\mathfrak h$, the infinitesimal generator of the lifted action on the left-trivialized tangent bundle is
+\begin{equation}
+    \zeta_{G\times\mathfrak g}(g,\xi)
+    =
+    \left.\frac{\mathrm d}{\mathrm d\epsilon}\right|_{\epsilon=0}
+    \left(
+        \varphi_L
+        \circ T_g\Phi_{\exp_H(\epsilon\zeta)}
+        \circ\varphi_L^{-1}
+    \right)(g,\xi).
+    \label{eq:lifted_infinitesimal_generator}
+\end{equation}
+The corresponding Lagrangian momentum map $J_L:G\times\mathfrak g\rightarrow\mathfrak h^*$ is defined by
+\begin{equation}
+    J_L(g,\xi)\cdot\zeta
+    =
+    \Theta_L(g,\xi)\cdot
+    \zeta_{G\times\mathfrak g}(g,\xi).
+    \label{eq:continuous_lagrangian_momentum_map}
+\end{equation}
+
+\begin{theorem}[Noether's theorem]
+\label{thm:continuous_noether}
+If the Lagrangian is infinitesimally invariant under the lifted action, such that
+\begin{equation}
+    \mathrm dL(g,\xi)\cdot
+    \zeta_{G\times\mathfrak g}(g,\xi)=0
+    \qquad
+    \text{for all }\zeta\in\mathfrak h,
+    \label{eq:infinitesimal_lagrangian_invariance}
+\end{equation}
+then the associated momentum map is preserved along the Lagrangian flow,
+\begin{equation}
+    J_L\!\left(F_L^t(g,\xi)\right)
+    =
+    J_L(g,\xi).
+    \label{eq:continuous_noether_momentum_preservation}
+\end{equation}
+\end{theorem}
+
+Noether's theorem connects a continuous symmetry of the Lagrangian with a conserved momentum quantity \cite{Lee2008,Marsden2001}. This result is applied in Section~\ref{sec:momentum_conservation_3d_pendulum} to identify and verify the momentum preserved by the unforced 3D-pendulum.
+
 
 \section{Unforced 3D-Pendulum}
 \label{section:continuous_3D_pendulum}
